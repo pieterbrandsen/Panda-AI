@@ -1,0 +1,10 @@
+# Folders
+node_modules
+docs
+dist
+coverage
+
+# File types
+**/*.json
+**/*.md
+**/*.yml

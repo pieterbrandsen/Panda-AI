@@ -1,0 +1,39 @@
+jobs:
+  build:
+    resource_class: medium
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install
+      - run: npm run build
+  # test:
+  #   executor: node/default
+  #   steps:
+  #     - checkout
+  #     - node/install-packages:
+  #         cache-path: ~/project/node_modules
+  #         override-ci-command: npm install
+  #     - run: npm run test
+  test-cov:
+    executor: node/default
+    resource_class: medium
+    steps:
+      - checkout
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install
+      - run: npm run test-cov-runInBand
+      - run: ./node_modules/.bin/codecov --token="$CODECOV_TOKEN" --disable=gcov
+      - coveralls/upload 
+      
+orbs:
+  node: circleci/node@3.0.0
+  coveralls: coveralls/coveralls@1.0.6
+version: 2.1
+workflows:
+  testing:
+    jobs:
+      - build
+      - test-cov
