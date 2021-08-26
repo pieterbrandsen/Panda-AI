@@ -3,6 +3,8 @@ node_modules
 dist
 docs/source/_build
 coverage
+tmp-test-server
 
 # Files
 screeps.json
+.env
