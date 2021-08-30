@@ -3,6 +3,7 @@ node_modules
 docs
 dist
 coverage
+server
 
 # File types
 **/*.json
