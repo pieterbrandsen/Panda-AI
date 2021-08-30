@@ -1,4 +1,4 @@
-import { ErrorMapper } from './errorMapper';
+import { ErrorMapper } from './utils/external/errorMapper';
 
 export const loop = ErrorMapper.wrapLoop((): void => {
   Object.values(Game.spawns).forEach(spawn => {

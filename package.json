@@ -17,7 +17,7 @@
     "test-verbose": "jest --verbose",
     "test-watch": "jest --watch --verbose",
     "test-cov": "jest --coverage",
-    "test-cov-runInBand": "jest --coverage  --runInBand",
+    "test-cov-runInBand": "jest --coverage  --runInBand --passWithNoTests",
     "test-only": "jest --watch --coverage",
     "watch-main": "rollup -cw --environment DEST:main",
     "watch-pserver": "rollup -cw --environment DEST:pserver",
