@@ -1,5 +1,5 @@
 interface VersionedMemory {
-  Heap:number;
+  Heap: number;
   Root: number;
   Room: number;
   Structure: number;

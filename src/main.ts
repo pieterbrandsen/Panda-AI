@@ -7,13 +7,23 @@ import { ErrorMapper } from "./utils/external/errorMapper";
 
 // eslint-disable-next-line
 export const loop = ErrorMapper.wrapLoop((): void => {
-  if (!MemoryValidator.IsMemoryValid(Memory.version, VersionedMemoryTypeName.Root)) {
+  if (
+    !MemoryValidator.IsMemoryValid(Memory.version, VersionedMemoryTypeName.Root)
+  ) {
     MemoryInitializer.SetupRootMemory();
-    if (!MemoryValidator.IsMemoryValid(Memory.version, VersionedMemoryTypeName.Root)) return;
+    if (
+      !MemoryValidator.IsMemoryValid(
+        Memory.version,
+        VersionedMemoryTypeName.Root
+      )
+    )
+      return;
   }
 
   if (!HeapValidator.IsHeapValid()) {
     HeapInitializer.SetupHeap();
     if (!HeapValidator.IsHeapValid()) return;
   }
+
+  console.log(Game.time);
 });

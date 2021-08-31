@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
+/* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars */
 
 interface MemoryVersion {
   version: number;

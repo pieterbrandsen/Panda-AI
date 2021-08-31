@@ -1,9 +1,6 @@
 import { mockGlobal } from "screeps-jest";
-import VersionedMemoryObjects, {
-  VersionedMemoryTypeName,
-} from "../utils/constants/memory";
+import VersionedMemoryObjects from "../utils/constants/memory";
 import HeapValidator from "./validation";
-import MemoryValidator from "./validation";
 
 beforeAll(() => {
   mockGlobal<Memory>("Memory", {});
@@ -19,9 +16,7 @@ describe("Memory validation", () => {
       VersionedMemoryObjects.Heap = version;
 
       // Assert
-      expect(
-        HeapValidator.IsHeapValid()
-      ).toBeTruthy();
+      expect(HeapValidator.IsHeapValid()).toBeTruthy();
     });
     it("Should_BeFalse_When_MemoryVersionsDon'tMatch", () => {
       // Act
@@ -29,19 +24,15 @@ describe("Memory validation", () => {
       VersionedMemoryObjects.Heap = 2;
 
       // Assert
-      expect(
-        HeapValidator.IsHeapValid()
-      ).toBeFalsy();
+      expect(HeapValidator.IsHeapValid()).toBeFalsy();
     });
     it("Should_BeFalse_When_HeapMemoryVersionsIsUndefined", () => {
       // Act
-      global.version = undefined as unknown as number;
+      global.version = (undefined as unknown) as number;
       VersionedMemoryObjects.Heap = 2;
 
       // Assert
-      expect(
-        HeapValidator.IsHeapValid()
-      ).toBeFalsy();
+      expect(HeapValidator.IsHeapValid()).toBeFalsy();
     });
   });
 });
