@@ -3,13 +3,16 @@
 interface MemoryVersion {
   version: number;
 }
+interface MemoryObject<T> extends MemoryVersion {
+  data: StringMap<T>;
+}
 
-interface RoomMemory extends MemoryVersion {}
-interface StructureMemory extends MemoryVersion {}
-interface CreepMemory extends MemoryVersion {}
+interface RoomMemory {}
+interface StructureMemory {}
+interface CreepMemory {}
 interface RootMemory extends MemoryVersion {
-  rooms: StringMap<RoomMemory>;
-  structures: StringMap<StructureMemory>;
-  creeps: StringMap<CreepMemory>;
+  roomsData: MemoryObject<RoomMemory>;
+  structuresData: MemoryObject<StructureMemory>;
+  creepsData: MemoryObject<CreepMemory>;
 }
 interface Memory extends RootMemory {}
