@@ -1,4 +1,4 @@
-export enum VersionedMemoryName {
+export enum VersionedMemoryTypeName {
   "Root" = "Root",
   "Room" = "Room",
   "Structure" = "Structure",
