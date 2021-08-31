@@ -1,12 +1,10 @@
-import { ErrorMapper } from './utils/external/errorMapper';
+import MemoryInitializer from "./memory/initialization";
+import MemoryValidator from "./memory/validation";
+import { VersionedMemoryTypeName } from "./utils/constants/memory";
+import { ErrorMapper } from "./utils/external/errorMapper";
 
+// eslint-disable-next-line
 export const loop = ErrorMapper.wrapLoop((): void => {
-  Object.values(Game.spawns).forEach(spawn => {
-    spawn.spawnCreep([MOVE],"creep");
-  });
-
-  Object.values(Game.creeps).forEach(creep => {
-    creep.say("Hi",true);
-    if (creep.room.controller !== undefined) creep.moveTo(creep.room.controller);
-  });
+  if (!MemoryValidator.IsMemoryValid(2, VersionedMemoryTypeName.Root))
+    MemoryInitializer.SetupRootMemory();
 });

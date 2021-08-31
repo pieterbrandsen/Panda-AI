@@ -1,22 +1,39 @@
-const net = require('net');
-const q = require('q');
-const _ = require('lodash');
-require('dotenv').config();
+const net = require("net");
+const q = require("q");
+const _ = require("lodash");
+require("dotenv").config();
 
-const {setPassword, sleep, initServer, startServer, spawnBots, helpers, logConsole, followLog} = require('./helper');
+const {
+  setPassword,
+  sleep,
+  initServer,
+  startServer,
+  spawnBots,
+  helpers,
+  logConsole,
+  followLog,
+} = require("./helper");
 
-const {cliPort, verbose, tickDuration, playerRoom, players, rooms, milestones} = require('./config');
+const {
+  cliPort,
+  verbose,
+  tickDuration,
+  playerRoom,
+  players,
+  rooms,
+  milestones,
+} = require("./config");
 
 const controllerRooms = {};
 const status = {};
 let lastTick = 0;
 
-process.once('SIGINT', (code) => {
-  console.log('SIGINT received...');
+process.once("SIGINT", (code) => {
+  console.log("SIGINT received...");
   console.log(`${lastTick} End of simulation`);
-  console.log('Status:');
+  console.log("Status:");
   console.log(JSON.stringify(status, null, 2));
-  console.log('Milestones:');
+  console.log("Milestones:");
   console.log(JSON.stringify(milestones, null, 2));
   process.exit();
 });
@@ -54,25 +71,30 @@ class Tester {
    */
   async checkForSuccess(line, defer) {
     if (botsSpawned && line.startsWith(`'OK'`)) {
-      let appendix = '';
+      let appendix = "";
       if (this.maxRuntime > 0) {
-        appendix = ` with runtime ${this.maxRuntime / 60} minutes`
+        appendix = ` with runtime ${this.maxRuntime / 60} minutes`;
       }
       console.log(`> Start the simulation${appendix}`);
       if (this.maxRuntime > 0) {
         await sleep(this.maxRuntime);
         console.log(`${lastTick} End of simulation`);
-        console.log('Status:');
+        console.log("Status:");
         console.log(JSON.stringify(status, null, 2));
-        console.log('Milestones:');
+        console.log("Milestones:");
         console.log(JSON.stringify(milestones, null, 2));
-        const fails = milestones.filter((milestone) => milestone.required && milestone.tick < lastTick && !milestone.success);
+        const fails = milestones.filter(
+          (milestone) =>
+            milestone.required &&
+            milestone.tick < lastTick &&
+            !milestone.success
+        );
         if (fails.length > 0) {
           for (const fail of fails) {
             console.log(`${lastTick} Milestone failed ${JSON.stringify(fail)}`);
           }
           console.log(`${lastTick} Status check: failed`);
-          defer.reject('Not all milestones are hit.');
+          defer.reject("Not all milestones are hit.");
           return;
         }
         console.log(`${lastTick} Status check: passed`);
@@ -95,18 +117,18 @@ class Tester {
    */
   async execute() {
     const defer = q.defer();
-    const socket = net.connect(cliPort, '127.0.0.1');
+    const socket = net.connect(cliPort, "127.0.0.1");
 
-    socket.on('data', async (raw) => {
-      const data = raw.toString('utf8');
-      const line = data.replace(/^< /, '').replace(/\n< /, '');
+    socket.on("data", async (raw) => {
+      const data = raw.toString("utf8");
+      const line = data.replace(/^< /, "").replace(/\n< /, "");
       if (await spawnBots(line, socket, rooms, players, tickDuration)) {
         botsSpawned = true;
         return;
       }
       if (setPassword(line, socket, rooms, this.roomsSeen, playerRoom)) {
         if (rooms.length === Object.keys(this.roomsSeen).length) {
-          console.log('> Listen to the log');
+          console.log("> Listen to the log");
           followLog(rooms, logConsole, statusUpdater);
           await sleep(5);
           console.log(`> system.resumeSimulation()`);
@@ -118,10 +140,10 @@ class Tester {
       await this.checkForSuccess(line, defer);
     });
 
-    socket.on('connect', () => {
-      console.log('connected');
+    socket.on("connect", () => {
+      console.log("connected");
     });
-    socket.on('error', (error) => {
+    socket.on("error", (error) => {
       defer.reject(error);
     });
 
@@ -142,17 +164,19 @@ class Tester {
       console.log(`${lastTick} ${e}`);
     }
     const end = Date.now();
-    console.log(`${lastTick} seconds elapsed ${Math.floor((end - start) / 1000)}`);
+    console.log(
+      `${lastTick} seconds elapsed ${Math.floor((end - start) / 1000)}`
+    );
     /* eslint no-process-exit: "off" */
     process.exit(exitCode);
   }
 }
 
-const printCurrentStatus = function(gameTime) {
+const printCurrentStatus = function (gameTime) {
   if (!verbose) {
     return;
   }
-  console.log('-------------------------------');
+  console.log("-------------------------------");
   const keys = Object.keys(status);
   keys.sort((a, b) => {
     if (status[a].level === status[b].level) {
@@ -161,7 +185,9 @@ const printCurrentStatus = function(gameTime) {
     return status[a].level - status[b].level;
   });
   for (const key of keys) {
-    console.log(`${gameTime} Status: room ${key} level: ${status[key].level} progress: ${status[key].progress} structures: ${status[key].structures} creeps: ${status[key].creeps}`);
+    console.log(
+      `${gameTime} Status: room ${key} level: ${status[key].level} progress: ${status[key].progress} structures: ${status[key].structures} creeps: ${status[key].creeps}`
+    );
   }
 };
 
@@ -178,8 +204,12 @@ const statusUpdater = (event) => {
     }
     for (const milestone of milestones) {
       const failedRooms = [];
-      if (typeof milestone.success === 'undefined' || milestone.success === null) {
-        let success = Object.keys(status).length === Object.keys(players).length;
+      if (
+        typeof milestone.success === "undefined" ||
+        milestone.success === null
+      ) {
+        let success =
+          Object.keys(status).length === Object.keys(players).length;
         for (const room of Object.keys(status)) {
           for (const key of Object.keys(milestone.check)) {
             if (status[room][key] < milestone.check[key]) {
@@ -193,11 +223,19 @@ const statusUpdater = (event) => {
           milestone.success = event.data.gameTime < milestone.tick;
           milestone.tickReached = event.data.gameTime;
           if (milestone.success) {
-            console.log('===============================');
-            console.log(`${event.data.gameTime} Milestone: Success ${JSON.stringify(milestone)}`);
+            console.log("===============================");
+            console.log(
+              `${event.data.gameTime} Milestone: Success ${JSON.stringify(
+                milestone
+              )}`
+            );
           } else {
-            console.log('===============================');
-            console.log(`${event.data.gameTime} Milestone: Reached too late ${JSON.stringify(milestone)}`);
+            console.log("===============================");
+            console.log(
+              `${
+                event.data.gameTime
+              } Milestone: Reached too late ${JSON.stringify(milestone)}`
+            );
           }
         }
       }
@@ -208,8 +246,12 @@ const statusUpdater = (event) => {
 
       if (milestone.tick === event.data.gameTime) {
         milestone.failedRooms = failedRooms;
-        console.log('===============================');
-        console.log(`${event.data.gameTime} Milestone: Failed ${JSON.stringify(milestone)} status: ${JSON.stringify(status)}`);
+        console.log("===============================");
+        console.log(
+          `${event.data.gameTime} Milestone: Failed ${JSON.stringify(
+            milestone
+          )} status: ${JSON.stringify(status)}`
+        );
         continue;
       }
     }
