@@ -1,6 +1,6 @@
 import { mockGlobal } from "screeps-jest";
 import VersionedMemoryObjects, {
-  VersionedMemoryName,
+  VersionedMemoryTypeName,
 } from "../utils/constants/memory";
 import MemoryValidator from "./validation";
 
@@ -17,7 +17,7 @@ describe("Memory validation", () => {
 
       // Assert
       expect(
-        MemoryValidator.IsMemoryValid(1, VersionedMemoryName.Root)
+        MemoryValidator.IsMemoryValid(1, VersionedMemoryTypeName.Root)
       ).toBeTruthy();
     });
     it("Should_BeFalse_When_MemoryVersionsDon'tMatch", () => {
@@ -26,7 +26,7 @@ describe("Memory validation", () => {
 
       // Assert
       expect(
-        MemoryValidator.IsMemoryValid(1, VersionedMemoryName.Root)
+        MemoryValidator.IsMemoryValid(1, VersionedMemoryTypeName.Root)
       ).toBeFalsy();
     });
   });
