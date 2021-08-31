@@ -1,10 +1,4 @@
-export enum VersionedMemoryTypeName {
-  "Root" = "Root",
-  "Room" = "Room",
-  "Structure" = "Structure",
-  "Creep" = "Creep",
-}
-
+/* eslint-disable no-shadow */
 /*
   Object with VersionedMemoryName
 */
@@ -14,3 +8,10 @@ export default {
   Creep: 0,
   Structure: 0,
 } as VersionedMemory;
+
+export enum VersionedMemoryTypeName {
+  "Root" = "Root",
+  "Room" = "Room",
+  "Structure" = "Structure",
+  "Creep" = "Creep",
+}
