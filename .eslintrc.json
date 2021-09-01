@@ -27,6 +27,7 @@
         "jest"
     ],
     "rules": {
+        "default-case": ["error", { "commentPattern": "^skip\\sdefault" }],
         "no-param-reassign": 0,
         "no-underscore-dangle": 0,
         "no-unused-vars": 0,
