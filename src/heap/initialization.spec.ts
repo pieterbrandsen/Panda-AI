@@ -16,7 +16,7 @@ describe("HeapInitialization", () => {
 
     // Assert
     expect(global.version).toBe(
-      VersionedMemoryObjects[VersionedMemoryTypeName.Root]
+      VersionedMemoryObjects[VersionedMemoryTypeName.Heap]
     );
   });
 });

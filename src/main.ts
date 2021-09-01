@@ -1,5 +1,6 @@
 import HeapInitializer from "./heap/initialization";
 import HeapValidator from "./heap/validation";
+import GarbageCollection from "./memory/garbageCollection";
 import MemoryInitializer from "./memory/initialization";
 import MemoryValidator from "./memory/validation";
 import { VersionedMemoryTypeName } from "./utils/constants/memory";
@@ -25,5 +26,12 @@ export const loop = ErrorMapper.wrapLoop((): void => {
     if (!HeapValidator.IsHeapValid()) return;
   }
 
-  console.log(Game.time);
+  GarbageCollection.Check();
+  if (global.heapLifeTime === undefined) {
+    Memory.heapLifeTimes.push(Memory.lastHeapLifeTime);
+    global.heapLifeTime = 0;
+  }
+  global.heapLifeTime += 1;
+  Memory.lastHeapLifeTime = global.heapLifeTime;
+  console.log(Memory.lastHeapLifeTime);
 });

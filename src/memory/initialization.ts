@@ -19,6 +19,7 @@ export default class MemoryInitializer {
       data: {},
       version: -1,
     };
+    Memory.garbageData = [];
     Memory.version = constantMemoryVersions[VersionedMemoryTypeName.Root];
   }
 
