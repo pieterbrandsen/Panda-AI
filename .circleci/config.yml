@@ -28,7 +28,7 @@ jobs:
           cache-path: ~/project/node_modules
           override-ci-command: npm install
       - run: npm run test-cov-runInBand
-      - run: ./node_modules/.bin/codecov --token="$CODECOV_TOKEN" --disable=gcov
+      - run: codecov --token="$CODECOV_TOKEN" --disable=gcov
       - coveralls/upload 
       
 orbs:

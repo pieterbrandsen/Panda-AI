@@ -21,11 +21,12 @@
     "test-only": "jest --watch --coverage",
     "watch-main": "rollup -cw --environment DEST:main",
     "watch-pserver": "rollup -cw --environment DEST:pserver",
-    "watch-sim": "rollup -cw --environment DEST:sim"
+    "watch-sim": "rollup -cw --environment DEST:sim",
+    "test": "jest --ci --coverage && codecov"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pieterbrandsen/Pansiep.git"
+    "url": "git+https://github.com/pieterbrandsen/Panda-AI.git"
   },
   "author": "Pieter Brandsen",
   "license": "ISC",
@@ -73,5 +74,10 @@
     "lodash": "^4.17.21",
     "screeps-jest": "^2.0.0",
     "source-map": "~0.6.1"
+  },
+
+  "jest": {
+    "coverageDirectory": "./coverage/",
+    "collectCoverage": true
   }
 }
