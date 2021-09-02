@@ -17,12 +17,12 @@
     "test-verbose": "jest --verbose",
     "test-watch": "jest --watch --verbose",
     "test-cov": "jest --coverage",
-    "test-cov-runInBand": "jest --coverage  --runInBand",
+    "test-cov-runInBand": "jest --ci --coverage --runInBand",
     "test-only": "jest --watch --coverage",
     "watch-main": "rollup -cw --environment DEST:main",
     "watch-pserver": "rollup -cw --environment DEST:pserver",
     "watch-sim": "rollup -cw --environment DEST:sim",
-    "test": "jest --ci --coverage && codecov"
+    "upload-coverage": "npm run test-cov-runInBand && codecov"
   },
   "repository": {
     "type": "git",
