@@ -5,7 +5,6 @@ interface MemoryVersion {
   version: number;
 }
 interface MemoryObject<T> extends MemoryVersion {
-  cache: string[];
   data: StringMap<T>;
 }
 interface GarbageCollectionObject {
@@ -20,10 +19,14 @@ interface RoomCacheObject {
 
 
 interface RoomMemory {
-  cache: StringMap<RoomCacheObject[]>;
+  scout?: {name: string};  
 }
-interface StructureMemory {}
-interface CreepMemory {}
+interface StructureMemory {
+  lastExecutedAtTick: number;
+}
+interface CreepMemory {
+  lastExecutedAtTick: number;
+}
 interface RootMemory extends MemoryVersion {
   roomsData: MemoryObject<RoomMemory>;
   structuresData: MemoryObject<StructureMemory>;

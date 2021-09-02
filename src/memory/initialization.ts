@@ -51,7 +51,9 @@ export default class MemoryInitializer {
    * @param id - The id of the structure
    */
   private static InitializeStructureMemory(id: Id<Structure>): void {
-    Memory.structuresData.data[id] = {};
+    Memory.structuresData.data[id] = {
+      lastExecutedAtTick: 0
+    };
   }
 
   /**
@@ -67,7 +69,9 @@ export default class MemoryInitializer {
    * @param name - The name of the creep
    */
   private static InitializeCreepMemory(name: string): void {
-    Memory.creepsData.data[name] = {};
+    Memory.creepsData.data[name] = {
+      lastExecutedAtTick: 0
+    };
   }
 
   /**
