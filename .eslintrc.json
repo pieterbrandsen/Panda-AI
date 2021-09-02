@@ -27,6 +27,8 @@
         "jest"
     ],
     "rules": {
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": ["error"],
         "default-case": ["error", { "commentPattern": "^skip\\sdefault" }],
         "no-param-reassign": 0,
         "no-underscore-dangle": 0,

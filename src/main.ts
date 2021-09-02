@@ -3,6 +3,7 @@ import HeapValidator from "./heap/validation";
 import GarbageCollection from "./memory/garbageCollection";
 import MemoryInitializer from "./memory/initialization";
 import MemoryValidator from "./memory/validation";
+import ExecuteRooms from "./rooms/executeRooms";
 import { VersionedMemoryTypeName } from "./utils/constants/memory";
 import { ErrorMapper } from "./utils/external/errorMapper";
 
@@ -26,12 +27,6 @@ export const loop = ErrorMapper.wrapLoop((): void => {
     if (!HeapValidator.IsHeapValid()) return;
   }
 
+  ExecuteRooms.ExecuteAll();
   GarbageCollection.Check();
-  if (global.heapLifeTime === undefined) {
-    Memory.heapLifeTimes.push(Memory.lastHeapLifeTime);
-    global.heapLifeTime = 0;
-  }
-  global.heapLifeTime += 1;
-  Memory.lastHeapLifeTime = global.heapLifeTime;
-  console.log(Memory.lastHeapLifeTime);
 });
