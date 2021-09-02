@@ -52,7 +52,7 @@ export default class MemoryInitializer {
    */
   private static InitializeStructureMemory(id: Id<Structure>): void {
     Memory.structuresData.data[id] = {
-      lastExecutedAtTick: 0
+      lastExecutedAtTick: 0,
     };
   }
 
@@ -70,7 +70,7 @@ export default class MemoryInitializer {
    */
   private static InitializeCreepMemory(name: string): void {
     Memory.creepsData.data[name] = {
-      lastExecutedAtTick: 0
+      lastExecutedAtTick: 0,
     };
   }
 

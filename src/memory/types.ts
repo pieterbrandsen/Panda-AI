@@ -17,9 +17,8 @@ interface RoomCacheObject {
   id: string;
 }
 
-
 interface RoomMemory {
-  scout?: {name: string};  
+  scout?: { name: string };
 }
 interface StructureMemory {
   lastExecutedAtTick: number;

@@ -1,5 +1,3 @@
-import _ from "lodash";
-
 export default class GarbageCollection {
   /**
    * Insert data into garbage collection
