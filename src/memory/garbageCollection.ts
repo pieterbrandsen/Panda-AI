@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export default class GarbageCollection {
   /**
    * Insert data into garbage collection
@@ -38,8 +40,8 @@ export default class GarbageCollection {
   public static Check(): void {
     for (let i = 0; i < Memory.garbageData.length; i += 1) {
       const object = Memory.garbageData[i];
-      let liveObject: MemoryTypesInGarbageCollection;
-      let memoryObj: StringMap<unknown> | undefined;
+      let liveObject: ObjectTypesInGarbageCollection;
+      let memoryObj: StringMap<MemoryTypesInGarbageCollection> | undefined;
 
       switch (object.liveObjectType) {
         case "room":
@@ -54,8 +56,10 @@ export default class GarbageCollection {
           liveObject = Game.creeps[object.liveObjectKey];
           memoryObj = Memory.creepsData.data;
           break;
-
-        // skip default case
+        default:
+          liveObject = Game.getObjectById(object.liveObjectKey);
+          memoryObj = Memory.creepsData.data;
+          break;
       }
 
       if (liveObject !== undefined && memoryObj !== undefined) {
@@ -65,7 +69,7 @@ export default class GarbageCollection {
         Memory.garbageData.splice(i, 1);
         i -= 1;
       } else if (object.deletedAtTick < Game.time) {
-        Memory.garbageData.splice((i), 1);
+        Memory.garbageData.splice(i, 1);
         i -= 1;
       }
     }
