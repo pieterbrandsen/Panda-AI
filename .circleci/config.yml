@@ -28,9 +28,6 @@ jobs:
           cache-path: ~/project/node_modules
           override-ci-command: npm install
       - run: npm run upload-coverage
-      # - run: codecov --token="$CODECOV_TOKEN" --disable=gcov
-      - coveralls/upload 
-      
 orbs:
   node: circleci/node@4.7.0
   coveralls: coveralls/coveralls@1.0.6
