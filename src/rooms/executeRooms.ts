@@ -1,8 +1,11 @@
 import { forEach } from "lodash";
 import DataMemoryInitializer from "../memory/dataInitialization";
-import MemoryInitializer from "../memory/initialization";
+import GarbageCollection from "../memory/garbageCollection";
 import MemoryValidator from "../memory/validation";
 import { VersionedMemoryTypeName } from "../utils/constants/memory";
+import MineralManager from "./managers/mineralManager/manager";
+import CacheManager from "../cache/updateCache";
+import IsMyRoom from "./helpers/isMyRoom";
 
 export default class ExecuteRooms {
   public static ExecuteAll(): void {
@@ -22,23 +25,23 @@ export default class ExecuteRooms {
         return;
     }
 
-    // TODO: Get all rooms out of cache
-    forEach(Game.rooms, (room: Room) => {
-      ExecuteRooms.Execute(room.name);
+    CacheManager.UpdateRoom();
+
+    forEach(Object.keys(Memory.roomsData.data), (name: string) => {
+      ExecuteRooms.Execute(name);
     });
   }
 
   private static Execute(name: string): void {
     const room = Game.rooms[name];
-    const memory = Memory.roomsData.data[name];
+    const memory = Memory.roomsData.data[name] as RoomMemory;
 
     if (memory && memory.scout && Game.creeps[memory.scout.name]) return;
-    if (room === null) {
+    if (room === undefined) {
       // TODO: Send 1 scout
-      // TODO: Garbage collection implement (cache)
+      GarbageCollection.CollectRoom(memory, name);
       return;
     }
-    if (memory === undefined) MemoryInitializer.SetupRoomMemory(name);
     // TODO: Has memory been updated?
 
     // Update cache
@@ -49,6 +52,10 @@ export default class ExecuteRooms {
 
     // Source manager
     // Mineral manager
+
+    if (IsMyRoom(room.controller)) {
+      MineralManager.Run(room);
+    }
     // Controller manager
 
     // Resource controller manager
