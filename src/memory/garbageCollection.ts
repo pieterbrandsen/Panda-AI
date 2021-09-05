@@ -1,4 +1,21 @@
+import { forOwn } from "lodash";
+
 export default class GarbageCollection {
+  /**
+   * Delete data in used memory and place it in garbage collection
+   * @param object - The object to be added to garbage collection
+   * @param key - key of object in memory
+   */
+  public static CollectRoom(object: RoomMemory, key: string): void {
+    Memory.garbageData[key] = {
+      data: object,
+      deletedAtTick: Game.time + 2000,
+      liveObjectType: "room",
+    };
+
+    delete Memory.roomsData.data[key];
+  }
+
   /**
    * Insert data into garbage collection
    * @param object - The object to be added to garbage collection
@@ -6,26 +23,37 @@ export default class GarbageCollection {
    * @param type - Type of memory
    */
   public static Collect(
-    object: unknown,
+    object: StructureMemory | CreepMemory,
     key: string,
     type: LifeObjectType
   ): void {
-    Memory.garbageData.push({
+    Memory.garbageData[key] = {
       data: object,
       deletedAtTick: Game.time + 1000,
-      liveObjectKey: key,
       liveObjectType: type,
-    });
+    };
 
+    const roomMemory = Memory.roomsData.data[object.manager.roomName];
     switch (type) {
-      case "room":
-        delete Memory.roomsData[key];
-        break;
       case "structure":
-        delete Memory.structuresData[key];
+        delete Memory.structuresData.data[key];
         break;
       case "creep":
-        delete Memory.creepsData[key];
+        delete Memory.creepsData.data[key];
+        break;
+
+      // skip default case
+    }
+    if (!roomMemory) return;
+
+    const objectManagerMemory: BaseManagerMemory =
+      roomMemory.managersMemory[object.manager.name];
+    switch (type) {
+      case "structure":
+        delete objectManagerMemory[key];
+        break;
+      case "creep":
+        delete objectManagerMemory[key];
         break;
 
       // skip default case
@@ -36,40 +64,33 @@ export default class GarbageCollection {
    * Check all data in garbage collection, remove all expired data and revert non null data
    */
   public static Check(): void {
-    for (let i = 0; i < Memory.garbageData.length; i += 1) {
-      const object = Memory.garbageData[i];
+    forOwn(Memory.garbageData, (value, key) => {
       let liveObject: ObjectTypesInGarbageCollection;
       let memoryObj: StringMap<MemoryTypesInGarbageCollection> | undefined;
 
-      switch (object.liveObjectType) {
+      switch (value.liveObjectType) {
         case "room":
-          liveObject = Game.rooms[object.liveObjectKey];
+          liveObject = Game.rooms[key];
           memoryObj = Memory.roomsData.data;
           break;
         case "structure":
-          liveObject = Game.structures[object.liveObjectKey];
+          liveObject = Game.structures[key];
           memoryObj = Memory.structuresData.data;
           break;
         case "creep":
-          liveObject = Game.creeps[object.liveObjectKey];
+          liveObject = Game.creeps[key];
           memoryObj = Memory.creepsData.data;
           break;
-        default:
-          liveObject = Game.getObjectById(object.liveObjectKey);
-          memoryObj = Memory.creepsData.data;
-          break;
+
+        // skip default case
       }
 
       if (liveObject !== undefined && memoryObj !== undefined) {
-        memoryObj[
-          object.liveObjectKey
-        ] = object.data as MemoryTypesInGarbageCollection;
-        Memory.garbageData.splice(i, 1);
-        i -= 1;
-      } else if (object.deletedAtTick < Game.time) {
-        Memory.garbageData.splice(i, 1);
-        i -= 1;
+        memoryObj[key] = value.data as MemoryTypesInGarbageCollection;
+        delete Memory.garbageData[key];
+      } else if (value.deletedAtTick < Game.time) {
+        delete Memory.garbageData[key];
       }
-    }
+    });
   }
 }

@@ -1,36 +1,15 @@
-export enum CacheType {
-  "mineral" = "mineral",
-}
+import UpdateRoomCache from "./types/rooms";
+import UpdateMineralManagerCache from "./types/mineralManager";
 
 export default class CacheManager {
-  public static UpdateRoom<T extends Mineral | Structure | Source>(
-    room: Room,
-    cacheType: CacheType
-  ): void {
-    // // Find all objects
-    // let objects: T[] = [];
-    // switch (cacheType) {
-    //   case "mineral":
-    //   objects = room.find(FIND_MINERALS) as T[];
-    //   break;
-    // }
-    // const cache = Memory.roomsData.data[room.name].cache[cacheType];
-    // const ids = (objects.map(o => o.id) as string[]).concat(cache.map(c => c.id));
-    // _.forEach(ids, id => {
-    //   const object = objects.find(o => o.id === id);
-    //   const cacheObject = cache.find(o => o.id === id);
-    //   if (object) {
-    //     if (cacheObject && object.room && object.room.name !== room.name) {
-    //       //GarbageCollection.Collect();
-    //       }
-    //       else if (!cacheObject && object.room && object.room.name === room.name) {
-    //         cache.push({id:id});
-    //       }
-    //   } else {
-    //     if (cacheObject) {
-    //     // GarbageCollection.Collect();
-    //     }
-    //   }
-    // });
-  }
+  /**
+   * Update the room cache
+   */
+  public static UpdateRoom = UpdateRoomCache;
+
+  /**
+   * Update the mineral manager cache
+   * @param room - The room to update
+   */
+  public static UpdateMineralManager = UpdateMineralManagerCache;
 }

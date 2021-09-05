@@ -1,5 +1,5 @@
 import { mockGlobal } from "screeps-jest";
-import VersionedMemoryObjects from "../utils/constants/memory";
+import { VersionedMemoryObjects } from "../utils/constants/memory";
 import HeapValidator from "./validation";
 
 beforeAll(() => {

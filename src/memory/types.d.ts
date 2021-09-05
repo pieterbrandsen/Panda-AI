@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars */
-type LifeObjectType = "creep" | "structure" | "room" | "mineral";
+type LifeObjectType = "creep" | "structure" | "room";
 
 interface MemoryVersion {
   version: number;
@@ -10,29 +10,26 @@ interface MemoryObject<T> extends MemoryVersion {
 interface GarbageCollectionObject {
   data: unknown;
   deletedAtTick: number;
-  liveObjectKey: string;
   liveObjectType: LifeObjectType;
-}
-interface RoomCacheObject {
-  id: string;
 }
 
 interface RoomMemory {
   scout?: { name: string };
+  managersMemory: ManagersMemory;
 }
 interface StructureMemory {
+  manager: ManagerObject;
   lastExecutedAtTick: number;
 }
 interface CreepMemory {
+  manager: ManagerObject;
   lastExecutedAtTick: number;
 }
 interface RootMemory extends MemoryVersion {
   roomsData: MemoryObject<RoomMemory>;
   structuresData: MemoryObject<StructureMemory>;
   creepsData: MemoryObject<CreepMemory>;
-  garbageData: GarbageCollectionObject[];
-  heapLifeTimes: number[];
-  lastHeapLifeTime: number;
+  garbageData: StringMap<GarbageCollectionObject>;
 }
 interface Memory extends RootMemory {}
 type ObjectTypesInGarbageCollection =
@@ -40,7 +37,7 @@ type ObjectTypesInGarbageCollection =
   | Structure
   | Creep
   | Structure
-  | null;
+  | undefined;
 
 type MemoryTypesInGarbageCollection =
   | RoomMemory
