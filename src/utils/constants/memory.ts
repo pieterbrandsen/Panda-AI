@@ -1,13 +1,14 @@
 /*
   Object with VersionedMemoryName
 */
-export default {
+const rootVersion = -1;
+export const VersionedMemoryObjects: VersionedMemory = {
   Heap: 0,
-  Root: 0,
+  Root: rootVersion,
   Room: 0,
   Creep: 0,
   Structure: 0,
-} as VersionedMemory;
+};
 
 export enum VersionedMemoryTypeName {
   "Heap" = "Heap",
@@ -15,4 +16,49 @@ export enum VersionedMemoryTypeName {
   "Room" = "Room",
   "Structure" = "Structure",
   "Creep" = "Creep",
+}
+
+export const DefaultRootMemory: RootMemory = {
+  creepsData: {
+    data: {},
+    version: -1,
+  },
+  structuresData: {
+    data: {},
+    version: -1,
+  },
+  roomsData: {
+    data: {},
+    version: -1,
+  },
+  garbageData: {},
+  version: rootVersion,
+};
+
+export function DefaultRoomMemory(name: string): RoomMemory {
+  return {
+    managersMemory: {
+      mineral: {
+        creeps: {},
+        structures: {},
+        mineral: {
+          id: "",
+          amount: 0,
+          type: "H",
+          pos: { x: 0, y: 0, roomName: name },
+        },
+        constructionSites: {},
+      },
+    },
+  };
+}
+
+export function DefaultStructureMemory(
+  manager: ManagerObject
+): StructureMemory {
+  return { manager, lastExecutedAtTick: 0 };
+}
+
+export function DefaultCreepMemory(manager: ManagerObject): StructureMemory {
+  return { manager, lastExecutedAtTick: 0 };
 }

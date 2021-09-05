@@ -1,4 +1,5 @@
-import ConstantMemoryVersions, {
+import {
+  VersionedMemoryObjects,
   VersionedMemoryTypeName,
 } from "../utils/constants/memory";
 
@@ -7,7 +8,7 @@ export default class HeapInitializer {
    * Sets all heap vars to default values.
    */
   private static InitializeHeap(): void {
-    global.version = ConstantMemoryVersions[VersionedMemoryTypeName.Heap];
+    global.version = VersionedMemoryObjects[VersionedMemoryTypeName.Heap];
   }
 
   /**

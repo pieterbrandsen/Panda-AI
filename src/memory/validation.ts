@@ -1,4 +1,5 @@
-import constantMemoryVersions, {
+import {
+  VersionedMemoryObjects,
   VersionedMemoryTypeName,
 } from "../utils/constants/memory";
 
@@ -13,7 +14,7 @@ export default class MemoryValidator {
     version: number,
     memoryTypeName: VersionedMemoryTypeName
   ): boolean {
-    const constantMemoryVersion = constantMemoryVersions[memoryTypeName];
+    const constantMemoryVersion = VersionedMemoryObjects[memoryTypeName];
     return version === constantMemoryVersion;
   }
 }

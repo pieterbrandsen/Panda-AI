@@ -1,5 +1,6 @@
 import { mockGlobal } from "screeps-jest";
-import VersionedMemoryObjects, {
+import {
+  VersionedMemoryObjects,
   VersionedMemoryTypeName,
 } from "../utils/constants/memory";
 import MemoryValidator from "./validation";
