@@ -98,7 +98,7 @@ describe("MineralManager", () => {
     Memory.creepsData.data[creep.name] = DefaultCreepMemory({
       name: "mineral",
       roomName: creep.room.name,
-    });
+    },[]);
     Game.getObjectById = jest.fn().mockReturnValue(creep);
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
     cache.creeps[creep.name] = { type: "K" };
@@ -126,7 +126,7 @@ describe("MineralManager", () => {
     Memory.creepsData.data[creep.name] = DefaultCreepMemory({
       name: "mineral",
       roomName: creep.room.name,
-    });
+    },[]);
     Game.getObjectById = jest.fn().mockReturnValue(creep);
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
     cache.creeps[creep.name] = { type: "K" };
