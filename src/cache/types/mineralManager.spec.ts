@@ -166,7 +166,7 @@ describe("MineralManager", () => {
     UpdateMineralManagerCache(room);
 
     // Assert
-    expect(Object.keys(cache.structures)).toHaveLength(0);
+    expect(Object.keys(cache.structures)).toHaveLength(2);
     expect(cache.mineral.extractorId).toBeUndefined();
   });
   it("Should_DoNothing_When_NoStructuresAreNull", () => {

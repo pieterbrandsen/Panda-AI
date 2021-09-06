@@ -44,8 +44,6 @@ export default function UpdateMineralManagerCache(room: Room): void {
       ] = cacheCrp;
       delete cache.creeps[key];
     }
-
-    // TODO: Garbage collection in its file
   });
   forOwn(cache.structures, (cacheStr, key) => {
     const structure = Game.getObjectById<Structure>(key);
@@ -55,8 +53,6 @@ export default function UpdateMineralManagerCache(room: Room): void {
       if (cache.mineral.extractorId === key) {
         delete cache.mineral.extractorId;
       }
-      delete cache.structures[key];
-      // TODO: Garbage collection in its file
     }
   });
   forOwn(cache.constructionSites, (cachedSite, key) => {
