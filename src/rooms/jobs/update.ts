@@ -1,7 +1,11 @@
 export default class JobUpdater {
+  /**
+   * Update all jobs out of the array
+   * @param jobs - Jobs to be checked for updating
+   */
   public static Run(jobs:Job[]) {
     const deleteJobIds:number[]= [];
-    for (let i = 0; i < jobs.length; i++) {
+    for (let i = 0; i < jobs.length; i+=1) {
       const job = jobs[i];
       if (job.nextUpdateTick >= Game.time) {
       switch (job.type) {
@@ -13,8 +17,6 @@ export default class JobUpdater {
           // skip default case
       }
     }
-
-      
     }
 
     for (let i = deleteJobIds.length; i > 0; i--) {
