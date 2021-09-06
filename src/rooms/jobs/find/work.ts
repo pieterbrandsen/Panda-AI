@@ -1,7 +1,7 @@
 import { minBy } from "lodash";
 import WorkJobTypes from "../../../utils/constants/jobTypes";
 
-export default class WorkJobHelper {
+export default class WorkJobsHelper {
   /**
    * Get all work jobs
    * @param jobs -All jobs to check
@@ -17,7 +17,7 @@ export default class WorkJobHelper {
    * @returns
    */
   public static FindNewJob(jobs: Job[]): Job | undefined {
-    const workJobs = WorkJobHelper.GetAllJobs(jobs).filter((j) => j.available);
+    const workJobs = WorkJobsHelper.GetAllJobs(jobs).filter((j) => j.available);
     return minBy(workJobs, (j) => j.latestStructureOrCreepAssignedAtTick);
   }
 }

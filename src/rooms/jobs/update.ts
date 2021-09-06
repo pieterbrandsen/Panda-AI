@@ -7,7 +7,7 @@ export default class JobUpdater {
     const deleteJobIds: number[] = [];
     for (let i = 0; i < jobs.length; i += 1) {
       const job = jobs[i];
-      if (job.nextUpdateTick >= Game.time) {
+      if (job.nextUpdateTick <= Game.time) {
         switch (job.type) {
           case "harvestMineral":
             if (job.amountLeftToMine === 0) deleteJobIds.push(i);
@@ -19,7 +19,7 @@ export default class JobUpdater {
       }
     }
 
-    for (let i = deleteJobIds.length; i > 0; i -= 1) {
+    for (let i = deleteJobIds.length - 1; i >= 0; i -= 1) {
       jobs.splice(deleteJobIds[i], 1);
     }
   }
