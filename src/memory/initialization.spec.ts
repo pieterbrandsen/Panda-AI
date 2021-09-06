@@ -24,7 +24,7 @@ describe("MemoryInitialization", () => {
       "str" as Id<Structure>,
       managerObject
     );
-    MemoryInitializer.SetupCreepMemory("creep", managerObject);
+    MemoryInitializer.SetupCreepMemory("creep", managerObject, []);
 
     // Assert
     expect(Memory.version).toBe(
@@ -52,7 +52,7 @@ describe("MemoryInitialization", () => {
 
     // Act
     MemoryInitializer.SetupStructureMemory(structure.id, manager);
-    MemoryInitializer.SetupCreepMemory(creep.name, manager);
+    MemoryInitializer.SetupCreepMemory(creep.name, manager, []);
 
     // Assert
     expect(Object.keys(Memory.garbageData)).toHaveLength(0);

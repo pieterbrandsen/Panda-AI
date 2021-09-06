@@ -1,6 +1,5 @@
 import { mockGlobal, mockInstanceOf } from "screeps-jest";
 import RoomPositionHelper from "./roomPosition";
-import FreezeRoomPosition from "./roomPosition";
 
 beforeAll(() => {
   mockGlobal<Memory>("Memory", {});

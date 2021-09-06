@@ -1,5 +1,4 @@
 import RoomPositionHelper from "./roomPosition";
-import FreezeRoomPosition from "./roomPosition";
 
 export default function CreateConstructionSite(
   room: Room,

@@ -20,10 +20,15 @@ interface RoomMemory {
 interface StructureMemory {
   manager: ManagerObject;
   lastExecutedAtTick: number;
+  job?: AssignedJobObject;
+  checkForNewJobAtTick?: number;
 }
 interface CreepMemory {
   manager: ManagerObject;
   lastExecutedAtTick: number;
+  job?: AssignedJobObject;
+  checkForNewJobAtTick?: number;
+  possibleJobTypes: string[];
 }
 interface RootMemory extends MemoryVersion {
   roomsData: MemoryObject<RoomMemory>;

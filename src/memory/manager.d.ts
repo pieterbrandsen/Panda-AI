@@ -13,6 +13,7 @@ interface BaseManagerCreepCache {
   type: MineralConstant;
 }
 interface BaseManagerMemory {
+  jobs: Job[];
   structures: StringMap<BaseManagerStructureCache>;
   creeps: StringMap<BaseManagerCreepCache>;
   constructionSites: StringMap<BaseManagerConstructionSiteCache>;

@@ -39,6 +39,7 @@ export function DefaultRoomMemory(name: string): RoomMemory {
   return {
     managersMemory: {
       mineral: {
+        jobs: [],
         creeps: {},
         structures: {},
         mineral: {
@@ -59,6 +60,9 @@ export function DefaultStructureMemory(
   return { manager, lastExecutedAtTick: 0 };
 }
 
-export function DefaultCreepMemory(manager: ManagerObject): StructureMemory {
-  return { manager, lastExecutedAtTick: 0 };
+export function DefaultCreepMemory(
+  manager: ManagerObject,
+  possibleJobTypes: JobType[]
+): CreepMemory {
+  return { manager, lastExecutedAtTick: 0, possibleJobTypes };
 }
