@@ -1,8 +1,6 @@
 import { mockGlobal, mockInstanceOf } from "screeps-jest";
-import FreezeRoomPosition, {
-  PositionToStringConverter,
-  UnfreezeRoomPosition,
-} from "./roomPosition";
+import RoomPositionHelper from "./roomPosition";
+import FreezeRoomPosition from "./roomPosition";
 
 beforeAll(() => {
   mockGlobal<Memory>("Memory", {});
@@ -13,7 +11,7 @@ const position = mockInstanceOf<RoomPosition>({ x: 1, y: 1, roomName: "room" });
 describe("RoomPosition", () => {
   it("Should_FreezeRoomPosition_When_Called", () => {
     // Act
-    const frozenPos = FreezeRoomPosition(position);
+    const frozenPos = RoomPositionHelper.FreezeRoomPosition(position);
 
     // Assert
     expect(frozenPos.x).toBe(position.x);
@@ -25,7 +23,7 @@ describe("RoomPosition", () => {
     const frozenPos = position;
 
     // Act
-    const roomPosition = UnfreezeRoomPosition(frozenPos);
+    const roomPosition = RoomPositionHelper.UnfreezeRoomPosition(frozenPos);
 
     // Assert
     expect(roomPosition.x).toBe(frozenPos.x);
@@ -34,7 +32,9 @@ describe("RoomPosition", () => {
   });
   it("Should_ConvertRoomPositionToString_When_Called", () => {
     // Act
-    const positionString = PositionToStringConverter(position);
+    const positionString = RoomPositionHelper.PositionToStringConverter(
+      position
+    );
 
     // Assert
     expect(positionString).toContain(position.x.toString());

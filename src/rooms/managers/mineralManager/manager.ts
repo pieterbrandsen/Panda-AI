@@ -1,10 +1,7 @@
 import { forEach } from "lodash";
 import CacheManager from "../../../cache/updateCache";
 import CreateConstructionSite from "../../helpers/createConstructionSite";
-import {
-  PositionToStringConverter,
-  UnfreezeRoomPosition,
-} from "../../helpers/roomPosition";
+import RoomPositionHelper from "../../helpers/roomPosition";
 
 export default class MineralManager {
   /**
@@ -29,11 +26,13 @@ export default class MineralManager {
 
     if (!extractor) {
       const extractorConstructionSite =
-        cache.constructionSites[PositionToStringConverter(cache.mineral.pos)];
+        cache.constructionSites[
+          RoomPositionHelper.PositionToStringConverter(cache.mineral.pos)
+        ];
       if (!extractorConstructionSite) {
         CreateConstructionSite(
           room,
-          UnfreezeRoomPosition(cache.mineral.pos),
+          RoomPositionHelper.UnfreezeRoomPosition(cache.mineral.pos),
           STRUCTURE_EXTRACTOR,
           cache
         );

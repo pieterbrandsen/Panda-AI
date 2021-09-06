@@ -3,7 +3,7 @@ import CacheManager from "../../../cache/updateCache";
 import GarbageCollection from "../../../memory/garbageCollection";
 import MemoryInitializer from "../../../memory/initialization";
 import CreateConstructionSite from "../../helpers/createConstructionSite";
-import { PositionToStringConverter } from "../../helpers/roomPosition";
+import RoomPositionHelper from "../../helpers/roomPosition";
 import MineralManager from "./manager";
 
 beforeAll(() => {
@@ -50,7 +50,9 @@ describe("MineralManager", () => {
     // Arrange
     Game.getObjectById = jest.fn(() => undefined);
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
-    cache.constructionSites[PositionToStringConverter(cache.mineral.pos)] = {
+    cache.constructionSites[
+      RoomPositionHelper.PositionToStringConverter(cache.mineral.pos)
+    ] = {
       pos: cache.mineral.pos,
       type: STRUCTURE_EXTRACTOR,
       progressLeft: 1,
