@@ -1,5 +1,6 @@
 type JobType = "harvestMineral";
 interface Job {
+  // Base
   id: string;
   creationTime: number;
   nextUpdateTick: number;
@@ -8,8 +9,10 @@ interface Job {
   hasPriority: boolean;
   available: boolean;
   latestStructureOrCreepAssignedAtTick: number;
-  amountLeftToMine?: number;
   type: JobType;
+  
+  // Mineral, Harvest
+  amountLeftToMine?: number;
 }
 interface AssignedJobObject {
   id: string;
