@@ -13,9 +13,9 @@ export default class MineralManager {
   public static Run(room: Room): void {
     if (!room.controller || room.controller.level < 6 || !room.storage) return;
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
-    
-    JobUpdater.Run(cache.jobs)
-    
+
+    JobUpdater.Run(cache.jobs);
+
     CacheManager.UpdateMineralManager(room);
 
     const extractor = Game.getObjectById<StructureExtractor>(
@@ -23,7 +23,7 @@ export default class MineralManager {
     );
 
     if (cache.mineral.amount > 0 && extractor) {
-      if (!cache.jobs.find(j=>j.targetId === cache.mineral.id)) {
+      if (!cache.jobs.find((j) => j.targetId === cache.mineral.id)) {
         cache.jobs.push(JobCreatorHelper.HarvestMineral(cache.mineral));
       }
     }

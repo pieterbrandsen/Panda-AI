@@ -94,7 +94,10 @@ export default class MemoryInitializer {
       delete Memory.garbageData[name];
       return;
     }
-    Memory.creepsData.data[name] = DefaultCreepMemory(manager, possibleJobTypes);
+    Memory.creepsData.data[name] = DefaultCreepMemory(
+      manager,
+      possibleJobTypes
+    );
   }
 
   /**
@@ -102,7 +105,11 @@ export default class MemoryInitializer {
    * @param name - The name of the creep
    * @param manager - Manager associated with the creep
    */
-    public static SetupCreepMemory(name: string, manager: ManagerObject,possibleJobTypes: JobType[]): void {
+  public static SetupCreepMemory(
+    name: string,
+    manager: ManagerObject,
+    possibleJobTypes: JobType[]
+  ): void {
     MemoryInitializer.InitializeCreepMemory(name, manager, possibleJobTypes);
   }
 }

@@ -62,7 +62,7 @@ describe("MineralManager", () => {
     ).toBe(mineral.id);
   });
 
-  it("Should_InitializeMineral_When_MineralIsFound", () => {
+  it("Should_UpdateMineral_When_MineralIsFoundAndInitializedAlready", () => {
     // Arrange
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
     cache.mineral.id = mineral.id;
@@ -95,10 +95,13 @@ describe("MineralManager", () => {
       memory: {},
       room: { name: "room2" },
     });
-    Memory.creepsData.data[creep.name] = DefaultCreepMemory({
-      name: "mineral",
-      roomName: creep.room.name,
-    },[]);
+    Memory.creepsData.data[creep.name] = DefaultCreepMemory(
+      {
+        name: "mineral",
+        roomName: creep.room.name,
+      },
+      []
+    );
     Game.getObjectById = jest.fn().mockReturnValue(creep);
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
     cache.creeps[creep.name] = { type: "K" };
@@ -123,10 +126,13 @@ describe("MineralManager", () => {
       memory: {},
       room: { name: "room" },
     });
-    Memory.creepsData.data[creep.name] = DefaultCreepMemory({
-      name: "mineral",
-      roomName: creep.room.name,
-    },[]);
+    Memory.creepsData.data[creep.name] = DefaultCreepMemory(
+      {
+        name: "mineral",
+        roomName: creep.room.name,
+      },
+      []
+    );
     Game.getObjectById = jest.fn().mockReturnValue(creep);
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
     cache.creeps[creep.name] = { type: "K" };
@@ -205,7 +211,7 @@ describe("MineralManager", () => {
     // Assert
     expect(Object.keys(cache.constructionSites)).toHaveLength(0);
   });
-  it("Should_DeleteConstructionSiteOutOfCache_When_NotFound", () => {
+  it("Should_DeleteConstructionSiteOutOfCache_When_NotFoundAndInitializeStructureMemory", () => {
     // Arrange
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
     cache.constructionSites = {
@@ -251,7 +257,7 @@ describe("MineralManager", () => {
         type: STRUCTURE_EXTRACTOR,
         pos: { x: 0, y: 0, roomName: "room" },
       },
-      "site": {
+      site: {
         progressLeft: 10000,
         type: STRUCTURE_EXTRACTOR,
         pos: { x: 0, y: 0, roomName: "room" },

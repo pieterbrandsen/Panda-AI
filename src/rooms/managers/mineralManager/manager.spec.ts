@@ -16,7 +16,7 @@ const room = mockInstanceOf<Room>({
   find: jest.fn().mockReturnValue([]),
   name: roomName,
   controller: { level: 6 },
-  storage: {}
+  storage: {},
 });
 const roomWithLowLevelController = mockInstanceOf<Room>({
   find: jest.fn().mockReturnValue([]),
@@ -78,12 +78,12 @@ describe("MineralManager", () => {
   it("Should_AddAnJob_When_NoneWasFoundForMining", () => {
     // Arrange
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
-cache.mineral.amount = 100;
+    cache.mineral.amount = 100;
 
     // Act
     MineralManager.Run(room);
 
     // Assert
     expect(cache.jobs.length).toBe(1);
-  })
+  });
 });

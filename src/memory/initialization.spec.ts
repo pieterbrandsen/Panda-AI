@@ -52,7 +52,7 @@ describe("MemoryInitialization", () => {
 
     // Act
     MemoryInitializer.SetupStructureMemory(structure.id, manager);
-    MemoryInitializer.SetupCreepMemory(creep.name, manager,[]);
+    MemoryInitializer.SetupCreepMemory(creep.name, manager, []);
 
     // Assert
     expect(Object.keys(Memory.garbageData)).toHaveLength(0);
