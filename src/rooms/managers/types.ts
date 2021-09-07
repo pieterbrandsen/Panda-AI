@@ -1,4 +1,5 @@
 // #region
+type ManagerNames = "mineral" | "resourceStorage" | "spawn";
 interface BaseManagerConstructionSiteCache {
   type: BuildableStructureConstant;
   pos: FreezedRoomPosition;
