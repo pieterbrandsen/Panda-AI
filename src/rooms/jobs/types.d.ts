@@ -1,4 +1,4 @@
-type JobType = "harvestMineral";
+type JobType = "harvestMineral" | "transfer" | "withdraw";
 interface Job {
   // Base
   id: string;
@@ -10,9 +10,14 @@ interface Job {
   available: boolean;
   latestStructureOrCreepAssignedAtTick: number;
   type: JobType;
-  
-  // Mineral, Harvest
-  amountLeftToMine?: number;
+  hasNeedOfFulfillment: boolean;
+
+  // Mineral, Harvest, Transfer, Withdraw
+  amountLeft?: number;
+
+  // Transfer, Withdraw
+  resourceType?: ResourceConstant;
+  requiredPercentage?: number;
 }
 interface AssignedJobObject {
   id: string;

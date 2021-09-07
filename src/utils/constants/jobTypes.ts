@@ -1,2 +1,2 @@
-// WorkJobTypes
-export default ["harvestMineral"] as JobType[];
+const workJobTypes: JobType[] = ["harvestMineral"];
+export default workJobTypes;

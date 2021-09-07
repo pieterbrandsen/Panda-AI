@@ -1,7 +1,5 @@
-import { mockGlobal } from "screeps-jest";
+import { mockGlobal, mockInstanceOf } from "screeps-jest";
 import MemoryInitializer from "../../memory/initialization";
-import { DefaultRoomMemory } from "../../utils/constants/memory";
-import JobCreatorHelper from "./creation";
 import JobUpdater from "./update";
 
 beforeAll(() => {
@@ -9,91 +7,78 @@ beforeAll(() => {
   mockGlobal<Game>("Game", {}, true);
   MemoryInitializer.SetupRootMemory();
 });
-const roomName = "room";
 
 describe("JobUpdater", () => {
   beforeEach(() => {
     Game.time = 0;
-    Memory.roomsData.data[roomName] = DefaultRoomMemory(roomName);
-  });
-  it("Should_UpdateJobAndDelete_When_MineralIsEmpty", () => {
-    // Arrange
-    const cache = Memory.roomsData.data[roomName].managersMemory.mineral;
-    const job = JobCreatorHelper.HarvestMineral({
-      amount: 0,
-      id: "id2",
-      pos: { x: 0, y: 0, roomName: "room" },
-      type: "H",
-    });
-    const job2 = JobCreatorHelper.HarvestMineral({
-      amount: 1,
-      id: "id2",
-      pos: { x: 0, y: 0, roomName: "room" },
-      type: "H",
-    });
-    Game.time = 10000;
-    cache.jobs = [job, job2];
-
-    // Act
-    JobUpdater.Run(cache.jobs);
-
-    // Assert
-    expect(cache.jobs.length).toBe(1);
-    expect(cache.jobs[0].amountLeftToMine).toBe(1);
   });
   it("Should_DoNothing_When_NotReadyForUpdating", () => {
     // Arrange
-    const cache = Memory.roomsData.data[roomName].managersMemory.mineral;
-    const job = JobCreatorHelper.HarvestMineral({
-      amount: 0,
-      id: "id2",
-      pos: { x: 0, y: 0, roomName: "room" },
-      type: "H",
+    const job = mockInstanceOf<Job>({
+      type: "transfer",
+      targetId: "",
+      id: "job",
+      nextUpdateTick: 0,
     });
-    const job2 = JobCreatorHelper.HarvestMineral({
-      amount: 1,
-      id: "id2",
-      pos: { x: 0, y: 0, roomName: "room" },
-      type: "H",
-    });
+
     Game.time = -1;
-    cache.jobs = [job, job2];
+    const jobs = [job];
 
     // Act
-    JobUpdater.Run(cache.jobs);
+    JobUpdater.Run(jobs);
 
     // Assert
-    expect(cache.jobs.length).toBe(2);
+    expect(jobs.length).toBe(1);
   });
-  it("Should_DeleteCorrectJobsOutOfList_When_DeletingJobs", () => {
+  it("Should_NotUpdateWithdrawJob_When_StructureIsNull", () => {
     // Arrange
-    const cache = Memory.roomsData.data[roomName].managersMemory.mineral;
-    const deleteJob = JobCreatorHelper.HarvestMineral({
-      amount: 0,
-      id: "id",
-      pos: { x: 0, y: 0, roomName: "room" },
-      type: "H",
+    Game.getObjectById = jest.fn().mockReturnValue(null);
+    const job = mockInstanceOf<Job>({
+      type: "transfer",
+      targetId: "",
+      nextUpdateTick: 0,
+      amountLeft: 10,
     });
-    const job = JobCreatorHelper.HarvestMineral({
-      amount: 1,
-      id: "id2",
-      pos: { x: 0, y: 0, roomName: "room" },
-      type: "H",
-    });
-    const deleteJob2 = JobCreatorHelper.HarvestMineral({
-      amount: 0,
-      id: "id3",
-      pos: { x: 0, y: 0, roomName: "room" },
-      type: "H",
-    });
-    Game.time = 100000;
-    cache.jobs = [deleteJob, job, deleteJob2];
+    const jobs = [job];
 
     // Act
-    JobUpdater.Run(cache.jobs);
+    JobUpdater.Run(jobs);
 
     // Assert
-    expect(cache.jobs.length).toBe(1);
-    expect(cache.jobs[0].id).toBe("id2");
+    expect(jobs[0].amountLeft).toBe(10);
+  });
+  it("Should_UpdateAmountLeftToCorrectValueForBothTypes", () => {
+    // Arrange
+    const structure = mockInstanceOf<Structure>({
+      id: "id1",
+      store: { energy: 9, getCapacity: jest.fn().mockReturnValue(100) },
+    });
+    Game.getObjectById = jest.fn().mockReturnValue(structure);
+    const transferJob = mockInstanceOf<Job>({
+      type: "transfer",
+      targetId: "",
+      id: "job",
+      nextUpdateTick: 0,
+      resourceType: "energy",
+      requiredPercentage: 10,
+      amountLeft: 10,
+    });
+    const withdrawJob = mockInstanceOf<Job>({
+      type: "withdraw",
+      targetId: "",
+      id: "job",
+      nextUpdateTick: 0,
+      resourceType: "energy",
+      requiredPercentage: 10,
+      amountLeft: 10,
+    });
+    const jobs = [transferJob, withdrawJob];
+
+    // Act
+    JobUpdater.Run(jobs);
+
+    // Assert
+    expect(transferJob.amountLeft).toBe(1);
+    expect(withdrawJob.amountLeft).toBe(0);
   });
 });
