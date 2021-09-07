@@ -20,6 +20,15 @@ export default class JobCreatorHelper {
     };
   }
 
+  /**
+   * Create an transfer job
+   * @param structure - Structure for job
+   * @param requiredPercentage - Required percentage to fill too
+   * @param resourceType - type of resource to transfer
+   * @param amountLeft - amount left to transfer
+   * @param hasNeedOfFulfillment - Does need to be fulfilled or only when creep needs to loose energy
+   * @returns - An job
+   */
   public static Transfer(
     structure: Structure,
     requiredPercentage: number,
@@ -44,6 +53,15 @@ export default class JobCreatorHelper {
     };
   }
 
+  /**
+   * Create an withdraw job
+   * @param structure - Structure for job
+   * @param requiredPercentage - Required percentage to fill too
+   * @param resourceType - type of resource to transfer
+   * @param amountLeft - amount left to transfer
+   * @param hasNeedOfFulfillment - Does need to be fulfilled or only when creep needs to loose energy
+   * @returns - An job
+   */
   public static Withdraw(
     structure: Structure,
     requiredPercentage: number,

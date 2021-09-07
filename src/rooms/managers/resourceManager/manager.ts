@@ -2,6 +2,14 @@ import ResourceLevels from "../../../utils/constants/resourceLevels";
 import JobCreatorHelper from "../../jobs/creation";
 
 export default class ResourceStorageManager {
+  /**
+   * Create jobs required to manage the structure resource level
+   * @param structure - Structure to manage
+   * @param jobs - List of jobs to add too
+   * @param isSourceStructure
+   * @param isControllerStructure
+   * @param isHearthStructure
+   */
   public static ControlStructureResourceLevel(
     structure:
       | StructureStorage
