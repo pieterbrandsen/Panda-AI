@@ -17,6 +17,7 @@ export default class JobCreatorHelper {
       nextUpdateTick: Game.time + 1000,
       amountLeft: mineralCache.amount,
       hasNeedOfFulfillment: true,
+      mineralType: mineralCache.type,
     };
   }
 
