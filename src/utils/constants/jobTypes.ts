@@ -1,2 +1,3 @@
 const workJobTypes: JobType[] = ["harvestMineral"];
-export default workJobTypes;
+const pioneerJobTypes: JobType[] = ["transfer", "withdraw"];
+export { workJobTypes, pioneerJobTypes };
