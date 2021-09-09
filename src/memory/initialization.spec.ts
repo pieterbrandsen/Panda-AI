@@ -1,5 +1,6 @@
 import { mockGlobal, mockInstanceOf } from "screeps-jest";
 import {
+  DefaultRoomMemory,
   VersionedMemoryObjects,
   VersionedMemoryTypeName,
 } from "../utils/constants/memory";
@@ -17,7 +18,7 @@ const room = mockInstanceOf<Room>({
 describe("MemoryInitialization", () => {
   beforeEach(() => {
     MemoryInitializer.SetupRootMemory();
-    MemoryInitializer.SetupRoomMemory(room);
+    Memory.roomsData.data[room.name] = DefaultRoomMemory(room.name);
   });
   it("Should_SetupMemoryObjects_When_Called", () => {
     // Act
@@ -26,7 +27,7 @@ describe("MemoryInitialization", () => {
       "str" as Id<Structure>,
       managerObject
     );
-    MemoryInitializer.SetupCreepMemory("creep", managerObject, []);
+    MemoryInitializer.SetupCreepMemory("creep", managerObject, "work");
 
     // Assert
     expect(Memory.version).toBe(
@@ -54,7 +55,7 @@ describe("MemoryInitialization", () => {
 
     // Act
     MemoryInitializer.SetupStructureMemory(structure.id, manager);
-    MemoryInitializer.SetupCreepMemory(creep.name, manager, []);
+    MemoryInitializer.SetupCreepMemory(creep.name, manager, "work");
 
     // Assert
     expect(Object.keys(Memory.garbageData)).toHaveLength(0);

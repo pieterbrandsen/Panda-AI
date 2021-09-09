@@ -6,14 +6,13 @@ import {
   DefaultRoomMemory,
 } from "../../utils/constants/memory";
 import BaseManagerCache from "./baseManager";
-import UpdateMineralManagerCache from "./mineralManager";
 
 beforeAll(() => {
   mockGlobal<Memory>("Memory", {});
   mockGlobal<Game>("Game", { rooms: {} }, true);
   MemoryInitializer.SetupRootMemory();
 });
-const managerName:ManagerNames = "mineral";
+const managerName: ManagerNames = "mineral";
 const mineral = mockInstanceOf<Mineral>({
   id: "mineral",
   room: { name: "room" },
@@ -50,7 +49,7 @@ describe("BaseManager", () => {
   });
   afterEach(() => {
     jest.clearAllMocks();
-  })
+  });
 
   it("Should_ChangeManagerRoom_When_CreepIsInNewRoom", () => {
     // Arrange
@@ -74,7 +73,7 @@ describe("BaseManager", () => {
       Memory.roomsData.data[creep.room.name].managersMemory[managerName];
 
     // Act
-    BaseManagerCache(room.name,managerName);
+    BaseManagerCache(room.name, managerName);
 
     // Assert
     expect(cache.creeps[creep.name]).toBeUndefined();
@@ -102,7 +101,7 @@ describe("BaseManager", () => {
     cache.creeps[creep.name] = { type: "K" };
 
     // Act
-    BaseManagerCache(room.name,managerName);
+    BaseManagerCache(room.name, managerName);
 
     // Assert
     expect(cache.creeps[creep.name]).toBeDefined();
@@ -127,7 +126,7 @@ describe("BaseManager", () => {
     Game.getObjectById = jest.fn().mockReturnValue(null);
 
     // Act
-    BaseManagerCache(room.name,managerName);
+    BaseManagerCache(room.name, managerName);
 
     // Assert
     expect(Object.keys(cache.structures)).toHaveLength(2);
@@ -143,7 +142,7 @@ describe("BaseManager", () => {
     Game.getObjectById = jest.fn().mockReturnValue(extractor);
 
     // Act
-    BaseManagerCache(room.name,managerName);
+    BaseManagerCache(room.name, managerName);
 
     // Assert
     expect(cache.structures[extractor.id]).toBeDefined();
@@ -170,7 +169,7 @@ describe("BaseManager", () => {
     );
 
     // Act
-    BaseManagerCache(room.name,managerName);
+    BaseManagerCache(room.name, managerName);
 
     // Assert
     expect(Object.keys(cache.constructionSites)).toHaveLength(0);
@@ -227,7 +226,7 @@ describe("BaseManager", () => {
       );
 
     // Act
-    BaseManagerCache(room.name,managerName);
+    BaseManagerCache(room.name, managerName);
 
     // Assert
     expect(Object.keys(cache.constructionSites)).toHaveLength(0);
@@ -262,7 +261,7 @@ describe("BaseManager", () => {
     );
 
     // Act
-    BaseManagerCache(room.name,managerName);
+    BaseManagerCache(room.name, managerName);
 
     // Assert
     expect(Object.keys(cache.constructionSites)).toHaveLength(2);

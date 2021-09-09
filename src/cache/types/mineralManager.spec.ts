@@ -1,9 +1,6 @@
 import { mockGlobal, mockInstanceOf } from "screeps-jest";
 import MemoryInitializer from "../../memory/initialization";
-import RoomPositionHelper from "../../rooms/helpers/roomPosition";
-import {
-  DefaultRoomMemory,
-} from "../../utils/constants/memory";
+import { DefaultRoomMemory } from "../../utils/constants/memory";
 import UpdateMineralManagerCache from "./mineralManager";
 
 beforeAll(() => {
@@ -30,12 +27,12 @@ const room = mockInstanceOf<Room>({
 
 describe("MineralManager", () => {
   beforeEach(() => {
-    Game.getObjectById = jest.fn().mockReturnValue(mineral)
+    Game.getObjectById = jest.fn().mockReturnValue(mineral);
     Memory.roomsData.data[room.name] = DefaultRoomMemory(room.name);
   });
   afterEach(() => {
     jest.clearAllMocks();
-  })
+  });
   it("Should_UpdateNothing_When_MineralIsNotFound", () => {
     // Arrange
     const oldFindFunction = room.find;

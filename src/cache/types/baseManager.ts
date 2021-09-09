@@ -7,10 +7,14 @@ import IsStructureType from "../../utils/constants/predicate";
  * @param roomName - name of the room
  * @param managerName - name of manager
  */
-export default function BaseManagerCache(roomName: string, managerName:ManagerNames) {
+export default function BaseManagerCache(
+  roomName: string,
+  managerName: ManagerNames
+): void {
   const cache = Memory.roomsData.data[roomName].managersMemory;
-  const managerCache = Memory.roomsData.data[roomName].managersMemory[managerName];
-  
+  const managerCache =
+    Memory.roomsData.data[roomName].managersMemory[managerName];
+
   forOwn(managerCache.creeps, (cacheCrp, key) => {
     const creep = Game.getObjectById<Creep>(key);
 

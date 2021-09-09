@@ -16,12 +16,12 @@ const room = mockInstanceOf<Room>({
 describe("SpawnManagerCache", () => {
   beforeEach(() => {
     Memory.roomsData.data[room.name] = DefaultRoomMemory(room.name);
-  })
+  });
   it("Should_CallBaseCacheUpdater_When_Called", () => {
     // Act
     UpdateSpawnManagerCache(room);
 
     // Assert
     expect(true).toBeTruthy();
-  })
-})
+  });
+});

@@ -1,4 +1,5 @@
 import { mockGlobal, mockInstanceOf } from "screeps-jest";
+import { DefaultRoomMemory } from "../utils/constants/memory";
 import GarbageCollection from "./garbageCollection";
 import MemoryInitializer from "./initialization";
 
@@ -15,7 +16,7 @@ describe("GarbageCollection", () => {
   beforeEach(() => {
     Game.time = 0;
     MemoryInitializer.SetupRootMemory();
-    MemoryInitializer.SetupRoomMemory(room);
+    Memory.roomsData.data[room.name] = DefaultRoomMemory(room.name);
   });
   it("Should_MoveMemoryObjToGarbageObject_When_Called", () => {
     // Act

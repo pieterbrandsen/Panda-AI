@@ -1,11 +1,9 @@
-import { forOwn } from "lodash";
-import IsStructureType from "../../utils/constants/predicate";
-import RoomPositionHelper from "../../rooms/helpers/roomPosition";
 import BaseManager from "./baseManager";
 
 export default function UpdateMineralManagerCache(room: Room): void {
   const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
-  const mineral: Mineral =  Game.getObjectById(cache.mineral.id) || room.find(FIND_MINERALS)[0];
+  const mineral: Mineral =
+    Game.getObjectById(cache.mineral.id) || room.find(FIND_MINERALS)[0];
 
   if (!mineral || !mineral.room) {
     return;
