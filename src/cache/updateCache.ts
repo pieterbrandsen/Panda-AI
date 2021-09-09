@@ -4,7 +4,7 @@ import UpdateSpawnManagerCache from "./types/spawnManager";
 
 export default class CacheManager {
   /**
-   * Update the room cache
+   * Update the rooms cache
    */
   public static UpdateRoom = UpdateRoomCache;
 
