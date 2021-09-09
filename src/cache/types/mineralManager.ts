@@ -21,18 +21,18 @@ export default function UpdateMineralManagerCache(room: Room): void {
     cache.mineral.amount = Math.round(mineral.mineralAmount);
   }
 
-  const extractor: StructureExtractor = mineral.pos.findInRange<StructureExtractor>(
-    FIND_STRUCTURES,
-    0,
-    { filter: IsStructureType(STRUCTURE_EXTRACTOR) }
-  )[0];
-  if (extractor && cache.structures[extractor.id] === undefined) {
-    cache.structures[extractor.id] = {
-      type: extractor.structureType,
-      pos: extractor.pos,
-    };
-    cache.mineral.extractorId = extractor.id;
-  }
+  // const extractor: StructureExtractor = mineral.pos.findInRange<StructureExtractor>(
+  //   FIND_STRUCTURES,
+  //   0,
+  //   { filter: IsStructureType(STRUCTURE_EXTRACTOR) }
+  // )[0];
+  // if (extractor && cache.structures[extractor.id] === undefined) {
+  //   cache.structures[extractor.id] = {
+  //     type: extractor.structureType,
+  //     pos: extractor.pos,
+  //   };
+  //   cache.mineral.extractorId = extractor.id;
+  // }
 
   forOwn(cache.creeps, (cacheCrp, key) => {
     const creep = Game.getObjectById<Creep>(key);
@@ -75,6 +75,9 @@ export default function UpdateMineralManagerCache(room: Room): void {
           type: structureAtPos.structureType,
           pos: structureAtPos.pos,
         };
+        if (structureAtPos.structureType === STRUCTURE_EXTRACTOR) {
+          cache.mineral.extractorId = structureAtPos.id;
+        }
       }
     } else {
       if (!cachedSite.id) cachedSite.id = site.id;
