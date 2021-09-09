@@ -4,6 +4,7 @@ import CreateConstructionSite from "../../helpers/createConstructionSite";
 import RoomPositionHelper from "../../helpers/roomPosition";
 import JobCreatorHelper from "../../jobs/creation";
 import JobUpdater from "../../jobs/update";
+import UpdateSpawningQueue from "../spawnManager/update";
 
 export default class MineralManager {
   /**
@@ -11,7 +12,7 @@ export default class MineralManager {
    * @param room  - The room
    */
   public static Run(room: Room): void {
-    if (!room.controller || room.controller.level < 6 || !room.storage) return;
+    // if (!room.controller || room.controller.level < 6 || !room.storage) return;
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
 
     JobUpdater.Run(cache.jobs);
@@ -50,6 +51,7 @@ export default class MineralManager {
       }
     });
 
-    // TODO: Spawning manager
+    UpdateSpawningQueue.Update(room, "harvestMineral", "mineral");
+    UpdateSpawningQueue.Update(room, "build", "mineral");
   }
 }

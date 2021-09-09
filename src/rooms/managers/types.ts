@@ -1,5 +1,5 @@
 // #region
-type ManagerNames = "mineral" | "resourceStorage" | "spawn";
+type ManagerNames = "mineral" | "spawn" | "pioneer";
 interface BaseManagerConstructionSiteCache {
   type: BuildableStructureConstant;
   pos: FreezedRoomPosition;
@@ -10,9 +10,7 @@ interface BaseManagerStructureCache {
   type: StructureConstant;
   pos: FreezedRoomPosition;
 }
-interface BaseManagerCreepCache {
-  type: MineralConstant;
-}
+interface BaseManagerCreepCache {}
 interface BaseManagerMemory {
   jobs: Job[];
   structures: StringMap<BaseManagerStructureCache>;
@@ -35,8 +33,32 @@ interface MineralManagerMemory extends BaseManagerMemory {
 }
 // #endregion
 
+// #region Spawning
+interface QueueCreep {
+  body: BodyPartConstant[];
+  bodyCost: number;
+  memory: CreepMemory;
+  name: string;
+  roomName: string;
+  managerName: ManagerNames;
+  creepType: CreepType;
+}
+interface SpawnManagerMemory extends BaseManagerMemory {
+  queue: QueueCreep[];
+  lastSpawnedType: CreepType;
+}
+// #endregion
+
+// #region Pioneer
+interface PioneerManagerMemory extends BaseManagerMemory {
+  isActive: boolean;
+}
+// #endregion
+
 interface ManagersMemory {
   mineral: MineralManagerMemory;
+  spawn: SpawnManagerMemory;
+  pioneer: PioneerManagerMemory;
 }
 interface ManagerObject {
   name: ManagerNames;
