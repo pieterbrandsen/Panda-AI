@@ -15,11 +15,13 @@ const room = mockInstanceOf<Room>({
 });
 
 describe("MemoryInitialization", () => {
+  beforeEach(() => {
+    MemoryInitializer.SetupRootMemory();
+    MemoryInitializer.SetupRoomMemory(room);
+  });
   it("Should_SetupMemoryObjects_When_Called", () => {
     // Act
     const managerObject: ManagerObject = { name: "mineral", roomName: "" };
-    MemoryInitializer.SetupRootMemory();
-    MemoryInitializer.SetupRoomMemory(room);
     MemoryInitializer.SetupStructureMemory(
       "str" as Id<Structure>,
       managerObject

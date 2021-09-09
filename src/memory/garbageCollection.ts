@@ -69,10 +69,6 @@ export default class GarbageCollection {
       let memoryObj: StringMap<MemoryTypesInGarbageCollection> | undefined;
 
       switch (value.liveObjectType) {
-        case "room":
-          liveObject = Game.rooms[key];
-          memoryObj = Memory.roomsData.data;
-          break;
         case "structure":
           liveObject = Game.structures[key];
           memoryObj = Memory.structuresData.data;

@@ -15,10 +15,10 @@ describe("GarbageCollection", () => {
   beforeEach(() => {
     Game.time = 0;
     MemoryInitializer.SetupRootMemory();
+    MemoryInitializer.SetupRoomMemory(room);
   });
   it("Should_MoveMemoryObjToGarbageObject_When_Called", () => {
     // Act
-    MemoryInitializer.SetupRoomMemory(room);
     GarbageCollection.Collect(
       {
         lastExecutedAtTick: 0,
@@ -53,7 +53,6 @@ describe("GarbageCollection", () => {
   });
   it("Should_BringAliveObjectsBackToMemory_When_Visible", () => {
     // Arrange
-    MemoryInitializer.SetupRoomMemory(room);
     Game.rooms[room.name] = mockInstanceOf<Room>({});
     Game.structures.structure = mockInstanceOf<Structure>({});
     Game.creeps.creep = mockInstanceOf<Creep>({});
