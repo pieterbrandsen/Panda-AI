@@ -4,4 +4,4 @@ describe("UserConstant", () => {
   it("ShouldBeDefined", () => {
     expect(User).toBeDefined();
   });
-})
+});

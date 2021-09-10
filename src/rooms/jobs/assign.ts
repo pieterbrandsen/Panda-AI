@@ -8,9 +8,9 @@ export default class JobAssignmentsHelper {
   public static AssignJob(
     memory: CreepMemory | StructureMemory,
     job: Job,
-    roomName:string
+    roomName: string
   ): void {
-    memory.job = { id: job.id, roomName: roomName };
+    memory.job = { id: job.id, roomName };
     job.latestStructureOrCreepAssignedAtTick = Game.time;
   }
 }
