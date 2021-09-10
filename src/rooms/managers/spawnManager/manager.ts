@@ -1,5 +1,6 @@
 import { forEach, forOwn, remove } from "lodash";
 import CacheManager from "../../../cache/updateCache";
+import JobUpdater from "../../jobs/update";
 import GetNextCreepType from "./helpers/getNextCreep";
 
 export default class SpawnManager {
@@ -10,19 +11,21 @@ export default class SpawnManager {
   public static Run(room: Room): void {
     const cache = Memory.roomsData.data[room.name].managersMemory.spawn;
 
+    JobUpdater.Run(cache.jobs);
+
     CacheManager.UpdateSpawnManager(room);
 
     // forOwn(cache.creeps, (cacheCrp, key) => {});
     const spawns: StructureSpawn[] = [];
     forOwn(cache.structures, (cacheStr, key) => {
       const structure = Game.getObjectById(key);
-      if (structure instanceof StructureSpawn) {
-        spawns.push(structure);
+      if (structure && cacheStr.type === STRUCTURE_SPAWN) {
+        spawns.push(structure as StructureSpawn);
       }
     });
 
     forEach(spawns, (spawn) => {
-      if (cache.queue.length === 0) return;
+      if (cache.queue.length === 0 || spawn.spawning) return;
 
       const pioneersInQueue = cache.queue.filter(
         (c) => c.creepType === "pioneer"

@@ -46,7 +46,7 @@ export default class BodyHelper {
     currentCost = defaultIteratee.cost;
     i = defaultIteratee.reqBodyPartPerLoop;
     while (i < requiredBodyPartCount) {
-      if (currentCost + loopIteratee.cost > maxCost) {
+      if (currentCost + loopIteratee.cost > maxCost || arrayOfBodyParts[y].length + loopIteratee.body.length > 50) {
         if (i === 0) break;
         y += 1;
         arrayOfBodyParts[y] = defaultIteratee.body;

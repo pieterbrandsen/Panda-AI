@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars */
 // #region
 type ManagerNames = "mineral" | "spawn" | "pioneer";
 interface BaseManagerConstructionSiteCache {

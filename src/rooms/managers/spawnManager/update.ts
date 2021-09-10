@@ -21,18 +21,21 @@ export default class UpdateSpawningQueue {
     let multiplier = 1;
     let per1Lifetime = 0;
 
+    const alivePioneerBodyParts:BodyPartConstant[] = [];
     const aliveBodyParts = countBy(
       Object.keys(
         Object.fromEntries(
           Object.entries(managerCache.creeps).filter(
-            ([key]) =>
-              Memory.creepsData.data[key].manager.name === managerName
+            ([key]) => Memory.creepsData.data[key].manager.name === managerName && Memory.creepsData.data[key].manager.roomName === room.name
           )
         )
       ).reduce<BodyPartConstant[]>(
-        (bodyParts: BodyPartConstant[], name: string):BodyPartConstant[] => {
+        (bodyParts: BodyPartConstant[], name: string): BodyPartConstant[] => {
           const creep = Game.creeps[name];
           if (creep) {
+            if (Memory.creepsData.data[name].creepType === "pioneer") {
+              alivePioneerBodyParts.push(...creep.body.map((part) => part.type));
+            }
             bodyParts.push(...creep.body.map((part) => part.type));
           }
 
@@ -40,6 +43,13 @@ export default class UpdateSpawningQueue {
         },
         []
       )
+    );
+
+    const queuedPioneerBodyParts=countBy(
+      spawnCache.queue
+        .filter((creep) => creep.creepType === "pioneer" && creep.managerName === managerName)
+        .map((creep) => creep.body)
+        .flat()
     );
     const queuedBodyParts = countBy(
       spawnCache.queue
@@ -57,9 +67,9 @@ export default class UpdateSpawningQueue {
     switch (jobType) {
       case "pioneer":
         bodyPart = WORK;
-        requiredBodyPartCount = 10;
-        queuedBodyPartCount = queuedBodyParts[bodyPart] || 0;
-        aliveBodyPartCount = aliveBodyParts[bodyPart] || 0;
+        requiredBodyPartCount = 5;
+        queuedBodyPartCount = queuedPioneerBodyParts[bodyPart] || 0;
+        aliveBodyPartCount = alivePioneerBodyParts[bodyPart] || 0;
         creepType = "pioneer";
         break;
       case "harvestMineral":
@@ -69,9 +79,11 @@ export default class UpdateSpawningQueue {
         requiredBodyPartCount =
           sum(
             managerCache.jobs
-              .filter((job) => job.type === "harvestMineral")
+              .filter((job) => job.type === jobType)
               .map((job) => job.amountLeft)
-          ) / per1Lifetime * multiplier;
+          ) /
+            (per1Lifetime *
+          multiplier);
         queuedBodyPartCount = queuedBodyParts[bodyPart] || 0;
         aliveBodyPartCount = aliveBodyParts[bodyPart] || 0;
         creepType = "work";
@@ -84,12 +96,8 @@ export default class UpdateSpawningQueue {
       Math.ceil(
         (requiredBodyPartCount - aliveBodyPartCount - queuedBodyPartCount) / 5
       ) * 5;
-    if (missingBodyParts === 0) return;
-    const bodies = BodyHelper.Generate(
-      room,
-      missingBodyParts,
-      jobType
-    );
+    if (missingBodyParts <= 0) return;
+    const bodies = BodyHelper.Generate(room, missingBodyParts, jobType);
     forEach(bodies, (body) => {
       if (body.length > 0) {
         spawnCache.queue.push({
@@ -100,7 +108,7 @@ export default class UpdateSpawningQueue {
             creepType
           ),
           managerName,
-          name: `${managerName}-${jobType}-${global.totalQueuedCreeps+=1}`,
+          name: `${managerName}-${jobType}-${(global.totalQueuedCreeps += 1)}`,
           roomName: room.name,
           creepType,
         });

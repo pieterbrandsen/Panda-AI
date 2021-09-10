@@ -20,7 +20,7 @@ export default function GetNextCreep(roomName: string): QueueCreep {
         break;
     }
 
-    creep = queue.find((creep) => creep.creepType === cache.lastSpawnedType);
+    creep = queue.find((crp) => crp.creepType === cache.lastSpawnedType);
   }
 
   return creep;
