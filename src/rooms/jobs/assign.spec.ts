@@ -21,7 +21,7 @@ describe("AssignJob", () => {
     });
 
     // Act
-    JobAssignmentsHelper.AssignJob(memory, job);
+    JobAssignmentsHelper.AssignJob(memory, job, "room");
 
     // Assert
     expect(memory.job).toBeDefined();
