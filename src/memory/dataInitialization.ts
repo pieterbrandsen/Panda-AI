@@ -1,4 +1,5 @@
-import constantMemoryVersions, {
+import {
+  VersionedMemoryObjects,
   VersionedMemoryTypeName,
 } from "../utils/constants/memory";
 
@@ -9,7 +10,7 @@ export default class DataMemoryInitializer {
   private static InitializeRoomDataMemory(): void {
     Memory.roomsData = {
       data: {},
-      version: constantMemoryVersions[VersionedMemoryTypeName.Room],
+      version: VersionedMemoryObjects[VersionedMemoryTypeName.Room],
     };
   }
 
@@ -26,7 +27,7 @@ export default class DataMemoryInitializer {
   private static InitializeStructureDataMemory(): void {
     Memory.structuresData = {
       data: {},
-      version: constantMemoryVersions[VersionedMemoryTypeName.Structure],
+      version: VersionedMemoryObjects[VersionedMemoryTypeName.Structure],
     };
   }
 
@@ -43,7 +44,7 @@ export default class DataMemoryInitializer {
   private static InitializeCreepDataMemory(): void {
     Memory.creepsData = {
       data: {},
-      version: constantMemoryVersions[VersionedMemoryTypeName.Creep],
+      version: VersionedMemoryObjects[VersionedMemoryTypeName.Creep],
     };
   }
 

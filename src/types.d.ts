@@ -1,6 +1,8 @@
 interface StringMap<T> {
   [key: string]: T;
 }
-// declare namespace NodeJS {
-//   interface Global {}
-// }
+interface FreezedRoomPosition {
+  x: number;
+  y: number;
+  roomName: string;
+}

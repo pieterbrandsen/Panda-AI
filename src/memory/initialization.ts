@@ -1,25 +1,21 @@
-import constantMemoryVersions, {
-  VersionedMemoryTypeName,
+import { forOwn } from "lodash";
+import {
+  DefaultCreepMemory,
+  DefaultRoomMemory,
+  DefaultRootMemory,
+  DefaultStructureMemory,
 } from "../utils/constants/memory";
+import RemoveAllConstructionSites from "../rooms/helpers/removeAllConstructionSites";
+import SetupStructuresCache from "../rooms/helpers/setupStructuresCache";
 
 export default class MemoryInitializer {
   /**
    * Initializes the memory of the root
    */
   private static InitializeRootMemory(): void {
-    Memory.creepsData = {
-      data: {},
-      version: -1,
-    };
-    Memory.structuresData = {
-      data: {},
-      version: -1,
-    };
-    Memory.roomsData = {
-      data: {},
-      version: -1,
-    };
-    Memory.version = constantMemoryVersions[VersionedMemoryTypeName.Root];
+    forOwn(DefaultRootMemory, (value, key) => {
+      Memory[key] = value;
+    });
   }
 
   /**
@@ -30,50 +26,84 @@ export default class MemoryInitializer {
   }
 
   /**
-   * Initializes the memory of room
+   * Initializes the memory of room if no garbage collected object was found
    * @param name - The name of the room
    */
   private static InitializeRoomMemory(name: string): void {
-    Memory.roomsData.data[name] = {};
+    const garbageMemory = Memory.garbageData[name];
+    if (garbageMemory) {
+      Memory.roomsData.data[name] = garbageMemory.data as RoomMemory;
+      delete Memory.garbageData[name];
+      return;
+    }
+    Memory.roomsData.data[name] = DefaultRoomMemory(name);
   }
 
   /**
    * Setup the memory required to function as room
-   * @param name - The name of the room
+   * @param room - The room object to be modified
    */
-  public static SetupRoomMemory(name: string): void {
-    MemoryInitializer.InitializeRoomMemory(name);
+  public static SetupRoomMemory(room: Room): void {
+    MemoryInitializer.InitializeRoomMemory(room.name);
+
+    RemoveAllConstructionSites(room);
+    SetupStructuresCache(room);
   }
 
   /**
-   * Initializes the memory of the structure
+   * Initializes the memory of the structure if no garbage collected object was found
    * @param id - The id of the structure
+   * @param manager - Manager associated with the structure
    */
-  private static InitializeStructureMemory(id: Id<Structure>): void {
-    Memory.structuresData.data[id] = {};
+  private static InitializeStructureMemory(
+    id: Id<Structure>,
+    manager: ManagerObject
+  ): void {
+    const garbageMemory = Memory.garbageData[id];
+    if (garbageMemory) {
+      Memory.structuresData.data[id] = garbageMemory.data as StructureMemory;
+      delete Memory.garbageData[id];
+      return;
+    }
+    // TODO: Check in test if it used DefaultStructureMemory function instead of garbage memory when required
+    Memory.structuresData.data[id] = DefaultStructureMemory(manager);
   }
 
   /**
    * Setup the memory required to function as structure
    * @param id - The id of the structure
+   * @param manager - Manager associated with the structure
    */
-  public static SetupStructureMemory(id: Id<Structure>): void {
-    MemoryInitializer.InitializeStructureMemory(id);
+  public static SetupStructureMemory(
+    id: Id<Structure>,
+    manager: ManagerObject
+  ): void {
+    MemoryInitializer.InitializeStructureMemory(id, manager);
   }
 
   /**
-   * Initializes the memory of the creep
+   * Initializes the memory of the creep if no garbage collected object was found
    * @param name - The name of the creep
+   * @param manager - Manager associated with the creep
    */
-  private static InitializeCreepMemory(name: string): void {
-    Memory.creepsData.data[name] = {};
+  private static InitializeCreepMemory(
+    name: string,
+    manager: ManagerObject,
+    creepType: CreepType
+  ): void {
+    Memory.creepsData.data[name] = DefaultCreepMemory(manager, creepType);
   }
 
   /**
    * Setup the memory required to function as creep
    * @param name - The name of the creep
+   * @param manager - Manager associated with the creep
    */
-  public static SetupCreepMemory(name: string): void {
-    MemoryInitializer.InitializeCreepMemory(name);
+  public static SetupCreepMemory(
+    name: string,
+    manager: ManagerObject,
+    creepType: CreepType
+  ): void {
+    MemoryInitializer.InitializeCreepMemory(name, manager, creepType);
   }
 }
