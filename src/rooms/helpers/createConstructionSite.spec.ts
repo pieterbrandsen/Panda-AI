@@ -1,5 +1,6 @@
 import { mockGlobal, mockInstanceOf } from "screeps-jest";
 import MemoryInitializer from "../../memory/initialization";
+import { DefaultRoomMemory } from "../../utils/constants/memory";
 import CreateConstructionSite from "./createConstructionSite";
 
 beforeAll(() => {
@@ -14,7 +15,7 @@ const room = mockInstanceOf<Room>({
 
 describe("CreateConstructionSite", () => {
   beforeEach(() => {
-    MemoryInitializer.SetupRoomMemory(room);
+    Memory.roomsData.data[room.name] = DefaultRoomMemory(room.name);
   });
   it("Should_AddSiteToCsSiteCache_WhenOK", () => {
     // Arrange

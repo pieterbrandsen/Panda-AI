@@ -15,8 +15,8 @@ const room = mockInstanceOf<Room>({
   find: jest.fn().mockReturnValue([constructionSite]),
 });
 
-describe("KillAllCreeps", () => {
-  it("Should_KillAllCreepsInRoom_When_Called", () => {
+describe("RemoveAllConstructionSites", () => {
+  it("Should_RemoveAllConstructionSitesInRoom_When_Called", () => {
     // Act
     RemoveAllConstructionSites(room);
 

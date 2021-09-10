@@ -1,4 +1,3 @@
-import { forEach } from "lodash";
 import CacheManager from "../../../cache/updateCache";
 import CreateConstructionSite from "../../helpers/createConstructionSite";
 import RoomPositionHelper from "../../helpers/roomPosition";
@@ -12,7 +11,7 @@ export default class MineralManager {
    * @param room  - The room
    */
   public static Run(room: Room): void {
-    // if (!room.controller || room.controller.level < 6 || !room.storage) return;
+    if (!room.controller || room.controller.level < 6 || !room.storage) return;
     const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
 
     JobUpdater.Run(cache.jobs);
@@ -44,12 +43,10 @@ export default class MineralManager {
       }
     }
 
-    forEach(Object.keys(cache.creeps), (id) => {
-      const creep = Game.getObjectById<Creep>(id as Id<Creep>);
-      if (creep) {
-        // TODO: Execute creep
-      }
-    });
+    // forEach(Object.keys(cache.creeps), (id) => {
+    //   const creep = Game.getObjectById<Creep>(id as Id<Creep>);
+    //   if (creep) {}
+    // });
 
     UpdateSpawningQueue.Update(room, "harvestMineral", "mineral");
     UpdateSpawningQueue.Update(room, "build", "mineral");

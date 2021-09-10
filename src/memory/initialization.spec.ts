@@ -41,21 +41,24 @@ describe("MemoryInitialization", () => {
     // Arrange
     const manager: ManagerObject = { name: "mineral", roomName: "" };
     const structure = mockInstanceOf<Structure>({ id: "structure" });
-    const creep = mockInstanceOf<Creep>({ name: "creep" });
+    // const room = mockInstanceOf<Room>({
+    //   name: "room",
+    //   find: jest.fn().mockReturnValue([]),
+    // });
     Memory.garbageData[structure.id] = {
       data: {},
       deletedAtTick: 0,
       liveObjectType: "structure",
     };
-    Memory.garbageData[creep.name] = {
+    Memory.garbageData[room.name] = {
       data: {},
       deletedAtTick: 0,
-      liveObjectType: "creep",
+      liveObjectType: "room",
     };
 
     // Act
     MemoryInitializer.SetupStructureMemory(structure.id, manager);
-    MemoryInitializer.SetupCreepMemory(creep.name, manager, "work");
+    MemoryInitializer.SetupRoomMemory(room);
 
     // Assert
     expect(Object.keys(Memory.garbageData)).toHaveLength(0);

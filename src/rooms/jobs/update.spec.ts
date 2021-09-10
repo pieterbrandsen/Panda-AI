@@ -81,4 +81,21 @@ describe("JobUpdater", () => {
     expect(transferJob.amountLeft).toBe(1);
     expect(withdrawJob.amountLeft).toBe(0);
   });
+  it("Should_UpdateHarvestMineralJobs", () => {
+    // Arrange
+    const mineral = mockInstanceOf<Mineral>({ mineralAmount: 0 });
+    Game.getObjectById = jest.fn().mockReturnValue(mineral);
+    const job = mockInstanceOf<Job>({
+      amountLeft: 100,
+      nextUpdateTick: 0,
+      type: "harvestMineral",
+      targetId: "mineral",
+    });
+
+    // Act
+    JobUpdater.Run([job]);
+
+    // Assert
+    expect(job.amountLeft).toBe(0);
+  });
 });

@@ -33,6 +33,7 @@ export default class MemoryInitializer {
     const garbageMemory = Memory.garbageData[name];
     if (garbageMemory) {
       Memory.roomsData.data[name] = garbageMemory.data as RoomMemory;
+      delete Memory.garbageData[name];
       return;
     }
     Memory.roomsData.data[name] = DefaultRoomMemory(name);
@@ -90,12 +91,6 @@ export default class MemoryInitializer {
     manager: ManagerObject,
     creepType: CreepType
   ): void {
-    const garbageMemory = Memory.garbageData[name];
-    if (garbageMemory) {
-      Memory.creepsData.data[name] = garbageMemory.data as CreepMemory;
-      delete Memory.garbageData[name];
-      return;
-    }
     Memory.creepsData.data[name] = DefaultCreepMemory(manager, creepType);
   }
 

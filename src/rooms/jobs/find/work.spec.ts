@@ -1,8 +1,8 @@
 import { mockGlobal } from "screeps-jest";
 import MemoryInitializer from "../../../memory/initialization";
+import { workJobTypes } from "../../../utils/constants/jobTypes";
 import JobCreatorHelper from "../creation";
 import WorkJobsHelper from "./work";
-import WorkJobTypes from "../../../utils/constants/jobTypes";
 
 beforeAll(() => {
   mockGlobal<Memory>("Memory", {});
@@ -33,7 +33,7 @@ describe("FindWorkJobs", () => {
     // Assert
     expect(workJobs).toHaveLength(1);
     expect(
-      workJobs.find((j) => !WorkJobTypes.includes(j.type))
+      workJobs.find((j) => !workJobTypes.includes(j.type))
     ).toBeUndefined();
   });
   it("Should_ReturnJobWithOldestAssignmentOfWorker_When_Called", () => {
