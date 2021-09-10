@@ -6,6 +6,7 @@ import {
   DefaultStructureMemory,
 } from "../utils/constants/memory";
 import RemoveAllConstructionSites from "../rooms/helpers/removeAllConstructionSites";
+import SetupStructuresCache from "../rooms/helpers/setupStructuresCache";
 
 export default class MemoryInitializer {
   /**
@@ -32,6 +33,7 @@ export default class MemoryInitializer {
     const garbageMemory = Memory.garbageData[name];
     if (garbageMemory) {
       Memory.roomsData.data[name] = garbageMemory.data as RoomMemory;
+      delete Memory.garbageData[name];
       return;
     }
     Memory.roomsData.data[name] = DefaultRoomMemory(name);
@@ -45,6 +47,7 @@ export default class MemoryInitializer {
     MemoryInitializer.InitializeRoomMemory(room.name);
 
     RemoveAllConstructionSites(room);
+    SetupStructuresCache(room);
   }
 
   /**
@@ -86,18 +89,9 @@ export default class MemoryInitializer {
   private static InitializeCreepMemory(
     name: string,
     manager: ManagerObject,
-    possibleJobTypes: JobType[]
+    creepType: CreepType
   ): void {
-    const garbageMemory = Memory.garbageData[name];
-    if (garbageMemory) {
-      Memory.creepsData.data[name] = garbageMemory.data as CreepMemory;
-      delete Memory.garbageData[name];
-      return;
-    }
-    Memory.creepsData.data[name] = DefaultCreepMemory(
-      manager,
-      possibleJobTypes
-    );
+    Memory.creepsData.data[name] = DefaultCreepMemory(manager, creepType);
   }
 
   /**
@@ -108,8 +102,8 @@ export default class MemoryInitializer {
   public static SetupCreepMemory(
     name: string,
     manager: ManagerObject,
-    possibleJobTypes: JobType[]
+    creepType: CreepType
   ): void {
-    MemoryInitializer.InitializeCreepMemory(name, manager, possibleJobTypes);
+    MemoryInitializer.InitializeCreepMemory(name, manager, creepType);
   }
 }

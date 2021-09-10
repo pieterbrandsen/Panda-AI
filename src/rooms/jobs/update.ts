@@ -8,6 +8,11 @@ export default class JobUpdater {
       const job = jobs[i];
       if (job.nextUpdateTick <= Game.time) {
         switch (job.type) {
+          case "harvestMineral":
+            job.amountLeft = (Game.getObjectById(
+              job.targetId
+            ) as Mineral).mineralAmount;
+            break;
           case "transfer":
           case "withdraw": {
             const structure = Game.getObjectById(

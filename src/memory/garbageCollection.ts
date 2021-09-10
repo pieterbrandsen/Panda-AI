@@ -33,31 +33,11 @@ export default class GarbageCollection {
       liveObjectType: type,
     };
 
+    delete Memory.structuresData.data[key];
     const roomMemory = Memory.roomsData.data[object.manager.roomName];
-    switch (type) {
-      case "structure":
-        delete Memory.structuresData.data[key];
-        break;
-      case "creep":
-        delete Memory.creepsData.data[key];
-        break;
-
-      // skip default case
-    }
     if (!roomMemory) return;
 
-    const objectManagerMemory: BaseManagerMemory =
-      roomMemory.managersMemory[object.manager.name];
-    switch (type) {
-      case "structure":
-        delete objectManagerMemory[key];
-        break;
-      case "creep":
-        delete objectManagerMemory[key];
-        break;
-
-      // skip default case
-    }
+    delete roomMemory.managersMemory[object.manager.name].structures[key];
   }
 
   /**
@@ -69,17 +49,13 @@ export default class GarbageCollection {
       let memoryObj: StringMap<MemoryTypesInGarbageCollection> | undefined;
 
       switch (value.liveObjectType) {
-        case "room":
-          liveObject = Game.rooms[key];
-          memoryObj = Memory.roomsData.data;
-          break;
         case "structure":
           liveObject = Game.structures[key];
           memoryObj = Memory.structuresData.data;
           break;
-        case "creep":
-          liveObject = Game.creeps[key];
-          memoryObj = Memory.creepsData.data;
+        case "room":
+          liveObject = Game.rooms[key];
+          memoryObj = Memory.roomsData.data;
           break;
 
         // skip default case

@@ -1,5 +1,5 @@
 import { minBy } from "lodash";
-import WorkJobTypes from "../../../utils/constants/jobTypes";
+import { workJobTypes } from "../../../utils/constants/jobTypes";
 
 export default class WorkJobsHelper {
   /**
@@ -8,7 +8,7 @@ export default class WorkJobsHelper {
    * @returns - List of jobs with work types
    */
   public static GetAllJobs(jobs: Job[]): Job[] {
-    return jobs.filter((j) => WorkJobTypes.includes(j.type));
+    return jobs.filter((j) => workJobTypes.includes(j.type));
   }
 
   /**

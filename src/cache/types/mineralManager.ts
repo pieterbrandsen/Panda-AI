@@ -1,10 +1,9 @@
-import { forOwn } from "lodash";
-import IsStructureType from "../../utils/constants/predicate";
-import RoomPositionHelper from "../../rooms/helpers/roomPosition";
+import BaseManager from "./baseManager";
 
 export default function UpdateMineralManagerCache(room: Room): void {
-  const mineral: Mineral = room.find(FIND_MINERALS)[0];
   const cache = Memory.roomsData.data[room.name].managersMemory.mineral;
+  const mineral: Mineral =
+    Game.getObjectById(cache.mineral.id) || room.find(FIND_MINERALS)[0];
 
   if (!mineral || !mineral.room) {
     return;
@@ -21,64 +20,5 @@ export default function UpdateMineralManagerCache(room: Room): void {
     cache.mineral.amount = Math.round(mineral.mineralAmount);
   }
 
-  const extractor: StructureExtractor = mineral.pos.findInRange<StructureExtractor>(
-    FIND_STRUCTURES,
-    0,
-    { filter: IsStructureType(STRUCTURE_EXTRACTOR) }
-  )[0];
-  if (extractor && cache.structures[extractor.id] === undefined) {
-    cache.structures[extractor.id] = {
-      type: extractor.structureType,
-      pos: extractor.pos,
-    };
-    cache.mineral.extractorId = extractor.id;
-  }
-
-  forOwn(cache.creeps, (cacheCrp, key) => {
-    const creep = Game.getObjectById<Creep>(key);
-
-    if (creep && creep.room.name !== room.name) {
-      Memory.creepsData.data[key].manager.roomName = creep.room.name;
-      Memory.roomsData.data[creep.room.name].managersMemory.mineral.creeps[
-        key
-      ] = cacheCrp;
-      delete cache.creeps[key];
-    }
-  });
-  forOwn(cache.structures, (cacheStr, key) => {
-    const structure = Game.getObjectById<Structure>(key);
-
-    // TODO: Move this to extractor structure file
-    if (!structure) {
-      if (cache.mineral.extractorId === key) {
-        delete cache.mineral.extractorId;
-      }
-    }
-  });
-  forOwn(cache.constructionSites, (cachedSite, key) => {
-    let site: ConstructionSite | null | undefined;
-    if (cachedSite.id) {
-      site = Game.getObjectById<ConstructionSite>(cachedSite.id);
-    } else {
-      const position = RoomPositionHelper.UnfreezeRoomPosition(cachedSite.pos);
-      [site] = position.findInRange(FIND_CONSTRUCTION_SITES, 0);
-    }
-
-    if (!site) {
-      delete cache.constructionSites[key];
-      const position = RoomPositionHelper.UnfreezeRoomPosition(cachedSite.pos);
-      const structureAtPos = position.findInRange(FIND_STRUCTURES, 0, {
-        filter: IsStructureType(cachedSite.type),
-      })[0];
-      if (structureAtPos) {
-        cache.structures[structureAtPos.id] = {
-          type: structureAtPos.structureType,
-          pos: structureAtPos.pos,
-        };
-      }
-    } else {
-      if (!cachedSite.id) cachedSite.id = site.id;
-      cachedSite.progressLeft = site.progressTotal - site.progress;
-    }
-  });
+  BaseManager(room.name, "mineral");
 }

@@ -6,10 +6,18 @@ import MemoryInitializer from "../memory/initialization";
 import { DefaultRoomMemory } from "../utils/constants/memory";
 import MineralManager from "./managers/mineralManager/manager";
 import GarbageCollection from "../memory/garbageCollection";
+import SpawnManager from "./managers/spawnManager/manager";
 
 beforeAll(() => {
   mockGlobal<Memory>("Memory", {});
   mockGlobal<Game>("Game", { rooms: {}, creeps: {} }, true);
+
+  DataMemoryInitializer.SetupRoomDataMemory = jest.fn();
+  MemoryValidator.IsMemoryValid = jest.fn().mockReturnValue(true);
+
+  GarbageCollection.CollectRoom = jest.fn();
+  SpawnManager.Run = jest.fn();
+  MineralManager.Run = jest.fn();
 });
 const roomName = "W1N1";
 const room = mockInstanceOf<Room>({ name: roomName, controller: undefined });
@@ -17,14 +25,11 @@ const room = mockInstanceOf<Room>({ name: roomName, controller: undefined });
 describe("ExecuteRooms", () => {
   beforeEach(() => {
     Game.rooms = { [roomName]: room };
-
     MemoryInitializer.SetupRootMemory();
-    DataMemoryInitializer.SetupRoomDataMemory = jest.fn().mockClear();
-    MemoryInitializer.SetupRoomMemory = jest.fn().mockClear();
-    MemoryValidator.IsMemoryValid = jest.fn().mockClear().mockReturnValue(true);
-
-    GarbageCollection.CollectRoom = jest.fn().mockClear();
-    MineralManager.Run = jest.fn().mockClear();
+    Memory.roomsData.data[room.name] = DefaultRoomMemory(room.name);
+  });
+  afterEach(() => {
+    jest.clearAllMocks();
   });
   it("Should_SetupDataRoomMemory_When_NotMemoryNotValid", () => {
     // Arrange
@@ -57,6 +62,7 @@ describe("ExecuteRooms", () => {
 
     // Assert
     expect(MineralManager.Run).toBeCalled();
+    expect(SpawnManager.Run).toBeCalled();
   });
   it("Should_NotExecuteOwnedRoomManagers_WhenControllerIsNotOwned", () => {
     Memory.roomsData.data[roomName] = DefaultRoomMemory(roomName);
@@ -83,7 +89,8 @@ describe("ExecuteRooms", () => {
   });
   it("Should_NotDoRoomStuff_When_ScoutIsUnderway", () => {
     // Arrange
-    Memory.roomsData.data = { unseen: DefaultRoomMemory(roomName) };
+    Game.rooms = {};
+    Memory.roomsData.data = { unseen: DefaultRoomMemory("unseen") };
     const memory = Memory.roomsData.data.unseen;
     memory.scout = { name: "scout" };
     Game.creeps[memory.scout.name] = mockInstanceOf<Creep>({});

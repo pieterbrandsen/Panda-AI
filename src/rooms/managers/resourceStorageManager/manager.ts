@@ -31,14 +31,12 @@ export default class ResourceStorageManager {
         if (isSourceStructure) resourceLevel = ResourceLevels.containerSource;
         else if (isControllerStructure)
           resourceLevel = ResourceLevels.containerController;
-        else resourceLevel = ResourceLevels.containerNormal;
         break;
       case "link":
         if (isSourceStructure) resourceLevel = ResourceLevels.linkSource;
         else if (isControllerStructure)
           resourceLevel = ResourceLevels.linkController;
         else if (isHearthStructure) resourceLevel = ResourceLevels.linkHearth;
-        else resourceLevel = ResourceLevels.linkNormal;
         break;
       case "extension":
         resourceLevel = ResourceLevels.extension;
@@ -58,6 +56,8 @@ export default class ResourceStorageManager {
 
       // skip default case
     }
+
+    if (!resourceLevel) return;
 
     const usedStorage = structure.store[resourceType];
     const maxStorage = structure.store.getCapacity(resourceType) as number;

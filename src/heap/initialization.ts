@@ -8,6 +8,7 @@ export default class HeapInitializer {
    * Sets all heap vars to default values.
    */
   private static InitializeHeap(): void {
+    global.totalQueuedCreeps = 0;
     global.version = VersionedMemoryObjects[VersionedMemoryTypeName.Heap];
   }
 

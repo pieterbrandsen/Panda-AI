@@ -11,10 +11,8 @@ interface ResourceLevel {
   empty: number;
 }
 interface ResourceLevels {
-  containerNormal: ResourceLevel;
   containerSource: ResourceLevel;
   containerController: ResourceLevel;
-  linkNormal: ResourceLevel;
   linkHearth: ResourceLevel;
   linkSource: ResourceLevel;
   linkController: ResourceLevel;
@@ -23,4 +21,15 @@ interface ResourceLevels {
   tower: ResourceLevel;
   spawn: ResourceLevel;
   extension: ResourceLevel;
+}
+
+interface BodyIteratee {
+  cost: number;
+  body: BodyPartConstant[];
+  reqBodyPartPerLoop: number;
+}
+interface BodyIterators {
+  harvestMineral: BodyIteratee;
+  build: BodyIteratee;
+  pioneer: BodyIteratee;
 }

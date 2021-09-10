@@ -1,9 +1,9 @@
-import { forEach } from "lodash";
 import CacheManager from "../../../cache/updateCache";
 import CreateConstructionSite from "../../helpers/createConstructionSite";
 import RoomPositionHelper from "../../helpers/roomPosition";
 import JobCreatorHelper from "../../jobs/creation";
 import JobUpdater from "../../jobs/update";
+import UpdateSpawningQueue from "../spawnManager/update";
 
 export default class MineralManager {
   /**
@@ -43,13 +43,12 @@ export default class MineralManager {
       }
     }
 
-    forEach(Object.keys(cache.creeps), (id) => {
-      const creep = Game.getObjectById<Creep>(id as Id<Creep>);
-      if (creep) {
-        // TODO: Execute creep
-      }
-    });
+    // forEach(Object.keys(cache.creeps), (id) => {
+    //   const creep = Game.getObjectById<Creep>(id as Id<Creep>);
+    //   if (creep) {}
+    // });
 
-    // TODO: Spawning manager
+    UpdateSpawningQueue.Update(room, "harvestMineral", "mineral");
+    UpdateSpawningQueue.Update(room, "build", "mineral");
   }
 }

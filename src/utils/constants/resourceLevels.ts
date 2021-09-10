@@ -1,5 +1,4 @@
 const ResourceLevels: ResourceLevels = {
-  containerNormal: { empty: 50, full: 80 },
   containerSource: {
     empty: 0,
     full: 0,
@@ -23,10 +22,6 @@ const ResourceLevels: ResourceLevels = {
   linkSource: {
     empty: 100,
     full: 0,
-  },
-  linkNormal: {
-    empty: 50,
-    full: 50,
   },
   spawn: {
     empty: 0,

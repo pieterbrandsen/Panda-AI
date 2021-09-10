@@ -1,4 +1,4 @@
-type JobType = "harvestMineral" | "transfer" | "withdraw";
+type JobType = "harvestMineral" | "transfer" | "withdraw" | "pioneer" | "build";
 interface Job {
   // Base
   id: string;
@@ -12,6 +12,9 @@ interface Job {
   type: JobType;
   hasNeedOfFulfillment: boolean;
 
+  // Mineral
+  mineralType?: MineralConstant;
+
   // Mineral, Harvest, Transfer, Withdraw
   amountLeft?: number;
 
@@ -21,4 +24,5 @@ interface Job {
 }
 interface AssignedJobObject {
   id: string;
+  roomName: string;
 }

@@ -23,12 +23,13 @@ interface StructureMemory {
   job?: AssignedJobObject;
   checkForNewJobAtTick?: number;
 }
+type CreepType = "work" | "carry" | "pioneer";
 interface CreepMemory {
   manager: ManagerObject;
   lastExecutedAtTick: number;
   job?: AssignedJobObject;
   checkForNewJobAtTick?: number;
-  possibleJobTypes: string[];
+  creepType: CreepType;
 }
 interface RootMemory extends MemoryVersion {
   roomsData: MemoryObject<RoomMemory>;

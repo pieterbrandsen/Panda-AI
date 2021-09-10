@@ -50,6 +50,21 @@ export function DefaultRoomMemory(name: string): RoomMemory {
         },
         constructionSites: {},
       },
+      spawn: {
+        jobs: [],
+        creeps: {},
+        structures: {},
+        constructionSites: {},
+        queue: [],
+        lastSpawnedType: "work",
+      },
+      pioneer: {
+        jobs: [],
+        creeps: {},
+        structures: {},
+        constructionSites: {},
+        isActive: true,
+      },
     },
   };
 }
@@ -62,7 +77,7 @@ export function DefaultStructureMemory(
 
 export function DefaultCreepMemory(
   manager: ManagerObject,
-  possibleJobTypes: JobType[]
+  creepType: CreepType
 ): CreepMemory {
-  return { manager, lastExecutedAtTick: 0, possibleJobTypes };
+  return { manager, lastExecutedAtTick: 0, creepType };
 }

@@ -1,4 +1,5 @@
 import { mockGlobal, mockInstanceOf } from "screeps-jest";
+import { DefaultRoomMemory } from "../utils/constants/memory";
 import GarbageCollection from "./garbageCollection";
 import MemoryInitializer from "./initialization";
 
@@ -15,10 +16,10 @@ describe("GarbageCollection", () => {
   beforeEach(() => {
     Game.time = 0;
     MemoryInitializer.SetupRootMemory();
+    Memory.roomsData.data[room.name] = DefaultRoomMemory(room.name);
   });
   it("Should_MoveMemoryObjToGarbageObject_When_Called", () => {
     // Act
-    MemoryInitializer.SetupRoomMemory(room);
     GarbageCollection.Collect(
       {
         lastExecutedAtTick: 0,
@@ -32,28 +33,18 @@ describe("GarbageCollection", () => {
         lastExecutedAtTick: 0,
         manager: { name: "mineral", roomName: "deadRoomSomehow" },
       },
-      "creep",
-      "creep"
-    );
-    GarbageCollection.Collect(
-      {
-        lastExecutedAtTick: 0,
-        manager: { name: "mineral", roomName: room.name },
-      },
-      "creep2",
-      "creep"
+      "structure2",
+      "structure"
     );
     GarbageCollection.CollectRoom(Memory.roomsData.data[room.name], room.name);
 
     // Assert
-    expect(Object.keys(Memory.garbageData)).toHaveLength(4);
+    expect(Object.keys(Memory.garbageData)).toHaveLength(3);
     expect(Object.keys(Memory.roomsData.data)).toHaveLength(0);
     expect(Object.keys(Memory.structuresData.data)).toHaveLength(0);
-    expect(Object.keys(Memory.creepsData.data)).toHaveLength(0);
   });
   it("Should_BringAliveObjectsBackToMemory_When_Visible", () => {
     // Arrange
-    MemoryInitializer.SetupRoomMemory(room);
     Game.rooms[room.name] = mockInstanceOf<Room>({});
     Game.structures.structure = mockInstanceOf<Structure>({});
     Game.creeps.creep = mockInstanceOf<Creep>({});
@@ -68,11 +59,6 @@ describe("GarbageCollection", () => {
         deletedAtTick: -10000,
         liveObjectType: "structure",
       },
-      creep: {
-        data: {},
-        deletedAtTick: -10000,
-        liveObjectType: "creep",
-      },
     };
 
     // Act
@@ -82,14 +68,13 @@ describe("GarbageCollection", () => {
     expect(Object.keys(Memory.garbageData)).toHaveLength(0);
     expect(Object.keys(Memory.roomsData.data)).toHaveLength(1);
     expect(Object.keys(Memory.structuresData.data)).toHaveLength(1);
-    expect(Object.keys(Memory.creepsData.data)).toHaveLength(1);
   });
   it("Should_DeleteObject_When_Expired", () => {
     Memory.garbageData = {
       deadCreep: {
         data: {},
         deletedAtTick: -10000,
-        liveObjectType: "creep",
+        liveObjectType: "structure",
       },
     };
 
@@ -105,7 +90,7 @@ describe("GarbageCollection", () => {
       deadCreep: {
         data: {},
         deletedAtTick: Game.time,
-        liveObjectType: "creep",
+        liveObjectType: "room",
       },
     };
 
