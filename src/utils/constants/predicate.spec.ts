@@ -1,5 +1,5 @@
 import { mockInstanceOf } from "screeps-jest";
-import IsStructureType from "./predicate";
+import IsStructureType, { GetRepairAmount } from "./predicate";
 
 const inputStructure = IsStructureType("container");
 const container = mockInstanceOf<StructureContainer>({
@@ -21,5 +21,12 @@ describe("Predicate", () => {
 
     // Assert
     expect(result).toBe(false);
+  });
+  it("Should_ReturnZero_When_NoRepairingIsNeeded", () => {
+    // Act
+    const amountLeft = GetRepairAmount(10, 5, 100);
+
+    // Assert
+    expect(amountLeft).toBe(5);
   });
 });

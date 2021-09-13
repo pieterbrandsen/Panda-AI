@@ -46,6 +46,28 @@ describe("JobCreationHelper", () => {
     expect(job.amountLeft).toBe(0);
     expect(job.type).toBe("transfer");
   });
+  it("Should_CreateAnNewTransferSpawningJob_When_Called", () => {
+    const structure = mockInstanceOf<Structure>({
+      pos: { x: 0, y: 0, roomName: "room" },
+      id: "structure",
+      structureType: STRUCTURE_CONTAINER,
+      store: { energy: 10, getCapacity: () => 100 },
+    });
+    const requiredPercentage = 10;
+    const resourceType = RESOURCE_ENERGY;
+    const job = JobCreatorHelper.TransferSpawning(
+      structure,
+      requiredPercentage,
+      resourceType,
+      0
+    );
+
+    // Assert
+    expect(job.id).toBe(structure.id);
+    expect(job.targetId).toBe(structure.id);
+    expect(job.amountLeft).toBe(0);
+    expect(job.type).toBe("transferSpawning");
+  });
   it("Should_CreateAnNewWithdrawJob_When_Called", () => {
     const structure = mockInstanceOf<Structure>({
       pos: { x: 0, y: 0, roomName: "room" },
@@ -67,5 +89,24 @@ describe("JobCreationHelper", () => {
     expect(job.targetId).toBe(structure.id);
     expect(job.amountLeft).toBe(0);
     expect(job.type).toBe("withdraw");
+  });
+  it("Should_CreateAnNewRepairJob_When_Called", () => {
+    // Arrange
+    const structure = mockInstanceOf<Structure>({
+      pos: { x: 0, y: 0, roomName: "room" },
+      id: "structure",
+      structureType: STRUCTURE_CONTAINER,
+      hits: 10,
+      hitsMax: 100,
+    });
+
+    // Act
+    const job = JobCreatorHelper.Repair(structure, structure.hits + 1);
+
+    // Assert
+    expect(job.id).toBe(structure.id);
+    expect(job.targetId).toBe(structure.id);
+    expect(job.amountLeft).toBe(1);
+    expect(job.type).toBe("repair");
   });
 });

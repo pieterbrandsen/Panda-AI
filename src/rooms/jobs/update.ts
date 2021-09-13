@@ -1,3 +1,5 @@
+import { GetRepairAmount } from "../../utils/constants/predicate";
+
 export default class JobUpdater {
   /**
    * Update all jobs out of the array
@@ -8,12 +10,30 @@ export default class JobUpdater {
       const job = jobs[i];
       if (job.nextUpdateTick <= Game.time) {
         switch (job.type) {
-          case "harvestMineral":
-            job.amountLeft = (Game.getObjectById(
-              job.targetId
-            ) as Mineral).mineralAmount;
+          case "harvestMineral": {
+            const mineral = Game.getObjectById(job.targetId) as Mineral | null;
+            if (mineral === null) {
+              break;
+            }
+            job.amountLeft = mineral.mineralAmount;
             break;
+          }
+          case "repair": {
+            const structure = Game.getObjectById(
+              job.targetId
+            ) as Structure | null;
+            if (structure === null) {
+              break;
+            }
+            job.amountLeft = GetRepairAmount(
+              job.requiredPercentage as number,
+              structure.hits,
+              structure.hitsMax
+            );
+            break;
+          }
           case "transfer":
+          case "transferSpawning":
           case "withdraw": {
             const structure = Game.getObjectById(
               job.targetId

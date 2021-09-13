@@ -66,6 +66,7 @@ export function DefaultRoomMemory(name: string): RoomMemory {
         isActive: true,
       },
     },
+    wallRampartHitPercentage: 0.25,
   };
 }
 

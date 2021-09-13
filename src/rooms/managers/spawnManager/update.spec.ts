@@ -85,6 +85,10 @@ describe("UpdateQueue", () => {
     // Act
     UpdateSpawningQueue.Update(room, "harvestMineral", "spawn");
     UpdateSpawningQueue.Update(room, "pioneer", "spawn");
+    UpdateSpawningQueue.Update(room, "build", "spawn");
+    UpdateSpawningQueue.Update(room, "repair", "spawn");
+    UpdateSpawningQueue.Update(room, "transfer", "spawn");
+    UpdateSpawningQueue.Update(room, "transferSpawning", "spawn");
 
     // Assert
     expect(cache.queue).toHaveLength(2);

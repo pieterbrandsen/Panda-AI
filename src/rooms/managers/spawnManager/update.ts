@@ -68,34 +68,53 @@ export default class UpdateSpawningQueue {
     let aliveBodyPartCount = 0;
     let queuedBodyPartCount = 0;
     let requiredBodyPartCount = 0;
-    let creepType: CreepType = "work";
 
+    let creepType: CreepType = "work";
     let bodyPart: BodyPartConstant = WORK;
     switch (jobType) {
       case "pioneer":
-        bodyPart = WORK;
         requiredBodyPartCount = 5;
         queuedBodyPartCount = queuedPioneerBodyParts[bodyPart] || 0;
         aliveBodyPartCount = alivePioneerBodyParts[bodyPart] || 0;
         creepType = "pioneer";
         break;
       case "harvestMineral":
-        bodyPart = WORK;
         multiplier = 5;
         per1Lifetime = 1500;
-        requiredBodyPartCount =
-          sum(
-            managerCache.jobs
-              .filter((job) => job.type === jobType)
-              .map((job) => job.amountLeft)
-          ) /
-          (per1Lifetime * multiplier);
-        queuedBodyPartCount = queuedBodyParts[bodyPart] || 0;
-        aliveBodyPartCount = aliveBodyParts[bodyPart] || 0;
-        creepType = "work";
+        break;
+      case "build":
+        per1Lifetime = 7500;
+        break;
+      case "transfer":
+      case "withdraw":
+        bodyPart = CARRY;
+        multiplier = 0.1;
+        per1Lifetime = 7500;
+        creepType = "carry";
+        break;
+      case "transferSpawning":
+        bodyPart = CARRY;
+        multiplier = 0.002;
+        per1Lifetime = 75000;
+        creepType = "carry";
+        break;
+      case "repair":
+        per1Lifetime = 150000;
         break;
 
       // skip default case
+    }
+
+    if (jobType !== "pioneer") {
+      requiredBodyPartCount =
+        sum(
+          managerCache.jobs
+            .filter((job) => job.type === jobType)
+            .map((job) => job.amountLeft)
+        ) /
+        (per1Lifetime * multiplier);
+      queuedBodyPartCount = queuedBodyParts[bodyPart] || 0;
+      aliveBodyPartCount = aliveBodyParts[bodyPart] || 0;
     }
 
     const missingBodyParts =
