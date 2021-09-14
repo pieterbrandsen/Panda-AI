@@ -1,3 +1,9 @@
+/**
+ * Get amount of hits required to be repaired
+ * @param requiredPercentage - Amount required to be minimum repair amount
+ * @param hits - Number of hits
+ * @param hitsMax - Max number of hits
+ */
 export function GetRepairAmount(
   requiredPercentage: number,
   hits: number,

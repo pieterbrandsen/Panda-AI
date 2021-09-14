@@ -19,6 +19,13 @@ const damagedRampart = mockInstanceOf<Structure>({
   id: "structure",
   pos: { x: 0, y: 0, roomName: room.name },
 });
+const damagedRoad = mockInstanceOf<Structure>({
+  hits: 0,
+  hitsMax: 100,
+  structureType: "road",
+  id: "structure",
+  pos: { x: 0, y: 0, roomName: room.name },
+});
 const damagedStructure = mockInstanceOf<Structure>({
   hits: 0,
   hitsMax: 100,
@@ -94,5 +101,33 @@ describe("ControlRepairJob", () => {
 
     // Assert
     expect(spawnCache.jobs[0].requiredPercentage).toBe(0.25);
+  });
+  it("Should_OnlyCreateRepairJobForRoad_When_StructureRepairedPercentageIsBelow50%", () => {
+    // Arrange
+    const spawnCache = Memory.roomsData.data[room.name].managersMemory.spawn;
+    damagedRoad.hits = 0;
+
+    // Act
+    ControlRepairJob.ControlDamagedStructure(damagedRoad, {
+      name: "spawn",
+      roomName: room.name,
+    });
+
+    // Assert
+    expect(spawnCache.jobs[0].amountLeft).toBe(100);
+  });
+  it("Should_NotCreateRepairJobForRoad_When_StructureRepairedPercentageIsAbove50%", () => {
+    // Arrange
+    const spawnCache = Memory.roomsData.data[room.name].managersMemory.spawn;
+    damagedRoad.hits = 50;
+
+    // Act
+    ControlRepairJob.ControlDamagedStructure(damagedRoad, {
+      name: "spawn",
+      roomName: room.name,
+    });
+
+    // Assert
+    expect(spawnCache.jobs).toHaveLength(0);
   });
 });
