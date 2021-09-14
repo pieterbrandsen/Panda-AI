@@ -2,6 +2,7 @@ import { forEach, forOwn, remove } from "lodash";
 import CacheManager from "../../../cache/updateCache";
 import JobUpdater from "../../jobs/update";
 import GetNextCreepType from "./helpers/getNextCreep";
+import UpdateSpawningQueue from "./update";
 
 export default class SpawnManager {
   /**
@@ -48,5 +49,8 @@ export default class SpawnManager {
         queueCreep.managerName
       ].creeps[queueCreep.name] = {};
     });
+
+    UpdateSpawningQueue.Update(room, "transferSpawning", "spawn");
+    UpdateSpawningQueue.Update(room, "withdraw", "spawn");
   }
 }

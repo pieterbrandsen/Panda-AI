@@ -1,4 +1,4 @@
-import { forOwn } from "lodash";
+import { forEach, forOwn } from "lodash";
 import {
   DefaultCreepMemory,
   DefaultRoomMemory,
@@ -13,6 +13,9 @@ export default class MemoryInitializer {
    * Initializes the memory of the root
    */
   private static InitializeRootMemory(): void {
+    forEach(Object.keys(Memory), (key) => {
+      delete Memory[key];
+    });
     forOwn(DefaultRootMemory, (value, key) => {
       Memory[key] = value;
     });

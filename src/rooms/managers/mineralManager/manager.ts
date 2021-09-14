@@ -43,12 +43,11 @@ export default class MineralManager {
       }
     }
 
-    // forEach(Object.keys(cache.creeps), (id) => {
-    //   const creep = Game.getObjectById<Creep>(id as Id<Creep>);
-    //   if (creep) {}
-    // });
+    // forOwn(cache.creeps, (cacheCrp, key) => {});
+    // forOwn(cache.structures, (cacheStr, key) => {});
 
     UpdateSpawningQueue.Update(room, "harvestMineral", "mineral");
     UpdateSpawningQueue.Update(room, "build", "mineral");
+    UpdateSpawningQueue.Update(room, "repair", "mineral");
   }
 }

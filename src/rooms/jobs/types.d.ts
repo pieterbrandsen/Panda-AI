@@ -1,5 +1,6 @@
 type JobType =
   | "harvestMineral"
+  | "harvestSource"
   | "transfer"
   | "transferSpawning"
   | "withdraw"

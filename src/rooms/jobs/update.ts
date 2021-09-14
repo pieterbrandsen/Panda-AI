@@ -10,6 +10,16 @@ export default class JobUpdater {
       const job = jobs[i];
       if (job.nextUpdateTick <= Game.time) {
         switch (job.type) {
+          case "harvestSource": {
+            const source = Game.getObjectById<Source>(
+              job.targetId
+            ) as Source | null;
+            if (source === null) {
+              break;
+            }
+            job.amountLeft = source.energy;
+            break;
+          }
           case "harvestMineral": {
             const mineral = Game.getObjectById(job.targetId) as Mineral | null;
             if (mineral === null) {
