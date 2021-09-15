@@ -45,13 +45,19 @@ describe("JobUpdater", () => {
       nextUpdateTick: 0,
       amountLeft: 10,
     });
+    const harvestSourceJob = mockInstanceOf<Job>({
+      type: "harvestSource",
+      targetId: "",
+      nextUpdateTick: 0,
+      amountLeft: 10,
+    });
     const repairJob = mockInstanceOf<Job>({
       type: "repair",
       targetId: "",
       nextUpdateTick: 0,
       amountLeft: 10,
     });
-    const jobs = [transferJob, harvestMineralJob, repairJob];
+    const jobs = [transferJob, harvestMineralJob, repairJob,harvestSourceJob];
 
     // Act
     JobUpdater.Run(jobs);
@@ -104,6 +110,23 @@ describe("JobUpdater", () => {
       nextUpdateTick: 0,
       type: "harvestMineral",
       targetId: "mineral",
+    });
+
+    // Act
+    JobUpdater.Run([job]);
+
+    // Assert
+    expect(job.amountLeft).toBe(0);
+  });
+  it("Should_UpdateHarvestSourceJob", () => {
+    // Arrange
+    const source = mockInstanceOf<Source>({ energy: 0 });
+    Game.getObjectById = jest.fn().mockReturnValue(source);
+    const job = mockInstanceOf<Job>({
+      amountLeft: 100,
+      nextUpdateTick: 0,
+      type: "harvestSource",
+      targetId: "source",
     });
 
     // Act

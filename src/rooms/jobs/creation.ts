@@ -39,7 +39,7 @@ export default class JobCreatorHelper {
       id: sourceId,
       targetId: sourceId,
       latestStructureOrCreepAssignedAtTick: 0,
-      type: "harvestMineral",
+      type: "harvestSource",
       pos: freezedSource.pos,
       nextUpdateTick: Game.time + 1000,
       amountLeft: freezedSource.energy,

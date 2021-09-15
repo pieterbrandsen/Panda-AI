@@ -24,6 +24,17 @@ describe("JobCreationHelper", () => {
     expect(job.amountLeft).toBe(mineralCache.amount);
     expect(job.type).toBe("harvestMineral");
   });
+  it("Should_CreateAnNewSourceJob_When_Called", () => {
+    const frozenSource: FreezedSource = {
+      energy: 0,
+      pos: { x: 0, y: 0, roomName: "room" },
+    };
+    const job = JobCreatorHelper.HarvestSource(frozenSource, "id" as Id<Source>);
+
+    // Assert
+    expect(job.amountLeft).toBe(frozenSource.energy);
+    expect(job.type).toBe("harvestSource");
+  });
   it("Should_CreateAnNewTransferJob_When_Called", () => {
     const structure = mockInstanceOf<Structure>({
       pos: { x: 0, y: 0, roomName: "room" },

@@ -4,6 +4,7 @@ import CreateConstructionSite from "../../helpers/createConstructionSite";
 import JobCreatorHelper from "../../jobs/creation";
 import JobUpdater from "../../jobs/update";
 import UpdateSpawningQueue from "../spawnManager/update";
+import SourcePositioningHelper from "./getBestSourceStructureSpot";
 import GetBestSourceStructureSpot from "./getBestSourceStructureSpot";
 
 export default class SourceManager {
@@ -38,7 +39,7 @@ export default class SourceManager {
       ) {
         CreateConstructionSite(
           room,
-          GetBestSourceStructureSpot(
+          SourcePositioningHelper.GetBestSourceStructureSpot(
             room,
             freezedSource,
             requiredStructureType

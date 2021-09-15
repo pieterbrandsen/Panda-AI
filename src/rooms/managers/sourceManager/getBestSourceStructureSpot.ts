@@ -1,6 +1,7 @@
 import { forEach } from "lodash";
 import RoomPositionHelper from "../../helpers/roomPosition";
 
+export default class SourcePositioningHelper {
 /**
  * Return an optimal position for a structure to be built.
  * @param room - The room to search for a position in.
@@ -8,7 +9,7 @@ import RoomPositionHelper from "../../helpers/roomPosition";
  * @param structureType - The structureType to build.
  * @returns - An RoomPosition 
  */
-export default function GetBestSourceStructureSpot(
+public static GetBestSourceStructureSpot(
   room: Room,
   source: FreezedSource,
   structureType: STRUCTURE_CONTAINER | STRUCTURE_LINK
@@ -71,4 +72,5 @@ export default function GetBestSourceStructureSpot(
   if (bestPos) console.log(bestPos.x, bestPos.y);
 
   return bestPos as RoomPosition;
+}
 }
