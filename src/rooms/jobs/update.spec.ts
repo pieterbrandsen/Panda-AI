@@ -57,7 +57,7 @@ describe("JobUpdater", () => {
       nextUpdateTick: 0,
       amountLeft: 10,
     });
-    const jobs = [transferJob, harvestMineralJob, repairJob,harvestSourceJob];
+    const jobs = [transferJob, harvestMineralJob, repairJob, harvestSourceJob];
 
     // Act
     JobUpdater.Run(jobs);

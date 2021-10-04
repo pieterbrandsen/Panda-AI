@@ -34,7 +34,9 @@ describe("SourceManager", (): void => {
   it("Should_CreateJob_When_NoneInCache", () => {
     // Arrange
     const cache = Memory.roomsData.data[room.name].managersMemory.source;
-    cache.sources = {"source":{energy: 0,pos:{x:0,y:0,roomName:room.name}}};
+    cache.sources = {
+      source: { energy: 0, pos: { x: 0, y: 0, roomName: room.name } },
+    };
 
     // Act
     SourceManager.Run(room);
@@ -42,28 +44,42 @@ describe("SourceManager", (): void => {
 
     // Assert
     expect(cache.jobs).toHaveLength(1);
-  })
+  });
   it("Should_SucceedBuildingConstructionSite_WhenNoFreezedStructure", () => {
-        // Arrange
-        room.controller = mockInstanceOf<StructureController>({level:2});
-        const cache = Memory.roomsData.data[room.name].managersMemory.source;
-        cache.sources = {"source":{energy: 0,pos:{x:0,y:0,roomName:room.name}}};
-        SourcePositioningHelper.GetBestSourceStructureSpot = jest.fn().mockReturnValue({x:0,y:0,roomName: "room"});
-        room.createConstructionSite = jest.fn().mockReturnValue(0);
+    // Arrange
+    room.controller = mockInstanceOf<StructureController>({ level: 2 });
+    const cache = Memory.roomsData.data[room.name].managersMemory.source;
+    cache.sources = {
+      source: { energy: 0, pos: { x: 0, y: 0, roomName: room.name } },
+    };
+    SourcePositioningHelper.GetBestSourceStructureSpot = jest
+      .fn()
+      .mockReturnValue({ x: 0, y: 0, roomName: "room" });
+    room.createConstructionSite = jest.fn().mockReturnValue(0);
 
-        // Act
-        SourceManager.Run(room);
-    
-        // Assert
-        expect(cache.jobs).toHaveLength(1);
+    // Act
+    SourceManager.Run(room);
+
+    // Assert
+    expect(cache.jobs).toHaveLength(1);
     expect(Object.keys(cache.constructionSites)).toHaveLength(1);
     expect(room.createConstructionSite).toHaveBeenCalled();
-  })
+  });
   it("Should_NotSucceedBuildingConstructionSite_WhenFreezedStructureInSourceMem", () => {
     // Arrange
-    room.controller = mockInstanceOf<StructureController>({level:7});
+    room.controller = mockInstanceOf<StructureController>({ level: 7 });
     const cache = Memory.roomsData.data[room.name].managersMemory.source;
-    cache.sources = {"source":{energy: 0,pos:{x:0,y:0,roomName:room.name},structure:{id:"id" as Id<Structure>,pos:{x:0,y:0,roomName:room.name},type:"container"}}};
+    cache.sources = {
+      source: {
+        energy: 0,
+        pos: { x: 0, y: 0, roomName: room.name },
+        structure: {
+          id: "id" as Id<Structure>,
+          pos: { x: 0, y: 0, roomName: room.name },
+          type: "container",
+        },
+      },
+    };
     room.createConstructionSite = jest.fn().mockReturnValue(0);
 
     // Act
@@ -71,5 +87,5 @@ describe("SourceManager", (): void => {
 
     // Assert
     expect(room.createConstructionSite).not.toHaveBeenCalled();
-})
-})
+  });
+});

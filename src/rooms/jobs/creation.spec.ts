@@ -29,7 +29,10 @@ describe("JobCreationHelper", () => {
       energy: 0,
       pos: { x: 0, y: 0, roomName: "room" },
     };
-    const job = JobCreatorHelper.HarvestSource(frozenSource, "id" as Id<Source>);
+    const job = JobCreatorHelper.HarvestSource(
+      frozenSource,
+      "id" as Id<Source>
+    );
 
     // Assert
     expect(job.amountLeft).toBe(frozenSource.energy);
