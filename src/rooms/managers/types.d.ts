@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars */
 // #region
-type ManagerNames = "mineral" | "spawn" | "pioneer";
+type ManagerNames = "mineral" | "spawn" | "pioneer" | "source";
 interface BaseManagerConstructionSiteCache {
   type: BuildableStructureConstant;
   pos: FreezedRoomPosition;
@@ -56,10 +56,25 @@ interface PioneerManagerMemory extends BaseManagerMemory {
 }
 // #endregion
 
+// #region Source
+interface FreezedSource {
+  pos: FreezedRoomPosition;
+  energy: number;
+  structure?: {
+    pos: FreezedRoomPosition;
+    id: Id<Structure>;
+    type: StructureConstant;
+  };
+}
+interface SourceManagerMemory extends BaseManagerMemory {
+  sources: StringMap<FreezedSource>;
+}
+
 interface ManagersMemory {
   mineral: MineralManagerMemory;
   spawn: SpawnManagerMemory;
   pioneer: PioneerManagerMemory;
+  source: SourceManagerMemory;
 }
 interface ManagerObject {
   name: ManagerNames;

@@ -24,6 +24,30 @@ export default class JobCreatorHelper {
   }
 
   /**
+   * Create an source job
+   * @param freezedSource - Frozen source for job
+   * @returns
+   */
+  public static HarvestSource(
+    freezedSource: FreezedSource,
+    sourceId: Id<Source>
+  ): Job {
+    return {
+      available: true,
+      creationTime: Game.time,
+      hasPriority: false,
+      id: sourceId,
+      targetId: sourceId,
+      latestStructureOrCreepAssignedAtTick: 0,
+      type: "harvestSource",
+      pos: freezedSource.pos,
+      nextUpdateTick: Game.time + 1000,
+      amountLeft: freezedSource.energy,
+      hasNeedOfFulfillment: true,
+    };
+  }
+
+  /**
    * Create an repair job
    * @param structure - Structure for job
    * @param requiredPercentage - Required percentage to fill too

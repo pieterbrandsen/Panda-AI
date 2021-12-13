@@ -82,6 +82,10 @@ export default class UpdateSpawningQueue {
         multiplier = 5;
         per1Lifetime = 1500;
         break;
+      case "harvestSource":
+        multiplier = 0.5;
+        per1Lifetime = 3000;
+        break;
       case "build":
         per1Lifetime = 7500;
         break;

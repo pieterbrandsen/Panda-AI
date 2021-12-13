@@ -108,6 +108,6 @@ describe("MineralManager", () => {
     MineralManager.Run(room);
 
     // Assert
-    expect(UpdateSpawningQueue.Update).toBeCalledTimes(2);
+    expect(UpdateSpawningQueue.Update).toBeCalledTimes(3);
   });
 });

@@ -84,6 +84,7 @@ describe("UpdateQueue", () => {
 
     // Act
     UpdateSpawningQueue.Update(room, "harvestMineral", "spawn");
+    UpdateSpawningQueue.Update(room, "harvestSource", "spawn");
     UpdateSpawningQueue.Update(room, "pioneer", "spawn");
     UpdateSpawningQueue.Update(room, "build", "spawn");
     UpdateSpawningQueue.Update(room, "repair", "spawn");
