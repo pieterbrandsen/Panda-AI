@@ -1,5 +1,6 @@
 import { forEach, forOwn } from "lodash";
 import MemoryInitializer from "../../memory/initialization";
+import RoomPositionHelper from "./roomPosition";
 
 /**
  * Get all structures to add them to an manager
@@ -26,6 +27,30 @@ export default function SetupStructuresCache(room: Room): void {
           }
         );
         break;
+        case "source":
+          forEach(
+            groupedStructures.filter((s) =>            ([
+              STRUCTURE_CONTAINER,
+              STRUCTURE_LINK,
+            ] as StructureConstant[]).includes(s.structureType)),
+            (structure) => {
+              const sources = managersMemory[managerName].sources;
+              forEach(sources, (source) => {
+                const pos = RoomPositionHelper.UnfreezeRoomPosition(source.pos);
+                if (pos.inRangeTo(structure.pos,2)) {
+                  managersMemory[managerName].structures[structure.id] = {
+                    pos: structure.pos,
+                    type: structure.structureType,
+                  };
+                  MemoryInitializer.SetupStructureMemory(structure.id, {
+                    name: managerName,
+                    roomName: room.name,
+                  });
+                }
+              })
+            }
+          );
+          break;
       case "spawn":
         forEach(
           groupedStructures.filter((s) =>

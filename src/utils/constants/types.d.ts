@@ -10,7 +10,7 @@ interface ResourceLevel {
   full: number;
   empty: number;
 }
-interface ResourceLevels {
+interface EnergyResourceLevels {
   containerSource: ResourceLevel;
   containerController: ResourceLevel;
   linkHearth: ResourceLevel;
@@ -21,6 +21,11 @@ interface ResourceLevels {
   tower: ResourceLevel;
   spawn: ResourceLevel;
   extension: ResourceLevel;
+}
+interface DefaultResourceLevels {
+  mineral: ResourceLevel;
+  compounds: ResourceLevel;
+  factory: ResourceLevel;
 }
 
 interface BodyIteratee {

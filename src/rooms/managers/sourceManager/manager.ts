@@ -38,8 +38,8 @@ export default class SourceManager {
         delete freezedSource.structure;
       }
 
-          // TODO: Check every 100 ticks 
-          if (
+          // TODO: Check every 100 ticks
+      if (
         !freezedSource.structure &&
         roomController.level >= 2 &&
         Object.keys(cache.constructionSites).length === 0

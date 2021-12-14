@@ -1,7 +1,136 @@
-import ResourceLevels from "../../../utils/constants/resourceLevels";
+import {MineralResources,BoostResources,FactoryResources,ResourceLevels} from "../../../utils/constants/resources";
 import JobCreatorHelper from "../../jobs/creation";
+import { forEach } from 'lodash';
 
 export default class ResourceStorageManager {
+  private static GetResourceLevel(resource:ResourceConstant): ResourceLevel {
+    if (MineralResources.includes(resource)) {
+      return ResourceLevels.default.mineral;
+    }
+    else if (BoostResources.includes(resource)) {
+      return ResourceLevels.default.compounds;
+    }
+    else if (FactoryResources.includes(resource)) {
+      return ResourceLevels.default.factory;
+    }
+    else return ResourceLevels.default.factory;
+  }
+  private static ControlResourceLevel(  structure:
+    | StructureStorage
+    | StructureTerminal
+    | StructureContainer
+    | StructureLink
+    | StructureTower
+    | StructureSpawn
+    | StructureExtension,
+    jobs: Job[],
+    resourceLevel: ResourceLevel,
+    resourceType: ResourceConstant) {
+      const usedStorage = structure.store[resourceType];
+      const maxStorage = structure.store.getCapacity(resourceType) as number;
+      const storageLevel = Math.floor((usedStorage / maxStorage) * 100);
+      const amountLeftToMax = maxStorage - usedStorage;
+      const amountLeftToEmpty = usedStorage;
+  
+      if (
+        ([
+          STRUCTURE_STORAGE,
+          STRUCTURE_TERMINAL,
+          STRUCTURE_LINK,
+        ] as StructureConstant[]).includes(structure.structureType)
+      ) {
+        if (storageLevel < resourceLevel.empty || storageLevel === 0) {
+          const job = jobs.find(
+            (j) => j.targetId === structure.id && j.type === "transfer"
+          );
+          if (!job)
+            jobs.push(
+              JobCreatorHelper.Transfer(
+                structure,
+                resourceLevel.empty,
+                resourceType,
+                amountLeftToMax,
+                true
+              )
+            );
+        } else if (
+          storageLevel > resourceLevel.empty &&
+          storageLevel < resourceLevel.full
+        ) {
+          let job = jobs.find(
+            (j) => j.targetId === structure.id && j.type === "transfer"
+          );
+          if (!job)
+            jobs.push(
+              JobCreatorHelper.Transfer(
+                structure,
+                resourceLevel.full,
+                resourceType,
+                amountLeftToMax,
+                false
+              )
+            );
+          job = jobs.find(
+            (j) => j.targetId === structure.id && j.type === "withdraw"
+          );
+          if (!job)
+            jobs.push(
+              JobCreatorHelper.Withdraw(
+                structure,
+                resourceLevel.empty,
+                resourceType,
+                amountLeftToEmpty,
+                false
+              )
+            );
+        } else if (storageLevel > resourceLevel.full) {
+          const job = jobs.find(
+            (j) => j.targetId === structure.id && j.type === "withdraw"
+          );
+          if (!job)
+            jobs.push(
+              JobCreatorHelper.Withdraw(
+                structure,
+                resourceLevel.full,
+                resourceType,
+                amountLeftToEmpty,
+                true
+              )
+            );
+        }
+      } else if (
+        storageLevel < resourceLevel.empty ||
+        storageLevel + resourceLevel.empty === 0
+      ) {
+        const job = jobs.find(
+          (j) => j.targetId === structure.id && j.type === "transfer"
+        );
+        if (!job)
+          jobs.push(
+            JobCreatorHelper.Transfer(
+              structure,
+              resourceLevel.empty,
+              resourceType,
+              amountLeftToMax,
+              true
+            )
+          );
+      } else if (storageLevel > resourceLevel.full) {
+        const job = jobs.find(
+          (j) => j.targetId === structure.id && j.type === "withdraw"
+        );
+        if (!job)
+          jobs.push(
+            JobCreatorHelper.Withdraw(
+              structure,
+              resourceLevel.full,
+              resourceType,
+              amountLeftToEmpty,
+              true
+            )
+          );
+      }
+  }
   /**
    * Create jobs required to manage the structure resource level
    * @param structure - Structure to manage
@@ -22,146 +151,65 @@ export default class ResourceStorageManager {
     jobs: Job[],
     isSourceStructure = false,
     isControllerStructure = false,
-    isHearthStructure = false
+    isHearthStructure = false,
   ): void {
-    const resourceType: ResourceConstant = RESOURCE_ENERGY;
-    let resourceLevel: ResourceLevel | undefined;
+    let resourceTypes: ResourceConstant[] = [];
+    let energyResourceLevel: ResourceLevel | undefined;
     switch (structure.structureType) {
       case "container":
-        if (isSourceStructure) resourceLevel = ResourceLevels.containerSource;
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        if (isSourceStructure) energyResourceLevel = ResourceLevels.energy.containerSource;
         else if (isControllerStructure)
-          resourceLevel = ResourceLevels.containerController;
+        energyResourceLevel = ResourceLevels.energy.containerController;
         break;
       case "link":
-        if (isSourceStructure) resourceLevel = ResourceLevels.linkSource;
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        if (isSourceStructure) energyResourceLevel = ResourceLevels.energy.linkSource;
         else if (isControllerStructure)
-          resourceLevel = ResourceLevels.linkController;
-        else if (isHearthStructure) resourceLevel = ResourceLevels.linkHearth;
+        energyResourceLevel = ResourceLevels.energy.linkController;
+        else if (isHearthStructure) energyResourceLevel = ResourceLevels.energy.linkHearth;
         break;
       case "extension":
-        resourceLevel = ResourceLevels.extension;
-        break;
-      case "storage":
-        resourceLevel = ResourceLevels.storage;
-        break;
-      case "terminal":
-        resourceLevel = ResourceLevels.terminal;
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        energyResourceLevel = ResourceLevels.energy.extension;
         break;
       case "spawn":
-        resourceLevel = ResourceLevels.spawn;
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        energyResourceLevel = ResourceLevels.energy.spawn;
         break;
       case "tower":
-        resourceLevel = ResourceLevels.tower;
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        energyResourceLevel = ResourceLevels.energy.tower;
         break;
-
+        case "storage":
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+          energyResourceLevel = ResourceLevels.energy.storage;
+          break;
+        case "terminal":
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+          energyResourceLevel = ResourceLevels.energy.terminal;
+          break;
       // skip default case
     }
 
-    if (!resourceLevel) return;
-
-    const usedStorage = structure.store[resourceType];
-    const maxStorage = structure.store.getCapacity(resourceType) as number;
-    const storageLevel = Math.floor((usedStorage / maxStorage) * 100);
-    const amountLeftToMax = maxStorage - usedStorage;
-    const amountLeftToEmpty = usedStorage;
-
-    if (
-      ([
-        STRUCTURE_STORAGE,
-        STRUCTURE_TERMINAL,
-        STRUCTURE_LINK,
-      ] as StructureConstant[]).includes(structure.structureType)
-    ) {
-      if (storageLevel < resourceLevel.empty || storageLevel === 0) {
-        const job = jobs.find(
-          (j) => j.targetId === structure.id && j.type === "transfer"
-        );
-        if (!job)
-          jobs.push(
-            JobCreatorHelper.Transfer(
-              structure,
-              resourceLevel.empty,
-              resourceType,
-              amountLeftToMax,
-              true
-            )
+    forEach(resourceTypes, (resourceType) => {
+      if (resourceType === RESOURCE_ENERGY) {
+        if (energyResourceLevel)
+          this.ControlResourceLevel(
+            structure,
+            jobs,
+            energyResourceLevel,
+            resourceType
           );
-      } else if (
-        storageLevel > resourceLevel.empty &&
-        storageLevel < resourceLevel.full
-      ) {
-        let job = jobs.find(
-          (j) => j.targetId === structure.id && j.type === "transfer"
+      } else {
+        const resourceLevel = this.GetResourceLevel(resourceType);
+        this.ControlResourceLevel(
+          structure,
+          jobs,
+          resourceLevel,
+          resourceType
         );
-        if (!job)
-          jobs.push(
-            JobCreatorHelper.Transfer(
-              structure,
-              resourceLevel.full,
-              resourceType,
-              amountLeftToMax,
-              false
-            )
-          );
-        job = jobs.find(
-          (j) => j.targetId === structure.id && j.type === "withdraw"
-        );
-        if (!job)
-          jobs.push(
-            JobCreatorHelper.Withdraw(
-              structure,
-              resourceLevel.empty,
-              resourceType,
-              amountLeftToEmpty,
-              false
-            )
-          );
-      } else if (storageLevel > resourceLevel.full) {
-        const job = jobs.find(
-          (j) => j.targetId === structure.id && j.type === "withdraw"
-        );
-        if (!job)
-          jobs.push(
-            JobCreatorHelper.Withdraw(
-              structure,
-              resourceLevel.full,
-              resourceType,
-              amountLeftToEmpty,
-              true
-            )
-          );
       }
-    } else if (
-      storageLevel < resourceLevel.empty ||
-      storageLevel + resourceLevel.empty === 0
-    ) {
-      const job = jobs.find(
-        (j) => j.targetId === structure.id && j.type === "transfer"
-      );
-      if (!job)
-        jobs.push(
-          JobCreatorHelper.Transfer(
-            structure,
-            resourceLevel.empty,
-            resourceType,
-            amountLeftToMax,
-            true
-          )
-        );
-    } else if (storageLevel > resourceLevel.full) {
-      const job = jobs.find(
-        (j) => j.targetId === structure.id && j.type === "withdraw"
-      );
-      if (!job)
-        jobs.push(
-          JobCreatorHelper.Withdraw(
-            structure,
-            resourceLevel.full,
-            resourceType,
-            amountLeftToEmpty,
-            true
-          )
-        );
-    }
+    })
   }
 }
