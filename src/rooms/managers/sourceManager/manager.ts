@@ -21,15 +21,16 @@ export default class SourceManager {
     const roomController = room.controller as StructureController;
     const requiredStructureType =
       roomController.level >= 7 ? STRUCTURE_LINK : STRUCTURE_CONTAINER;
-
-    forOwn(cache.sources, (freezedSource: FreezedSource, id: string) => {
-      if (!cache.jobs.find((j) => j.targetId === id)) {
-        cache.jobs.push(
-          JobCreatorHelper.HarvestSource(freezedSource, id as Id<Source>)
-        );
-      }
-
-      if (freezedSource.structure && freezedSource.structure.type !== requiredStructureType) {
+      
+      forOwn(cache.sources, (freezedSource: FreezedSource, id: string) => {
+        if (!cache.jobs.find((j) => j.targetId === id)) {
+          cache.jobs.push(
+            JobCreatorHelper.HarvestSource(freezedSource, id as Id<Source>)
+            );
+          }
+          
+          // TODO: Check every 100 ticks 
+          if (freezedSource.structure && freezedSource.structure.type !== requiredStructureType) {
         const structure = Game.getObjectById<Structure>(freezedSource.structure.id);
         if (structure) {
           structure.destroy();
@@ -37,7 +38,8 @@ export default class SourceManager {
         delete freezedSource.structure;
       }
 
-      if (
+          // TODO: Check every 100 ticks 
+          if (
         !freezedSource.structure &&
         roomController.level >= 2 &&
         Object.keys(cache.constructionSites).length === 0
