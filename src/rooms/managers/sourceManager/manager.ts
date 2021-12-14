@@ -29,20 +29,27 @@ export default class SourceManager {
         );
       }
 
-      // Delete container if link is required, only remove no garbage
+      if (freezedSource.structure && freezedSource.structure.type !== requiredStructureType) {
+        const structure = Game.getObjectById<Structure>(freezedSource.structure.id);
+        if (structure) {
+          structure.destroy();
+        }
+        delete freezedSource.structure;
+      }
 
       if (
         !freezedSource.structure &&
         roomController.level >= 2 &&
         Object.keys(cache.constructionSites).length === 0
       ) {
+        const bestPos = SourcePositioningHelper.GetBestSourceStructureSpot(
+          room,
+          freezedSource,
+          requiredStructureType
+        );
         CreateConstructionSite(
           room,
-          SourcePositioningHelper.GetBestSourceStructureSpot(
-            room,
-            freezedSource,
-            requiredStructureType
-          ),
+          bestPos,
           requiredStructureType,
           cache
         );

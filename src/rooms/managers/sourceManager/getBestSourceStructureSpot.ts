@@ -77,7 +77,6 @@ export default class SourcePositioningHelper {
         bestPos = pos;
       }
     });
-    if (bestPos) console.log(bestPos.x, bestPos.y);
 
     return bestPos as RoomPosition;
   }
