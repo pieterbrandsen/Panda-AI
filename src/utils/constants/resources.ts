@@ -70,7 +70,7 @@ export const MineralResources: ResourceConstant[] = [
   RESOURCE_ZYNTHIUM,
   RESOURCE_CATALYST,
 ];
-export const BoostResources: ResourceConstant[] = [
+export const CompoundResources: ResourceConstant[] = [
   RESOURCE_CATALYZED_GHODIUM_ACID,
 ];
 export const FactoryResources: ResourceConstant[] = [RESOURCE_MACHINE];

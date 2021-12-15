@@ -1,7 +1,7 @@
 import { forEach } from "lodash";
 import {
   MineralResources,
-  BoostResources,
+  CompoundResources,
   FactoryResources,
   ResourceLevels,
 } from "../../../utils/constants/resources";
@@ -12,7 +12,7 @@ export default class ResourceStorageManager {
     if (MineralResources.includes(resource)) {
       return ResourceLevels.default.mineral;
     }
-    if (BoostResources.includes(resource)) {
+    if (CompoundResources.includes(resource)) {
       return ResourceLevels.default.compounds;
     }
     if (FactoryResources.includes(resource)) {

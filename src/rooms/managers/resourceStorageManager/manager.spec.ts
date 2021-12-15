@@ -209,4 +209,15 @@ describe("ResourceManager", () => {
     // Assert
     expect(spyFunction).toHaveBeenCalledTimes(structureTypes.length + 2 + 3);
   });
+  it("Should_Return3TypesOfResourceLevels_WhenCalledWithDifferentResources", () => {
+    // Act
+    const mineral = ResourceStorageManager.GetResourceLevel(RESOURCE_POWER);
+    const compound = ResourceStorageManager.GetResourceLevel(RESOURCE_CATALYZED_GHODIUM_ACID);
+    const factory = ResourceStorageManager.GetResourceLevel(RESOURCE_MACHINE);
+
+    // Assert
+    expect(mineral.empty).toBe(ResourceLevels.default.mineral.empty);
+    expect(compound.empty).toBe(ResourceLevels.default.compounds.empty);
+    expect(factory.empty).toBe(ResourceLevels.default.factory.empty);
+  })
 });
