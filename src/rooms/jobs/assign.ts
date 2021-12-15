@@ -7,16 +7,16 @@ export default class JobAssignmentsHelper {
    */
   public static AssignJob(
     memory: CreepMemory | StructureMemory,
-    job: Job | null,
+    job: Job,
     roomName: string
   ): boolean {
-    if (job === null) {
-      switch ((memory as CreepMemory).creepType) {
-        default:
-          return false;
-      }
-      return true;
-    }
+    // if (job === null) {
+    //   switch ((memory as CreepMemory).creepType) {
+    //     default:
+    //       return false;
+    //   }
+    //   return true;
+    // }
     memory.job = { id: job.id, roomName };
     job.latestStructureOrCreepAssignedAtTick = Game.time;
     return true;
