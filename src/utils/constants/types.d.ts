@@ -35,6 +35,7 @@ interface BodyIteratee {
 }
 interface BodyIterators {
   harvestMineral: BodyIteratee;
+  harvestSource: BodyIteratee;
   build: BodyIteratee;
   pioneer: BodyIteratee;
 }
