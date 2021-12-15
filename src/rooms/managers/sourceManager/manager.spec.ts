@@ -76,7 +76,7 @@ describe("SourceManager", (): void => {
         structure: {
           id: "id" as Id<Structure>,
           pos: { x: 0, y: 0, roomName: room.name },
-          type: "container",
+          type: "link",
         },
       },
     };

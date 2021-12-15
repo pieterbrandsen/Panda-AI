@@ -10,7 +10,7 @@ interface ResourceLevel {
   full: number;
   empty: number;
 }
-interface ResourceLevels {
+interface EnergyResourceLevels {
   containerSource: ResourceLevel;
   containerController: ResourceLevel;
   linkHearth: ResourceLevel;
@@ -22,6 +22,11 @@ interface ResourceLevels {
   spawn: ResourceLevel;
   extension: ResourceLevel;
 }
+interface DefaultResourceLevels {
+  mineral: ResourceLevel;
+  compounds: ResourceLevel;
+  factory: ResourceLevel;
+}
 
 interface BodyIteratee {
   cost: number;
@@ -30,6 +35,7 @@ interface BodyIteratee {
 }
 interface BodyIterators {
   harvestMineral: BodyIteratee;
+  harvestSource: BodyIteratee;
   build: BodyIteratee;
   pioneer: BodyIteratee;
 }

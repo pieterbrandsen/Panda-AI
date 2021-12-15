@@ -1,5 +1,5 @@
 import { mockGlobal, mockInstanceOf } from "screeps-jest";
-import ResourceLevels from "../../../utils/constants/resourceLevels";
+import { ResourceLevels } from "../../../utils/constants/resources";
 import ResourceStorageManager from "./manager";
 
 beforeAll(() => {
@@ -37,7 +37,7 @@ describe("ResourceManager", () => {
   it("Should_CreateAnTransferANDWithdrawJobForStorage_WhenEnergyLevelIsMedium", () => {
     // Arrange
     const jobs: Job[] = [];
-    storage.store.energy = ResourceLevels.storage.empty + 1;
+    storage.store.energy = ResourceLevels.energy.storage.empty + 1;
 
     // Act
     ResourceStorageManager.ControlStructureResourceLevel(storage, jobs);
@@ -54,7 +54,7 @@ describe("ResourceManager", () => {
   it("Should_CreateAnWithdrawJobForStorage_WhenEnergyLevelIsTooHigh", () => {
     // Arrange
     const jobs: Job[] = [];
-    storage.store.energy = ResourceLevels.storage.full + 1;
+    storage.store.energy = ResourceLevels.energy.storage.full + 1;
 
     // Act
     ResourceStorageManager.ControlStructureResourceLevel(storage, jobs);
@@ -68,7 +68,7 @@ describe("ResourceManager", () => {
   it("Should_DoNothingForStorage_WhenEnergyLevelIsAtOneOfTheLevels", () => {
     // Arrange
     const jobs: Job[] = [];
-    storage.store.energy = ResourceLevels.storage.full;
+    storage.store.energy = ResourceLevels.energy.storage.full;
 
     // Act
     ResourceStorageManager.ControlStructureResourceLevel(storage, jobs);
@@ -103,7 +103,7 @@ describe("ResourceManager", () => {
   it("Should_CreateAnWithdrawJobForContainer_WhenEnergyLevelIsTooHigh", () => {
     // Arrange
     const jobs: Job[] = [];
-    container.store.energy = ResourceLevels.containerSource.full + 1;
+    container.store.energy = ResourceLevels.energy.containerSource.full + 1;
 
     // Act
     ResourceStorageManager.ControlStructureResourceLevel(container, jobs, true);
@@ -117,7 +117,7 @@ describe("ResourceManager", () => {
   it("Should_DoNothingForContainer_WhenEnergyLevelIsAtOneOfTheLevels", () => {
     // Arrange
     const jobs: Job[] = [];
-    container.store.energy = ResourceLevels.containerController.full;
+    container.store.energy = ResourceLevels.energy.containerController.full;
 
     // Act
     ResourceStorageManager.ControlStructureResourceLevel(

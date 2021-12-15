@@ -1,5 +1,6 @@
 import { forEach } from "lodash";
-import ResourceLevels from "../../../utils/constants/resourceLevels";
+import { ResourceLevels } from "../../../utils/constants/resources";
+import ResourceStorageManager from "./manager";
 
 export default class TerminalResourceStorageManager {
   public static Execute(terminal: StructureTerminal): void {
@@ -12,23 +13,27 @@ export default class TerminalResourceStorageManager {
     });
     if (terminals.length === 0) return;
 
-    const controlledResources: ResourceConstant[] = [RESOURCE_ENERGY];
-    forEach(controlledResources, (resource) => {
+    const resources: ResourceConstant[] = Object.keys(
+      terminal.store
+    ) as ResourceConstant[];
+    forEach(resources, (resource) => {
+      const resourceLevel =
+        resource === RESOURCE_ENERGY
+          ? ResourceLevels.energy.terminal
+          : ResourceStorageManager.GetResourceLevel(resource);
       const thisUsedPercentage =
         (terminal.store[resource] / terminal.store.getCapacity(resource)) * 100;
       let thisStorageLevel = 0;
-      if (ResourceLevels.terminal.empty >= thisUsedPercentage)
-        thisStorageLevel = -1;
-      if (ResourceLevels.terminal.full <= thisUsedPercentage)
-        thisStorageLevel = 1;
+      if (resourceLevel.empty >= thisUsedPercentage) thisStorageLevel = -1;
+      if (resourceLevel.full <= thisUsedPercentage) thisStorageLevel = 1;
 
       const storageLevels: TerminalStorageLevel[] = [];
       forEach(terminals, (ter) => {
         const amount = ter.store[resource];
         const usedPercentage = (amount / ter.store.getCapacity(resource)) * 100;
         let storageLevel = 0;
-        if (ResourceLevels.terminal.empty >= usedPercentage) storageLevel = -1;
-        if (ResourceLevels.terminal.full <= usedPercentage) storageLevel = 1;
+        if (resourceLevel.empty >= usedPercentage) storageLevel = -1;
+        if (resourceLevel.full <= usedPercentage) storageLevel = 1;
         storageLevels.push({
           amount,
           level: storageLevel,

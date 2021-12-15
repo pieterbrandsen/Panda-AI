@@ -1,16 +1,27 @@
-import ResourceLevels from "../../../utils/constants/resourceLevels";
+import { forEach } from "lodash";
+import {
+  MineralResources,
+  BoostResources,
+  FactoryResources,
+  ResourceLevels,
+} from "../../../utils/constants/resources";
 import JobCreatorHelper from "../../jobs/creation";
 
 export default class ResourceStorageManager {
-  /**
-   * Create jobs required to manage the structure resource level
-   * @param structure - Structure to manage
-   * @param jobs - List of jobs to add too
-   * @param isSourceStructure
-   * @param isControllerStructure
-   * @param isHearthStructure
-   */
-  public static ControlStructureResourceLevel(
+  public static GetResourceLevel(resource: ResourceConstant): ResourceLevel {
+    if (MineralResources.includes(resource)) {
+      return ResourceLevels.default.mineral;
+    }
+    if (BoostResources.includes(resource)) {
+      return ResourceLevels.default.compounds;
+    }
+    if (FactoryResources.includes(resource)) {
+      return ResourceLevels.default.factory;
+    }
+    return ResourceLevels.default.factory;
+  }
+
+  private static ControlResourceLevel(
     structure:
       | StructureStorage
       | StructureTerminal
@@ -20,45 +31,9 @@ export default class ResourceStorageManager {
       | StructureSpawn
       | StructureExtension,
     jobs: Job[],
-    isSourceStructure = false,
-    isControllerStructure = false,
-    isHearthStructure = false
-  ): void {
-    const resourceType: ResourceConstant = RESOURCE_ENERGY;
-    let resourceLevel: ResourceLevel | undefined;
-    switch (structure.structureType) {
-      case "container":
-        if (isSourceStructure) resourceLevel = ResourceLevels.containerSource;
-        else if (isControllerStructure)
-          resourceLevel = ResourceLevels.containerController;
-        break;
-      case "link":
-        if (isSourceStructure) resourceLevel = ResourceLevels.linkSource;
-        else if (isControllerStructure)
-          resourceLevel = ResourceLevels.linkController;
-        else if (isHearthStructure) resourceLevel = ResourceLevels.linkHearth;
-        break;
-      case "extension":
-        resourceLevel = ResourceLevels.extension;
-        break;
-      case "storage":
-        resourceLevel = ResourceLevels.storage;
-        break;
-      case "terminal":
-        resourceLevel = ResourceLevels.terminal;
-        break;
-      case "spawn":
-        resourceLevel = ResourceLevels.spawn;
-        break;
-      case "tower":
-        resourceLevel = ResourceLevels.tower;
-        break;
-
-      // skip default case
-    }
-
-    if (!resourceLevel) return;
-
+    resourceLevel: ResourceLevel,
+    resourceType: ResourceConstant
+  ) {
     const usedStorage = structure.store[resourceType];
     const maxStorage = structure.store.getCapacity(resourceType) as number;
     const storageLevel = Math.floor((usedStorage / maxStorage) * 100);
@@ -163,5 +138,85 @@ export default class ResourceStorageManager {
           )
         );
     }
+  }
+
+  /**
+   * Create jobs required to manage the structure resource level
+   * @param structure - Structure to manage
+   * @param jobs - List of jobs to add too
+   * @param isSourceStructure
+   * @param isControllerStructure
+   * @param isHearthStructure
+   */
+  public static ControlStructureResourceLevel(
+    structure:
+      | StructureStorage
+      | StructureTerminal
+      | StructureContainer
+      | StructureLink
+      | StructureTower
+      | StructureSpawn
+      | StructureExtension,
+    jobs: Job[],
+    isSourceStructure = false,
+    isControllerStructure = false,
+    isHearthStructure = false
+  ): void {
+    let resourceTypes: ResourceConstant[] = [];
+    let energyResourceLevel: ResourceLevel | undefined;
+    switch (structure.structureType) {
+      case "container":
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        if (isSourceStructure)
+          energyResourceLevel = ResourceLevels.energy.containerSource;
+        else if (isControllerStructure)
+          energyResourceLevel = ResourceLevels.energy.containerController;
+        break;
+      case "link":
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        if (isSourceStructure)
+          energyResourceLevel = ResourceLevels.energy.linkSource;
+        else if (isControllerStructure)
+          energyResourceLevel = ResourceLevels.energy.linkController;
+        else if (isHearthStructure)
+          energyResourceLevel = ResourceLevels.energy.linkHearth;
+        break;
+      case "extension":
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        energyResourceLevel = ResourceLevels.energy.extension;
+        break;
+      case "spawn":
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        energyResourceLevel = ResourceLevels.energy.spawn;
+        break;
+      case "tower":
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        energyResourceLevel = ResourceLevels.energy.tower;
+        break;
+      case "storage":
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        energyResourceLevel = ResourceLevels.energy.storage;
+        break;
+      case "terminal":
+        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        energyResourceLevel = ResourceLevels.energy.terminal;
+        break;
+      // skip default case
+    }
+
+    forEach(resourceTypes, (resourceType) => {
+      if (resourceType === RESOURCE_ENERGY) {
+        if (energyResourceLevel)
+          this.ControlResourceLevel(
+            structure,
+            jobs,
+            energyResourceLevel,
+            resourceType
+          );
+      } else {
+        const resourceLevel = this.GetResourceLevel(resourceType);
+        this.ControlResourceLevel(structure, jobs, resourceLevel, resourceType);
+      }
+    });
   }
 }

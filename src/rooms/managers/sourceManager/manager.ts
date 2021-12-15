@@ -21,25 +21,30 @@ export default class SourceManager {
     const roomController = room.controller as StructureController;
     const requiredStructureType =
       roomController.level >= 7 ? STRUCTURE_LINK : STRUCTURE_CONTAINER;
-      
-      forOwn(cache.sources, (freezedSource: FreezedSource, id: string) => {
-        if (!cache.jobs.find((j) => j.targetId === id)) {
-          cache.jobs.push(
-            JobCreatorHelper.HarvestSource(freezedSource, id as Id<Source>)
-            );
-          }
-          
-          // TODO: Check every 100 ticks 
-          if (freezedSource.structure && freezedSource.structure.type !== requiredStructureType) {
-        const structure = Game.getObjectById<Structure>(freezedSource.structure.id);
+
+    forOwn(cache.sources, (freezedSource: FreezedSource, id: string) => {
+      if (!cache.jobs.find((j) => j.targetId === id)) {
+        cache.jobs.push(
+          JobCreatorHelper.HarvestSource(freezedSource, id as Id<Source>)
+        );
+      }
+
+      // TODO: Check every 100 ticks
+      if (
+        freezedSource.structure &&
+        freezedSource.structure.type !== requiredStructureType
+      ) {
+        const structure = Game.getObjectById<Structure>(
+          freezedSource.structure.id
+        );
         if (structure) {
           structure.destroy();
         }
         delete freezedSource.structure;
       }
 
-          // TODO: Check every 100 ticks 
-          if (
+      // TODO: Check every 100 ticks
+      if (
         !freezedSource.structure &&
         roomController.level >= 2 &&
         Object.keys(cache.constructionSites).length === 0
@@ -49,12 +54,7 @@ export default class SourceManager {
           freezedSource,
           requiredStructureType
         );
-        CreateConstructionSite(
-          room,
-          bestPos,
-          requiredStructureType,
-          cache
-        );
+        CreateConstructionSite(room, bestPos, requiredStructureType, cache);
       }
     });
 
