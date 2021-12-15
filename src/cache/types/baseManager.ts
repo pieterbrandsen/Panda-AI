@@ -70,12 +70,12 @@ export default function BaseManagerCache(
           ] as StructureConstant[]).includes(structureAtPos.structureType) &&
           managerName === "source"
         ) {
-          forEach(cache.source.sources, (source) => {
+          forOwn(cache.source.sources, (source,sourceKey) => {
             const sourcePos = RoomPositionHelper.UnfreezeRoomPosition(
               source.pos
             );
             if (sourcePos.inRangeTo(structureAtPos.pos, 2)) {
-              cache.source.sources[key].structure = {
+              cache.source.sources[sourceKey].structure = {
                 id: structureAtPos.id,
                 type: structureAtPos.structureType,
                 pos: RoomPositionHelper.FreezeRoomPosition(structureAtPos.pos),
