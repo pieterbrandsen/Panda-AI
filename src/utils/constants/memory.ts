@@ -80,7 +80,7 @@ export function DefaultRoomMemory(name: string): RoomMemory {
 export function DefaultStructureMemory(
   manager: ManagerObject
 ): StructureMemory {
-  return { manager, lastExecutedAtTick: 0  };
+  return { manager, lastExecutedAtTick: 0 };
 }
 
 export function DefaultCreepMemory(

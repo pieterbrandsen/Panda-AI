@@ -11,9 +11,7 @@ export default class JobUpdater {
       if (Game.time >= job.nextUpdateTick) {
         switch (job.type) {
           case "harvestSource": {
-            const source = Game.getObjectById<Source>(
-              job.targetId
-            );
+            const source = Game.getObjectById<Source>(job.targetId);
             if (source === null) {
               break;
             }
@@ -29,9 +27,7 @@ export default class JobUpdater {
             break;
           }
           case "repair": {
-            const structure = Game.getObjectById<Structure>(
-              job.targetId
-            );
+            const structure = Game.getObjectById<Structure>(job.targetId);
             if (structure === null) {
               break;
             }

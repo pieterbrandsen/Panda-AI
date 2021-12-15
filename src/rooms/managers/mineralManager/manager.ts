@@ -28,7 +28,7 @@ export default class MineralManager {
       }
     }
 
-          // TODO: Check every 100 ticks 
+    // TODO: Check every 100 ticks
     if (!extractor) {
       const extractorConstructionSite =
         cache.constructionSites[

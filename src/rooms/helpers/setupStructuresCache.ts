@@ -27,30 +27,32 @@ export default function SetupStructuresCache(room: Room): void {
           }
         );
         break;
-        case "source":
-          forEach(
-            groupedStructures.filter((s) =>            ([
+      case "source":
+        forEach(
+          groupedStructures.filter((s) =>
+            ([
               STRUCTURE_CONTAINER,
               STRUCTURE_LINK,
-            ] as StructureConstant[]).includes(s.structureType)),
-            (structure) => {
-              const sources = managersMemory[managerName].sources;
-              forEach(sources, (source) => {
-                const pos = RoomPositionHelper.UnfreezeRoomPosition(source.pos);
-                if (pos.inRangeTo(structure.pos,2)) {
-                  managersMemory[managerName].structures[structure.id] = {
-                    pos: structure.pos,
-                    type: structure.structureType,
-                  };
-                  MemoryInitializer.SetupStructureMemory(structure.id, {
-                    name: managerName,
-                    roomName: room.name,
-                  });
-                }
-              })
-            }
-          );
-          break;
+            ] as StructureConstant[]).includes(s.structureType)
+          ),
+          (structure) => {
+            const { sources } = managersMemory[managerName];
+            forEach(sources, (source) => {
+              const pos = RoomPositionHelper.UnfreezeRoomPosition(source.pos);
+              if (pos.inRangeTo(structure.pos, 2)) {
+                managersMemory[managerName].structures[structure.id] = {
+                  pos: structure.pos,
+                  type: structure.structureType,
+                };
+                MemoryInitializer.SetupStructureMemory(structure.id, {
+                  name: managerName,
+                  roomName: room.name,
+                });
+              }
+            });
+          }
+        );
+        break;
       case "spawn":
         forEach(
           groupedStructures.filter((s) =>
