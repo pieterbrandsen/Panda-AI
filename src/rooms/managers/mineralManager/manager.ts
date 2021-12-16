@@ -1,4 +1,6 @@
+import { forOwn } from "lodash";
 import CacheManager from "../../../cache/updateCache";
+import ExecuteStructures from "../../../structures/executeStructures";
 import CreateConstructionSite from "../../helpers/createConstructionSite";
 import RoomPositionHelper from "../../helpers/roomPosition";
 import JobCreatorHelper from "../../jobs/creation";
@@ -45,7 +47,9 @@ export default class MineralManager {
     }
 
     // forOwn(cache.creeps, (cacheCrp, key) => {});
-    // forOwn(cache.structures, (cacheStr, key) => {});
+    forOwn(cache.structures, (cacheStr, key) => {
+      ExecuteStructures.Execute(cacheStr, key, "mineral");
+    });
 
     UpdateSpawningQueue.Update(room, "harvestMineral", "mineral");
     UpdateSpawningQueue.Update(room, "build", "mineral");

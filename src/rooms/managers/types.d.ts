@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars */
 // #region
-type ManagerNames = "mineral" | "spawn" | "pioneer" | "source";
+type ManagerNames = "mineral" | "spawn" | "pioneer" | "source" | "controller" | "base";
 interface BaseManagerConstructionSiteCache {
   type: BuildableStructureConstant;
   pos: FreezedRoomPosition;

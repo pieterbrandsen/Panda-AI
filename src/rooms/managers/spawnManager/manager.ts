@@ -1,5 +1,6 @@
 import { forEach, forOwn, remove } from "lodash";
 import CacheManager from "../../../cache/updateCache";
+import ExecuteStructures from "../../../structures/executeStructures";
 import JobUpdater from "../../jobs/update";
 import GetNextCreepType from "./helpers/getNextCreep";
 import UpdateSpawningQueue from "./update";
@@ -23,6 +24,7 @@ export default class SpawnManager {
       if (structure && cacheStr.type === STRUCTURE_SPAWN) {
         spawns.push(structure as StructureSpawn);
       }
+      ExecuteStructures.Execute(cacheStr, key, "mineral");
     });
 
     forEach(spawns, (spawn) => {

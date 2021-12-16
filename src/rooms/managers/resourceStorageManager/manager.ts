@@ -1,4 +1,4 @@
-import { forEach } from "lodash";
+import { forEach, uniq } from "lodash";
 import {
   MineralResources,
   CompoundResources,
@@ -107,6 +107,23 @@ export default class ResourceStorageManager {
           );
       }
     } else if (
+      ([STRUCTURE_SPAWN,StructureExtension] as StructureConstant[]).includes(structure.structureType) &&
+      storageLevel < resourceLevel.full
+    ) {
+      const job = jobs.find(
+        (j) => j.targetId === structure.id && j.type === "transfer"
+      );
+      if (!job)
+        jobs.push(
+          JobCreatorHelper.Transfer(
+            structure,
+            resourceLevel.empty,
+            resourceType,
+            amountLeftToMax,
+            true
+          )
+        );
+    } else if (
       storageLevel < resourceLevel.empty ||
       storageLevel + resourceLevel.empty === 0
     ) {
@@ -123,7 +140,7 @@ export default class ResourceStorageManager {
             true
           )
         );
-    } else if (storageLevel > resourceLevel.full) {
+    } else if (storageLevel >= resourceLevel.full) {
       const job = jobs.find(
         (j) => j.targetId === structure.id && j.type === "withdraw"
       );
@@ -162,18 +179,18 @@ export default class ResourceStorageManager {
     isControllerStructure = false,
     isHearthStructure = false
   ): void {
-    let resourceTypes: ResourceConstant[] = [];
+    let resourceTypes: ResourceConstant[] = [RESOURCE_ENERGY];
     let energyResourceLevel: ResourceLevel | undefined;
     switch (structure.structureType) {
       case "container":
-        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        resourceTypes = MineralResources.concat(resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]));
         if (isSourceStructure)
           energyResourceLevel = ResourceLevels.energy.containerSource;
         else if (isControllerStructure)
           energyResourceLevel = ResourceLevels.energy.containerController;
         break;
       case "link":
-        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        resourceTypes = MineralResources.concat(resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]));
         if (isSourceStructure)
           energyResourceLevel = ResourceLevels.energy.linkSource;
         else if (isControllerStructure)
@@ -182,29 +199,31 @@ export default class ResourceStorageManager {
           energyResourceLevel = ResourceLevels.energy.linkHearth;
         break;
       case "extension":
-        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        resourceTypes = resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]);
         energyResourceLevel = ResourceLevels.energy.extension;
         break;
       case "spawn":
-        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        resourceTypes = resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]);
         energyResourceLevel = ResourceLevels.energy.spawn;
         break;
       case "tower":
-        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        resourceTypes = resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]);
         energyResourceLevel = ResourceLevels.energy.tower;
         break;
       case "storage":
-        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        resourceTypes = MineralResources.concat(resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]));
         energyResourceLevel = ResourceLevels.energy.storage;
         break;
       case "terminal":
-        resourceTypes = Object.keys(structure.store) as ResourceConstant[];
+        resourceTypes = MineralResources.concat(resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]));
         energyResourceLevel = ResourceLevels.energy.terminal;
         break;
       // skip default case
     }
 
+    resourceTypes = uniq(resourceTypes);
     forEach(resourceTypes, (resourceType) => {
+
       if (resourceType === RESOURCE_ENERGY) {
         if (energyResourceLevel)
           this.ControlResourceLevel(

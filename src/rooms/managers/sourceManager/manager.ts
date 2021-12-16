@@ -1,5 +1,6 @@
 import { forOwn } from "lodash";
 import CacheManager from "../../../cache/updateCache";
+import ExecuteStructures from "../../../structures/executeStructures";
 import CreateConstructionSite from "../../helpers/createConstructionSite";
 import JobCreatorHelper from "../../jobs/creation";
 import JobUpdater from "../../jobs/update";
@@ -59,8 +60,9 @@ export default class SourceManager {
     });
 
     // forOwn(cache.creeps, (cacheCrp, key) => {});
-    // forOwn(cache.structures, (cacheStr, key) => {});
-
+    forOwn(cache.structures, (cacheStr, key) => {
+      ExecuteStructures.Execute(cacheStr, key, "source");
+    });
     UpdateSpawningQueue.Update(room, "harvestSource", "source");
     UpdateSpawningQueue.Update(room, "build", "source");
     UpdateSpawningQueue.Update(room, "repair", "source");
