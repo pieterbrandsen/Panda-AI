@@ -16,7 +16,7 @@ const spawn = mockInstanceOf<StructureSpawn>({
   structureType: STRUCTURE_SPAWN,
   id: "spawn",
   room,
-  spawning:null
+  spawning: null,
 });
 beforeAll(() => {
   mockGlobal<Memory>("Memory", {});

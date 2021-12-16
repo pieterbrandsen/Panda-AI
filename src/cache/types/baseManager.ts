@@ -1,4 +1,4 @@
-import { forEach, forOwn } from "lodash";
+import { forOwn } from "lodash";
 import RoomPositionHelper from "../../rooms/helpers/roomPosition";
 import IsStructureType from "../../utils/constants/predicate";
 
@@ -70,7 +70,7 @@ export default function BaseManagerCache(
           ] as StructureConstant[]).includes(structureAtPos.structureType) &&
           managerName === "source"
         ) {
-          forOwn(cache.source.sources, (source,sourceKey) => {
+          forOwn(cache.source.sources, (source, sourceKey) => {
             const sourcePos = RoomPositionHelper.UnfreezeRoomPosition(
               source.pos
             );

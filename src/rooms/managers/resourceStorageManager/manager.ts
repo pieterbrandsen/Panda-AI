@@ -107,7 +107,9 @@ export default class ResourceStorageManager {
           );
       }
     } else if (
-      ([STRUCTURE_SPAWN,StructureExtension] as StructureConstant[]).includes(structure.structureType) &&
+      ([STRUCTURE_SPAWN, StructureExtension] as StructureConstant[]).includes(
+        structure.structureType
+      ) &&
       storageLevel < resourceLevel.full
     ) {
       const job = jobs.find(
@@ -183,14 +185,22 @@ export default class ResourceStorageManager {
     let energyResourceLevel: ResourceLevel | undefined;
     switch (structure.structureType) {
       case "container":
-        resourceTypes = MineralResources.concat(resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]));
+        resourceTypes = MineralResources.concat(
+          resourceTypes.concat(
+            Object.keys(structure.store) as ResourceConstant[]
+          )
+        );
         if (isSourceStructure)
           energyResourceLevel = ResourceLevels.energy.containerSource;
         else if (isControllerStructure)
           energyResourceLevel = ResourceLevels.energy.containerController;
         break;
       case "link":
-        resourceTypes = MineralResources.concat(resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]));
+        resourceTypes = MineralResources.concat(
+          resourceTypes.concat(
+            Object.keys(structure.store) as ResourceConstant[]
+          )
+        );
         if (isSourceStructure)
           energyResourceLevel = ResourceLevels.energy.linkSource;
         else if (isControllerStructure)
@@ -199,23 +209,37 @@ export default class ResourceStorageManager {
           energyResourceLevel = ResourceLevels.energy.linkHearth;
         break;
       case "extension":
-        resourceTypes = resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]);
+        resourceTypes = resourceTypes.concat(
+          Object.keys(structure.store) as ResourceConstant[]
+        );
         energyResourceLevel = ResourceLevels.energy.extension;
         break;
       case "spawn":
-        resourceTypes = resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]);
+        resourceTypes = resourceTypes.concat(
+          Object.keys(structure.store) as ResourceConstant[]
+        );
         energyResourceLevel = ResourceLevels.energy.spawn;
         break;
       case "tower":
-        resourceTypes = resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]);
+        resourceTypes = resourceTypes.concat(
+          Object.keys(structure.store) as ResourceConstant[]
+        );
         energyResourceLevel = ResourceLevels.energy.tower;
         break;
       case "storage":
-        resourceTypes = MineralResources.concat(resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]));
+        resourceTypes = MineralResources.concat(
+          resourceTypes.concat(
+            Object.keys(structure.store) as ResourceConstant[]
+          )
+        );
         energyResourceLevel = ResourceLevels.energy.storage;
         break;
       case "terminal":
-        resourceTypes = MineralResources.concat(resourceTypes.concat(Object.keys(structure.store) as ResourceConstant[]));
+        resourceTypes = MineralResources.concat(
+          resourceTypes.concat(
+            Object.keys(structure.store) as ResourceConstant[]
+          )
+        );
         energyResourceLevel = ResourceLevels.energy.terminal;
         break;
       // skip default case
@@ -223,7 +247,6 @@ export default class ResourceStorageManager {
 
     resourceTypes = uniq(resourceTypes);
     forEach(resourceTypes, (resourceType) => {
-
       if (resourceType === RESOURCE_ENERGY) {
         if (energyResourceLevel)
           this.ControlResourceLevel(

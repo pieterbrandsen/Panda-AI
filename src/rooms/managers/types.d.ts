@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars */
 // #region
-type ManagerNames = "mineral" | "spawn" | "pioneer" | "source" | "controller" | "base";
+type ManagerNames =
+  | "mineral"
+  | "spawn"
+  | "pioneer"
+  | "source"
+  | "controller"
+  | "base";
 interface BaseManagerConstructionSiteCache {
   type: BuildableStructureConstant;
   pos: FreezedRoomPosition;
@@ -17,6 +23,11 @@ interface BaseManagerMemory {
   structures: StringMap<BaseManagerStructureCache>;
   creeps: StringMap<BaseManagerCreepCache>;
   constructionSites: StringMap<BaseManagerConstructionSiteCache>;
+}
+interface BaseStructure {
+  pos: FreezedRoomPosition;
+  id: Id<Structure>;
+  type: StructureConstant;
 }
 // #endregion
 
@@ -60,21 +71,31 @@ interface PioneerManagerMemory extends BaseManagerMemory {
 interface FreezedSource {
   pos: FreezedRoomPosition;
   energy: number;
-  structure?: {
-    pos: FreezedRoomPosition;
-    id: Id<Structure>;
-    type: StructureConstant;
-  };
+  structure?: BaseStructure;
 }
 interface SourceManagerMemory extends BaseManagerMemory {
   sources: StringMap<FreezedSource>;
 }
+// #endregion
 
+// #region Controller
+interface ControllerManagerMemory extends BaseManagerMemory {
+  energyStructure?: BaseStructure;
+}
+// #endregion
+
+// #region Base
+interface BaseBaseManagerMemory extends BaseManagerMemory {
+  link?: BaseStructure;
+}
+// #endregion
 interface ManagersMemory {
   mineral: MineralManagerMemory;
   spawn: SpawnManagerMemory;
   pioneer: PioneerManagerMemory;
   source: SourceManagerMemory;
+  base: BaseBaseManagerMemory;
+  controller: ControllerManagerMemory;
 }
 interface ManagerObject {
   name: ManagerNames;

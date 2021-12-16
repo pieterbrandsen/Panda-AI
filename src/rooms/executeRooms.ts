@@ -41,12 +41,13 @@ export default class ExecuteRooms {
     if (memory && memory.scout && Game.creeps[memory.scout.name]) return;
     if (room === undefined) {
       // TODO: Send 1 scout
+      // UpdateSpawningQueue.Update(room, "scout", "source");
       GarbageCollection.CollectRoom(memory, name);
       return;
     }
     // TODO: Has memory been updated?
 
-    // Update cache
+    // Update cache, done in executeAll?
 
     // Jobs manager
 

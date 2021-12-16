@@ -241,7 +241,8 @@ describe("BaseManager", () => {
   it("Should_DeleteSourceConstructionSiteOutOfCache_When_NotFoundAndInitializeStructureMemory", () => {
     // Arrange
     const sourceManagerName = "source";
-    const cache = Memory.roomsData.data[room.name].managersMemory[sourceManagerName];
+    const cache =
+      Memory.roomsData.data[room.name].managersMemory[sourceManagerName];
     cache.constructionSites = {
       [container.id]: {
         progressLeft: 0,
@@ -254,14 +255,16 @@ describe("BaseManager", () => {
         pos: { x: 0, y: 0, roomName: "room" },
       },
     };
-    cache.sources = {source: {
-      pos: { x: 0, y: 0, roomName: "room" },
-      energy: 0
-    },
-    source2: {
-      pos: { x: 0, y: 0, roomName: "room" },
-      energy: 0
-    }};
+    cache.sources = {
+      source: {
+        pos: { x: 0, y: 0, roomName: "room" },
+        energy: 0,
+      },
+      source2: {
+        pos: { x: 0, y: 0, roomName: "room" },
+        energy: 0,
+      },
+    };
     Game.getObjectById = jest.fn().mockReturnValue(null);
     RoomPositionHelper.UnfreezeRoomPosition = jest
       .fn()
@@ -326,7 +329,7 @@ describe("BaseManager", () => {
     // Assert
     expect(Object.keys(cache.constructionSites)).toHaveLength(0);
     expect(Object.keys(cache.structures)).toHaveLength(2);
-    expect(cache.sources["source"].structure).toBeDefined();
+    expect(cache.sources.source.structure).toBeDefined();
   });
   it("Should_UpdateSite_When_Found", () => {
     // Arrange
