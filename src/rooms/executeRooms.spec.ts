@@ -7,6 +7,7 @@ import { DefaultRoomMemory } from "../utils/constants/memory";
 import MineralManager from "./managers/mineralManager/manager";
 import GarbageCollection from "../memory/garbageCollection";
 import SpawnManager from "./managers/spawnManager/manager";
+import SourceManager from "./managers/sourceManager/manager";
 
 beforeAll(() => {
   mockGlobal<Memory>("Memory", {});
@@ -18,6 +19,7 @@ beforeAll(() => {
   GarbageCollection.CollectRoom = jest.fn();
   SpawnManager.Run = jest.fn();
   MineralManager.Run = jest.fn();
+  SourceManager.Run = jest.fn();
 });
 const roomName = "W1N1";
 const room = mockInstanceOf<Room>({ name: roomName, controller: undefined });
@@ -61,6 +63,7 @@ describe("ExecuteRooms", () => {
     ExecuteRooms.ExecuteAll();
 
     // Assert
+    expect(SourceManager.Run).toBeCalled();
     expect(MineralManager.Run).toBeCalled();
     expect(SpawnManager.Run).toBeCalled();
   });

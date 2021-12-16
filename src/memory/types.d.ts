@@ -16,6 +16,7 @@ interface GarbageCollectionObject {
 interface RoomMemory {
   scout?: { name: string };
   managersMemory: ManagersMemory;
+  wallRampartHitPercentage: number;
 }
 interface StructureMemory {
   manager: ManagerObject;

@@ -16,6 +16,7 @@ const spawn = mockInstanceOf<StructureSpawn>({
   structureType: STRUCTURE_SPAWN,
   id: "spawn",
   room,
+  spawning:null
 });
 beforeAll(() => {
   mockGlobal<Memory>("Memory", {});
@@ -82,8 +83,8 @@ describe("SpawnManager", () => {
     };
     Game.getObjectById = jest
       .fn()
-      .mockReturnValueOnce(extension)
-      .mockReturnValue(spawn);
+      .mockReturnValueOnce(spawn)
+      .mockReturnValue(extension);
 
     // Act
     SpawnManager.Run(room);

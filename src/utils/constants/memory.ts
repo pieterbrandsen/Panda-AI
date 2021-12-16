@@ -65,7 +65,15 @@ export function DefaultRoomMemory(name: string): RoomMemory {
         constructionSites: {},
         isActive: true,
       },
+      source: {
+        jobs: [],
+        creeps: {},
+        structures: {},
+        constructionSites: {},
+        sources: {},
+      },
     },
+    wallRampartHitPercentage: 0.25,
   };
 }
 

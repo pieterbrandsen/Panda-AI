@@ -35,6 +35,12 @@ const extractor = mockInstanceOf<StructureExtractor>({
   pos: mockInstanceOf<RoomPosition>({ x: 0, y: 0, roomName: "room" }),
   structureType: STRUCTURE_EXTRACTOR,
 });
+const container = mockInstanceOf<StructureContainer>({
+  id: "container",
+  room,
+  pos: mockInstanceOf<RoomPosition>({ x: 0, y: 0, roomName: "room" }),
+  structureType: STRUCTURE_CONTAINER,
+});
 
 const extension = mockInstanceOf<StructureExtension>({
   id: "extension",
@@ -147,7 +153,6 @@ describe("BaseManager", () => {
     // Assert
     expect(cache.structures[extractor.id]).toBeDefined();
   });
-
   it("Should_DeleteConstructionSiteOutOfCache_When_NotFound", () => {
     // Arrange
     const cache = Memory.roomsData.data[room.name].managersMemory[managerName];
@@ -231,6 +236,97 @@ describe("BaseManager", () => {
     // Assert
     expect(Object.keys(cache.constructionSites)).toHaveLength(0);
     expect(Object.keys(cache.structures)).toHaveLength(2);
+    expect(cache.mineral).toBeDefined();
+  });
+  it("Should_DeleteSourceConstructionSiteOutOfCache_When_NotFoundAndInitializeStructureMemory", () => {
+    // Arrange
+    const sourceManagerName = "source";
+    const cache = Memory.roomsData.data[room.name].managersMemory[sourceManagerName];
+    cache.constructionSites = {
+      [container.id]: {
+        progressLeft: 0,
+        type: STRUCTURE_CONTAINER,
+        pos: { x: 0, y: 0, roomName: "room" },
+      },
+      [extension.id]: {
+        progressLeft: 0,
+        type: STRUCTURE_EXTENSION,
+        pos: { x: 0, y: 0, roomName: "room" },
+      },
+    };
+    cache.sources = {source: {
+      pos: { x: 0, y: 0, roomName: "room" },
+      energy: 0
+    },
+    source2: {
+      pos: { x: 0, y: 0, roomName: "room" },
+      energy: 0
+    }};
+    Game.getObjectById = jest.fn().mockReturnValue(null);
+    RoomPositionHelper.UnfreezeRoomPosition = jest
+      .fn()
+      .mockReturnValueOnce(
+        mockInstanceOf<RoomPosition>({
+          x: 0,
+          y: 0,
+          roomName: room.name,
+          findInRange: jest.fn().mockReturnValue([]),
+          inRangeTo: jest.fn().mockReturnValue(true),
+        })
+      )
+      .mockReturnValueOnce(
+        mockInstanceOf<RoomPosition>({
+          x: 0,
+          y: 0,
+          roomName: room.name,
+          findInRange: jest.fn().mockReturnValueOnce([container]),
+          inRangeTo: jest.fn().mockReturnValue(true),
+        })
+      )
+      .mockReturnValueOnce(
+        mockInstanceOf<RoomPosition>({
+          x: 0,
+          y: 0,
+          roomName: room.name,
+          findInRange: jest.fn().mockReturnValue([]),
+          inRangeTo: jest.fn().mockReturnValue(true),
+        })
+      )
+      .mockReturnValueOnce(
+        mockInstanceOf<RoomPosition>({
+          x: 0,
+          y: 0,
+          roomName: room.name,
+          findInRange: jest.fn().mockReturnValue([]),
+          inRangeTo: jest.fn().mockReturnValue(false),
+        })
+      )
+      .mockReturnValueOnce(
+        mockInstanceOf<RoomPosition>({
+          x: 0,
+          y: 0,
+          roomName: room.name,
+          findInRange: jest.fn().mockReturnValue([]),
+          inRangeTo: jest.fn().mockReturnValue(false),
+        })
+      )
+      .mockReturnValue(
+        mockInstanceOf<RoomPosition>({
+          x: 0,
+          y: 0,
+          roomName: room.name,
+          findInRange: jest.fn().mockReturnValue([extension]),
+          inRangeTo: jest.fn().mockReturnValue(true),
+        })
+      );
+
+    // Act
+    BaseManagerCache(room.name, sourceManagerName);
+
+    // Assert
+    expect(Object.keys(cache.constructionSites)).toHaveLength(0);
+    expect(Object.keys(cache.structures)).toHaveLength(2);
+    expect(cache.sources["source"].structure).toBeDefined();
   });
   it("Should_UpdateSite_When_Found", () => {
     // Arrange

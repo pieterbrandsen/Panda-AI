@@ -1,4 +1,4 @@
-import { forOwn } from "lodash";
+import { forEach, forOwn } from "lodash";
 import RoomPositionHelper from "../../rooms/helpers/roomPosition";
 import IsStructureType from "../../utils/constants/predicate";
 
@@ -19,26 +19,27 @@ export default function BaseManagerCache(
     const creep = Game.getObjectById<Creep>(key);
 
     if (creep && creep.room.name !== roomName) {
+      const creepMemory = Memory.creepsData.data[creep.name];
+
       Memory.creepsData.data[key].manager.roomName = creep.room.name;
-      Memory.roomsData.data[creep.room.name].managersMemory.mineral.creeps[
-        key
-      ] = cacheCrp;
+      Memory.roomsData.data[creep.room.name].managersMemory[
+        creepMemory.manager.name
+      ].creeps[key] = cacheCrp;
       delete managerCache.creeps[key];
     }
   });
-  forOwn(managerCache.structures, (cacheStr, key) => {
-    const structure = Game.getObjectById<Structure>(key);
-
+  forOwn(managerCache.structures, (cacheStr, structureKey) => {
     // TODO: Move this to extractor structure file
-    if (!structure) {
-      if (cache.mineral.mineral.extractorId === key) {
-        delete cache.mineral.mineral.extractorId;
+    if (cacheStr.type === STRUCTURE_EXTRACTOR) {
+      const structure = Game.getObjectById<Structure>(structureKey);
+
+      if (!structure) {
+        if (cache.mineral.mineral.extractorId === structureKey) {
+          delete cache.mineral.mineral.extractorId;
+        }
       }
     }
   });
-  // forOwn(cache.structures, (cacheStr, key) => {
-  //   const structure = Game.getObjectById<Structure>(key);
-  // });
   forOwn(managerCache.constructionSites, (cachedSite, key) => {
     let site: ConstructionSite | null | undefined;
     if (cachedSite.id) {
@@ -61,6 +62,26 @@ export default function BaseManagerCache(
         };
         if (structureAtPos.structureType === STRUCTURE_EXTRACTOR) {
           cache.mineral.mineral.extractorId = structureAtPos.id;
+        }
+        if (
+          ([
+            STRUCTURE_CONTAINER,
+            STRUCTURE_LINK,
+          ] as StructureConstant[]).includes(structureAtPos.structureType) &&
+          managerName === "source"
+        ) {
+          forOwn(cache.source.sources, (source,sourceKey) => {
+            const sourcePos = RoomPositionHelper.UnfreezeRoomPosition(
+              source.pos
+            );
+            if (sourcePos.inRangeTo(structureAtPos.pos, 2)) {
+              cache.source.sources[sourceKey].structure = {
+                id: structureAtPos.id,
+                type: structureAtPos.structureType,
+                pos: RoomPositionHelper.FreezeRoomPosition(structureAtPos.pos),
+              };
+            }
+          });
         }
       }
     } else {

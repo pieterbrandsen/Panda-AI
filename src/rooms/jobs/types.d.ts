@@ -1,4 +1,12 @@
-type JobType = "harvestMineral" | "transfer" | "withdraw" | "pioneer" | "build";
+type JobType =
+  | "harvestMineral"
+  | "harvestSource"
+  | "transfer"
+  | "transferSpawning"
+  | "withdraw"
+  | "pioneer"
+  | "build"
+  | "repair";
 interface Job {
   // Base
   id: string;

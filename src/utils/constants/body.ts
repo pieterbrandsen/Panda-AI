@@ -4,6 +4,11 @@ export const DefaultIteratee: BodyIterators = {
     cost: 0,
     reqBodyPartPerLoop: 0,
   },
+  harvestSource: {
+    body: [],
+    cost: 0,
+    reqBodyPartPerLoop: 0,
+  },
   build: {
     body: [],
     cost: 0,
@@ -17,6 +22,11 @@ export const DefaultIteratee: BodyIterators = {
 };
 export const LoopIteratee: BodyIterators = {
   harvestMineral: {
+    body: [WORK, CARRY, MOVE],
+    cost: 200,
+    reqBodyPartPerLoop: 1,
+  },
+  harvestSource: {
     body: [WORK, CARRY, MOVE],
     cost: 200,
     reqBodyPartPerLoop: 1,

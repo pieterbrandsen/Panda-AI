@@ -1,6 +1,9 @@
 import { mockInstanceOf } from "screeps-jest";
 import BodyHelper from "./body";
-import { DefaultIteratee, LoopIteratee } from "../../../../utils/constants/body";
+import {
+  DefaultIteratee,
+  LoopIteratee,
+} from "../../../../utils/constants/body";
 
 const room = mockInstanceOf<Room>({
   name: "room",
@@ -38,14 +41,14 @@ describe("BodyHelper", () => {
     expect(bodies[0]).toHaveLength(0);
   });
   it("Should_NotCreateBodyOver50Parts_When_Called", () => {
-        // Arrange
-        room.energyCapacityAvailable = 30000;
-        LoopIteratee.pioneer = {body: [WORK], cost: 1, reqBodyPartPerLoop: 1};
-    
-        // Act
-        const bodies = BodyHelper.Generate(room, 51, "pioneer");
-    
-        // Assert
-        expect(bodies[0]).toHaveLength(50);
-  })
+    // Arrange
+    room.energyCapacityAvailable = 30000;
+    LoopIteratee.pioneer = { body: [WORK], cost: 1, reqBodyPartPerLoop: 1 };
+
+    // Act
+    const bodies = BodyHelper.Generate(room, 51, "pioneer");
+
+    // Assert
+    expect(bodies[0]).toHaveLength(50);
+  });
 });
