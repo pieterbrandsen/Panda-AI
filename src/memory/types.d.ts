@@ -25,7 +25,7 @@ interface StructureMemory {
   job?: AssignedJobObject;
   checkForNewJobAtTick?: number;
 }
-type CreepType = "work" | "carry" | "pioneer";
+type CreepType = "harvest" | "work" | "carry" | "pioneer";
 interface CreepMemory {
   manager: ManagerObject;
   lastExecutedAtTick: number;

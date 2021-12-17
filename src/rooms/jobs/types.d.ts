@@ -20,12 +20,10 @@ interface Job {
   latestStructureOrCreepAssignedAtTick: number;
   type: JobType;
   hasNeedOfFulfillment: boolean;
+  amountLeft: number;
 
   // Mineral
   mineralType?: MineralConstant;
-
-  // Mineral, Harvest, Transfer, Withdraw
-  amountLeft?: number;
 
   // Transfer, Withdraw
   resourceType?: ResourceConstant;
