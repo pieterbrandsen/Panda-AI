@@ -18,7 +18,7 @@ export default class ExecuteCreep {
     }
 
     if (creepMem && creepMem.job) {
-      const job = JobFinderHelper.FindJob(creepMem);
+      const job = JobFinderHelper.FindJob(creep, creepMem);
       if (job) {
         switch (job.type) {
           case "pioneer":
@@ -42,6 +42,6 @@ export default class ExecuteCreep {
       }
     }
 
-    JobFinderHelper.FindNewJob(creepMem);
+    JobFinderHelper.FindNewJob(creep, creepMem);
   }
 }
