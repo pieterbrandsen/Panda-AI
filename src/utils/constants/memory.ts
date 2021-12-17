@@ -37,6 +37,7 @@ export const DefaultRootMemory: RootMemory = {
 
 export function DefaultRoomMemory(name: string): RoomMemory {
   return {
+    isSpawningPioneers: false,
     managersMemory: {
       mineral: {
         jobs: [],

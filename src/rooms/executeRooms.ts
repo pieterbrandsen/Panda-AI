@@ -38,18 +38,22 @@ export default class ExecuteRooms {
     const room = Game.rooms[name];
     const memory = Memory.roomsData.data[name] as RoomMemory;
 
-    if (memory && memory.scout && Game.creeps[memory.scout.name]) return;
+    if (memory.scout && Game.creeps[memory.scout.name]) return;
     if (room === undefined) {
       // TODO: Send 1 scout
-      // UpdateSpawningQueue.Update(room, "scout", "source");
+      // UpdateSpawningQueue.Update(room, "scout", "scout");
       GarbageCollection.CollectRoom(memory, name);
       return;
     }
-    // TODO: Has memory been updated?
 
-    // Update cache, done in executeAll?
+    // TODO: IS this needed when body is already adjusted
+    // if (memory.isSpawningPioneers) {
+    //   if (room.energyAvailable <= 1000) UpdateSpawningQueue.Update(room, "pioneer", "pioneer");
+    //   else memory.isSpawningPioneers = false;
+    // }
+    // else if (room.energyAvailable <= 1000) memory.isSpawningPioneers = true
 
-    // Jobs manager
+    // Update cache
 
     // Base manager
 
@@ -57,7 +61,6 @@ export default class ExecuteRooms {
     // Mineral manager
 
     if (IsMyRoom(room.controller)) {
-      // UpdateSpawningQueue.Update(room, "pioneer", "pioneer");
       SourceManager.Run(room);
       MineralManager.Run(room);
       SpawnManager.Run(room);

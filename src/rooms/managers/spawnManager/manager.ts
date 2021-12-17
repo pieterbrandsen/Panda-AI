@@ -3,7 +3,7 @@ import CacheManager from "../../../cache/updateCache";
 import ExecuteCreep from "../../../creep/executeCreep";
 import ExecuteStructure from "../../../structures/executeStructure";
 import JobUpdater from "../../jobs/update";
-import GetNextCreepType from "./helpers/getNextCreep";
+import GetNextCreep from "./helpers/getNextCreep";
 import UpdateSpawningQueue from "./update";
 
 export default class SpawnManager {
@@ -40,7 +40,7 @@ export default class SpawnManager {
       const queueCreep =
         pioneersInQueue.length > 0
           ? pioneersInQueue[0]
-          : GetNextCreepType(room.name);
+          : GetNextCreep(room.name);
       const result = spawn.spawnCreep(queueCreep.body, queueCreep.name);
       if (result !== OK) return;
 

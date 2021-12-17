@@ -14,8 +14,9 @@ export default class UpdateSpawningQueue {
     jobType: JobType,
     managerName: ManagerNames
   ): void {
-    const managerCache =
-      Memory.roomsData.data[room.name].managersMemory[managerName];
+    const roomMem = Memory.roomsData.data[room.name];
+
+    const managerCache = roomMem.managersMemory[managerName];
     const spawnCache = Memory.roomsData.data[room.name].managersMemory.spawn;
 
     let multiplier = 1;

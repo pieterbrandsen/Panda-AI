@@ -15,6 +15,7 @@ interface GarbageCollectionObject {
 
 interface RoomMemory {
   scout?: { name: string };
+  isSpawningPioneers: boolean;
   managersMemory: ManagersMemory;
   wallRampartHitPercentage: number;
 }
