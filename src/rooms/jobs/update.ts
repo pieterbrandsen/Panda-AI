@@ -66,7 +66,7 @@ export default class JobUpdater {
 
           // skip default case
         }
-        job.nextUpdateTick = Game.time + 1000;
+        job.nextUpdateTick = Game.time + 10;
       }
     }
   }

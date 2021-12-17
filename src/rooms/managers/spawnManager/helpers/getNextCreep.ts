@@ -13,8 +13,11 @@ export default function GetNextCreep(roomName: string): QueueCreep {
         cache.lastSpawnedType = "carry";
         break;
       case "carry":
-        cache.lastSpawnedType = "work";
+        cache.lastSpawnedType = "harvest";
         break;
+        case "harvest":
+          cache.lastSpawnedType = "work";
+          break;
       default:
         cache.lastSpawnedType = "work";
         break;

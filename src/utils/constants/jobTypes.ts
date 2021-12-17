@@ -1,4 +1,21 @@
-const workJobTypes: JobType[] = ["harvestSource", "harvestMineral"];
-const carryJobTypes: JobType[] = ["transfer", "withdraw"];
-const pioneerJobTypes: JobType[] = ["harvestSource", "transfer", "withdraw"];
-export { workJobTypes, carryJobTypes, pioneerJobTypes };
+const harvestJobTypes: JobType[] = [
+    "harvestSource",
+]
+const workJobTypes: JobType[] = [
+  "harvestMineral",
+  "repair",
+  "upgrade",
+  "build",
+];
+const carryGetJobType: JobType = "withdraw";
+const carrySetJobType: JobType = "transfer";
+const pioneerGetJobTypes: JobType[] = ["harvestSource", "withdraw"];
+const pioneerSetJobTypes: JobType[] = ["transferSpawning"];
+export {
+  workJobTypes,
+  carryGetJobType,
+  carrySetJobType,
+  pioneerGetJobTypes,
+  pioneerSetJobTypes,
+  harvestJobTypes
+};

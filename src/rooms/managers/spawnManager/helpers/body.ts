@@ -42,11 +42,6 @@ export default class BodyHelper {
     const defaultIteratee = DefaultIteratee[jobType];
     const loopIteratee = LoopIteratee[jobType];
 
-    console.log(
-      jobType,
-      JSON.stringify(defaultIteratee),
-      JSON.stringify(loopIteratee)
-    );
     arrayOfBodyParts[y] = defaultIteratee.body;
     currentCost = defaultIteratee.cost;
     i = defaultIteratee.reqBodyPartPerLoop;

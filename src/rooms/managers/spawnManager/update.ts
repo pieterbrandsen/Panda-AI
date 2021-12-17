@@ -86,6 +86,7 @@ export default class UpdateSpawningQueue {
       case "harvestSource":
         multiplier = 0.5;
         per1Lifetime = 3000;
+        creepType = "harvest";
         break;
       case "build":
         per1Lifetime = 7500;
