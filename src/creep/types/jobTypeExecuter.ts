@@ -6,7 +6,7 @@ import UpgradeCreepModule from "./modules/upgrade";
 import WithdrawCreepModule from "./modules/withdraw";
 import PioneerCreep from "./pioneer";
 
-export default class WorkerCreep {
+export default class JobTypeExecuter {
   public static Execute(creep: Creep, creepMem: CreepMemory, job: Job): void {
     switch (job.type) {
       case "build": {

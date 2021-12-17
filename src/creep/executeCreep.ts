@@ -1,6 +1,5 @@
 import GarbageCollection from "../memory/garbageCollection";
-import ControlRepairJob from "../rooms/helpers/controlRepairJob";
-import ResourceStorageManager from "../rooms/managers/resourceStorageManager/manager";
+import JobFinderHelper from "../rooms/jobs/find";
 import PioneerCreep from "./types/pioneer";
 import TransfererCreep from "./types/transferer";
 import WorkerCreep from "./types/worker";
@@ -11,32 +10,31 @@ export default class ExecuteCreep {
     id: string,
     managerName: ManagerNames
   ): void {
-    const creep = Game.getObjectById<Creep | null>(id);
+    const creep = Game.creeps[id];
     const creepMem = Memory.creepsData.data[id];
-    if (creep === null) {
+    if (creep === undefined) {
       GarbageCollection.Collect(creepMem, id, "creep");
       return;
     }
 
-    const { jobs } = Memory.roomsData.data[creep.room.name].managersMemory[
-      managerName
-    ];
     if (creepMem && creepMem.job) {
-      const jobId = creepMem.job.id;
-      const job = jobs.find((job) => job.id === jobId);
+      const job = JobFinderHelper.FindJob(creepMem);
       if (job) {
         switch (job.type) {
           case "pioneer":
-            PioneerCreep.Execute(creep, creepMem);
+            PioneerCreep.Execute(creep, creepMem, job);
             break;
           case "transfer":
-            TransfererCreep.Execute(creep, creepMem, job.type);
-            break;
           case "transferSpawning":
-            TransfererCreep.Execute(creep, creepMem, job.type);
+          case "withdraw":
+            TransfererCreep.Execute(creep, creepMem, job);
             break;
           case "build":
-            WorkerCreep.Execute(creep, creepMem, job.type);
+          case "harvestMineral":
+          case "harvestSource":
+          case "upgrade":
+          case "repair":
+            WorkerCreep.Execute(creep, creepMem, job);
             break;
           // skip default case
         }
@@ -44,6 +42,6 @@ export default class ExecuteCreep {
       }
     }
 
-    // Find new job
+    JobFinderHelper.FindNewJob(creepMem);
   }
 }
