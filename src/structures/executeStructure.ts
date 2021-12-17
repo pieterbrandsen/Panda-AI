@@ -3,7 +3,7 @@ import ControlRepairJob from "../rooms/helpers/controlRepairJob";
 import ResourceStorageManager from "../rooms/managers/resourceStorageManager/manager";
 import LinkStructure from "./types/link";
 
-export default class ExecuteStructures {
+export default class ExecuteStructure {
   public static Execute(
     cacheStructure: BaseManagerStructureCache,
     id: string,
