@@ -5,7 +5,7 @@ import PioneerCreep from "./types/pioneer";
 import TransfererCreep from "./types/transferer";
 import WorkerCreep from "./types/worker";
 
-export default class ExecuteStructures {
+export default class ExecuteCreep {
   public static Execute(
     cacheCreep: BaseManagerCreepCache,
     id: string,
