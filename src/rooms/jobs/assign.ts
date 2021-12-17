@@ -10,23 +10,8 @@ export default class JobAssignmentsHelper {
     job: Job,
     roomName: string
   ): boolean {
-    // if (job === null) {
-    //   switch ((memory as CreepMemory).creepType) {
-    //     default:
-    //       return false;
-    //   }
-    //   return true;
-    // }
     memory.job = { id: job.id, roomName };
     job.latestStructureOrCreepAssignedAtTick = Game.time;
     return true;
   }
-
-  // public static FindAndAssignStructureJob(
-  //   memory: StructureMemory,
-  //   type: StructureConstant,
-  //   roomName: string
-  // ): boolean {
-  //   return false;
-  // }
 }

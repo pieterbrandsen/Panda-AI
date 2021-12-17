@@ -6,7 +6,8 @@ type JobType =
   | "withdraw"
   | "pioneer"
   | "build"
-  | "repair";
+  | "repair"
+  | "upgrade";
 interface Job {
   // Base
   id: string;
