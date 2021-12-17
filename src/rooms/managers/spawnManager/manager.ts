@@ -1,6 +1,7 @@
 import { forEach, forOwn, remove } from "lodash";
 import CacheManager from "../../../cache/updateCache";
-import ExecuteStructures from "../../../structures/executeStructures";
+import ExecuteCreep from "../../../creep/executeCreep";
+import ExecuteStructure from "../../../structures/executeStructure";
 import JobUpdater from "../../jobs/update";
 import GetNextCreepType from "./helpers/getNextCreep";
 import UpdateSpawningQueue from "./update";
@@ -17,14 +18,16 @@ export default class SpawnManager {
 
     CacheManager.UpdateSpawnManager(room);
 
-    // forOwn(cache.creeps, (cacheCrp, key) => {});
+    forOwn(cache.creeps, (cacheCrp, key) => {
+      ExecuteCreep.Execute(cacheCrp, key, "spawn");
+    });
     const spawns: StructureSpawn[] = [];
     forOwn(cache.structures, (cacheStr, key) => {
       const structure = Game.getObjectById(key);
       if (structure && cacheStr.type === STRUCTURE_SPAWN) {
         spawns.push(structure as StructureSpawn);
       }
-      ExecuteStructures.Execute(cacheStr, key, "mineral");
+      ExecuteStructure.Execute(cacheStr, key, "spawn");
     });
 
     forEach(spawns, (spawn) => {
