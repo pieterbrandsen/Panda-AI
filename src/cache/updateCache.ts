@@ -3,6 +3,7 @@ import UpdateMineralManagerCache from "./types/mineralManager";
 import UpdateSpawnManagerCache from "./types/spawnManager";
 import UpdateSourceManagerCache from "./types/sourceManager";
 import UpdateControllerManagerCache from "./types/controllerManager";
+import UpdatePioneerManagerCache from "./types/pioneerManager";
 
 export default class CacheManager {
   /**
@@ -28,4 +29,5 @@ export default class CacheManager {
    */
    public static UpdateSpawnManager = UpdateSpawnManagerCache;
    public static UpdateControllerManager = UpdateControllerManagerCache;
+   public static UpdatePioneerManager = UpdatePioneerManagerCache;
   }
