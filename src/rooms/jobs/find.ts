@@ -28,16 +28,18 @@ export default class JobFinderHelper {
     }
 
     const hasFreeSpace = creep.store.getFreeCapacity() > 0;
+    if (creepMem.manager.name === "pioneer") {
+      return jobs.filter((j) =>
+        (hasFreeSpace ? pioneerGetJobTypes : pioneerSetJobTypes).includes(
+          j.type
+        )
+      );
+    }
+
     switch (creepMem.creepType) {
       case "carry":
         return jobs.filter((j) =>
           hasFreeSpace ? carryGetJobType : carrySetJobType === j.type
-        );
-      case "pioneer": 
-        return jobs.filter((j) =>
-          (hasFreeSpace ? pioneerGetJobTypes : pioneerSetJobTypes).includes(
-            j.type
-          )
         );
       case "work": 
         return jobs.filter((j) =>

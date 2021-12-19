@@ -10,7 +10,7 @@ const workJobTypes: JobType[] = [
 const carryGetJobType: JobType = "withdraw";
 const carrySetJobType: JobType = "transfer";
 const pioneerGetJobTypes: JobType[] = ["harvestSource", "withdraw"];
-const pioneerSetJobTypes: JobType[] = ["transferSpawning"];
+const pioneerSetJobTypes: JobType[] = workJobTypes.concat(["transferSpawning"]);
 export {
   workJobTypes,
   carryGetJobType,

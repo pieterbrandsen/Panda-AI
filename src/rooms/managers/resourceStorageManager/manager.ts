@@ -117,7 +117,7 @@ export default class ResourceStorageManager {
       );
       if (!job)
         jobs.push(
-          JobCreatorHelper.Transfer(
+          JobCreatorHelper.TransferSpawning(
             structure,
             resourceLevel.empty,
             resourceType,
@@ -126,6 +126,9 @@ export default class ResourceStorageManager {
           )
         );
     } else if (
+      ([STRUCTURE_SPAWN, StructureExtension] as StructureConstant[]).includes(
+        structure.structureType
+      ) ===false  &&
       storageLevel < resourceLevel.empty ||
       storageLevel + resourceLevel.empty === 0
     ) {
@@ -142,7 +145,9 @@ export default class ResourceStorageManager {
             true
           )
         );
-    } else if (storageLevel >= resourceLevel.full) {
+    } else if (storageLevel >= resourceLevel.full &&  ([STRUCTURE_SPAWN, StructureExtension] as StructureConstant[]).includes(
+      structure.structureType
+    ) === false) {
       const job = jobs.find(
         (j) => j.targetId === structure.id && j.type === "withdraw"
       );

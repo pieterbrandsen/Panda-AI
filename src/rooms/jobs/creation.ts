@@ -186,7 +186,7 @@ export default class JobCreatorHelper {
       id: roomController.id,
       targetId: roomController.id,
       latestStructureOrCreepAssignedAtTick: 0,
-      type: "harvestSource",
+      type: "upgrade",
       pos: roomController.pos,
       nextUpdateTick: Game.time + 1000,
       amountLeft: roomController.level * 500,

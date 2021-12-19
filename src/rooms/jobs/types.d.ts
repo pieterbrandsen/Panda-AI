@@ -4,7 +4,6 @@ type JobType =
   | "transfer"
   | "transferSpawning"
   | "withdraw"
-  | "pioneer"
   | "build"
   | "repair"
   | "upgrade";

@@ -39,6 +39,11 @@ export const DefaultIteratee: BodyIterators = {
     cost: 0,
     reqBodyPartPerLoop: 0,
   },
+  upgrade: {
+    body: [],
+    cost: 0,
+    reqBodyPartPerLoop: 0,
+  },
 };
 export const LoopIteratee: BodyIterators = {
   pioneer: {
@@ -78,6 +83,11 @@ export const LoopIteratee: BodyIterators = {
   },
   repair: {
     body: [CARRY, MOVE,MOVE],
+    cost: 200,
+    reqBodyPartPerLoop: 1,
+  },
+  upgrade: {
+    body: [CARRY, WORK,MOVE],
     cost: 200,
     reqBodyPartPerLoop: 1,
   },

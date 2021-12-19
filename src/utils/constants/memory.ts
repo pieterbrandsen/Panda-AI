@@ -64,7 +64,6 @@ export function DefaultRoomMemory(name: string): RoomMemory {
         creeps: {},
         structures: {},
         constructionSites: {},
-        isActive: true,
       },
       source: {
         jobs: [],

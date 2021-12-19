@@ -16,14 +16,10 @@ export default class ExecuteCreep {
       GarbageCollection.Collect(creepMem, id, "creep");
       return;
     }
-
     if (creepMem && creepMem.job) {
-      const job = JobFinderHelper.FindJob(creep, creepMem);
+    const job = JobFinderHelper.FindJob(creep, creepMem);
       if (job) {
         switch (job.type) {
-          case "pioneer":
-            PioneerCreep.Execute(creep, creepMem, job);
-            break;
           case "transfer":
           case "transferSpawning":
           case "withdraw":

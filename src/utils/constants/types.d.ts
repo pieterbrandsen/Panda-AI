@@ -42,4 +42,5 @@ interface BodyIterators {
   transferSpawning: BodyIteratee;
   withdraw: BodyIteratee;
   repair: BodyIteratee;
+  upgrade: BodyIteratee;
  }

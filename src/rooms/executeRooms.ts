@@ -11,6 +11,7 @@ import SourceManager from "./managers/sourceManager/manager";
 import IsRoomSetup from "./helpers/isRoomSetup";
 import UpdateSpawningQueue from "./managers/spawnManager/update";
 import ControllerManager from './managers/controllerManager/manager';
+import PioneerManager from "./managers/pioneerManager/manager";
 
 export default class ExecuteRooms {
   public static ExecuteAll(): void {
@@ -51,10 +52,11 @@ export default class ExecuteRooms {
 
     const isRoomSetup = IsRoomSetup(room);
     if (memory.isSpawningPioneers) {
-      if (!isRoomSetup) UpdateSpawningQueue.Update(room, "pioneer", "pioneer");
-      else memory.isSpawningPioneers = false;
+      if (isRoomSetup) memory.isSpawningPioneers = false;
     }
     else if (!isRoomSetup) memory.isSpawningPioneers = true
+
+    if (memory.isSpawningPioneers) PioneerManager.Run(room);
 
     // Update cache
 

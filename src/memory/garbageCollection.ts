@@ -33,11 +33,22 @@ export default class GarbageCollection {
       liveObjectType: type,
     };
 
-    delete Memory.structuresData.data[key];
+    if ((object as CreepMemory).creepType) {
+      delete Memory.creepsData.data[key];
+    }
+    else { 
+      delete Memory.structuresData.data[key];
+    }
     const roomMemory = Memory.roomsData.data[object.manager.roomName];
     if (!roomMemory) return;
 
-    delete roomMemory.managersMemory[object.manager.name].structures[key];
+    if ((object as CreepMemory).creepType) {
+      delete roomMemory.managersMemory[object.manager.name].creeps[key];
+      delete Memory.creeps[key];
+    }
+    else { 
+      delete roomMemory.managersMemory[object.manager.name].structures[key];
+    }
   }
 
   /**

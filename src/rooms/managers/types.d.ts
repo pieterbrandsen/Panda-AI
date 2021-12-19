@@ -63,7 +63,6 @@ interface SpawnManagerMemory extends BaseManagerMemory {
 
 // #region Pioneer
 interface PioneerManagerMemory extends BaseManagerMemory {
-  isActive: boolean;
 }
 // #endregion
 

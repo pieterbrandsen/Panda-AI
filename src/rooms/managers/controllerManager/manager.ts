@@ -48,7 +48,7 @@ export default class ControllerManager {
       // TODO: Check every 100 ticks
       if (
         !cache.energyStructure &&
-        roomController.level >= 2 &&
+        roomController.level >= 3 &&
         Object.keys(cache.constructionSites).length === 0
       ) {
         const bestPos = EnergyStructurePositioningHelper.GetBestStructureSpot(

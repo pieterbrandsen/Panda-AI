@@ -11,6 +11,7 @@ import WithdrawCreepModule from "./modules/withdraw";
 export default class JobTypeExecuter {
   public static Execute(creep: Creep, creepMem: CreepMemory, job: Job): void {
     let returnCode: CreepModuleReturnCode = "continue";
+    
     switch (job.type) {
       case "build": {
         returnCode = BuildCreepModule.Execute(creep, creepMem, job);
@@ -18,9 +19,6 @@ export default class JobTypeExecuter {
       case "harvestMineral":
       case "harvestSource": {
         returnCode = HarvestCreepModule.Execute(creep, creepMem, job);
-      }
-      case "pioneer": {
-        returnCode = PioneerCreepModule.Execute(creep, creepMem, job);
       }
       case "repair": {
         returnCode = RepairCreepModule.Execute(creep, creepMem, job);
