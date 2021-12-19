@@ -1,7 +1,7 @@
 import { forEach } from "lodash";
-import RoomPositionHelper from "../../helpers/roomPosition";
+import RoomPositionHelper from "./roomPosition";
 
-export default class SourcePositioningHelper {
+export default class EnergyStructurePositioningHelper {
   /**
    * Return an optimal position for a structure to be built.
    * @param room - The room to search for a position in.
@@ -9,13 +9,14 @@ export default class SourcePositioningHelper {
    * @param structureType - The structureType to build.
    * @returns - An RoomPosition
    */
-  public static GetBestSourceStructureSpot(
+  public static GetBestStructureSpot(
     room: Room,
-    source: FreezedSource,
-    structureType: STRUCTURE_CONTAINER | STRUCTURE_LINK
+    pos: FreezedRoomPosition,
+    structureType: STRUCTURE_CONTAINER | STRUCTURE_LINK,
+    managerName:ManagerNames = "source"
   ): RoomPosition {
-    const sourcePos = RoomPositionHelper.UnfreezeRoomPosition(source.pos);
-    const range = structureType === STRUCTURE_LINK ? 2 : 1;
+    const sourcePos = RoomPositionHelper.UnfreezeRoomPosition(pos);
+    const range = managerName === "controller" ? 3 : structureType === STRUCTURE_LINK ? 2 : 1;
 
     let roomPositions: RoomPosition[] = [];
     for (let i = -range; i <= range; i += 1) {

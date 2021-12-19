@@ -6,7 +6,7 @@ import CreateConstructionSite from "../../helpers/createConstructionSite";
 import JobCreatorHelper from "../../jobs/creation";
 import JobUpdater from "../../jobs/update";
 import UpdateSpawningQueue from "../spawnManager/update";
-import SourcePositioningHelper from "./getBestSourceStructureSpot";
+import EnergyStructurePositioningHelper from "../../helpers/getBestEnergyStructureSpot";
 
 export default class SourceManager {
   /**
@@ -51,9 +51,9 @@ export default class SourceManager {
         roomController.level >= 2 &&
         Object.keys(cache.constructionSites).length === 0
       ) {
-        const bestPos = SourcePositioningHelper.GetBestSourceStructureSpot(
+        const bestPos = EnergyStructurePositioningHelper.GetBestStructureSpot(
           room,
-          freezedSource,
+          freezedSource.pos,
           requiredStructureType
         );
         CreateConstructionSite(room, bestPos, requiredStructureType, cache);

@@ -4,7 +4,7 @@ import MemoryInitializer from "../../../memory/initialization";
 import { DefaultRoomMemory } from "../../../utils/constants/memory";
 import JobUpdater from "../../jobs/update";
 import UpdateSpawningQueue from "../spawnManager/update";
-import SourcePositioningHelper from "./getBestSourceStructureSpot";
+import SourcePositioningHelper from "../../helpers/getBestEnergyStructureSpot";
 import SourceManager from "./manager";
 
 const roomName = "W1N1";
