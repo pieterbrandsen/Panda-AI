@@ -34,8 +34,12 @@ interface BodyIteratee {
   reqBodyPartPerLoop: number;
 }
 interface BodyIterators {
+  pioneer: BodyIteratee;
   harvestMineral: BodyIteratee;
   harvestSource: BodyIteratee;
   build: BodyIteratee;
-  pioneer: BodyIteratee;
-}
+  transfer: BodyIteratee;
+  transferSpawning: BodyIteratee;
+  withdraw: BodyIteratee;
+  repair: BodyIteratee;
+ }

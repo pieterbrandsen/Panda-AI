@@ -1,4 +1,9 @@
 export const DefaultIteratee: BodyIterators = {
+  pioneer: {
+    body: [],
+    cost: 0,
+    reqBodyPartPerLoop: 0,
+  },
   harvestMineral: {
     body: [],
     cost: 0,
@@ -14,13 +19,33 @@ export const DefaultIteratee: BodyIterators = {
     cost: 0,
     reqBodyPartPerLoop: 0,
   },
-  pioneer: {
+  transfer: {
+    body: [],
+    cost: 0,
+    reqBodyPartPerLoop: 0,
+  },
+  transferSpawning: {
+    body: [],
+    cost: 0,
+    reqBodyPartPerLoop: 0,
+  },
+  withdraw: {
+    body: [],
+    cost: 0,
+    reqBodyPartPerLoop: 0,
+  },
+  repair: {
     body: [],
     cost: 0,
     reqBodyPartPerLoop: 0,
   },
 };
 export const LoopIteratee: BodyIterators = {
+  pioneer: {
+    body: [WORK, CARRY, MOVE, MOVE],
+    cost: 250,
+    reqBodyPartPerLoop: 1,
+  },
   harvestMineral: {
     body: [WORK, CARRY, MOVE],
     cost: 200,
@@ -36,9 +61,24 @@ export const LoopIteratee: BodyIterators = {
     cost: 200,
     reqBodyPartPerLoop: 1,
   },
-  pioneer: {
-    body: [WORK, CARRY, MOVE, MOVE],
-    cost: 250,
+  transfer: {
+    body: [CARRY, MOVE,MOVE],
+    cost: 200,
+    reqBodyPartPerLoop: 1,
+  },
+  withdraw: {
+    body: [CARRY, MOVE,MOVE],
+    cost: 200,
+    reqBodyPartPerLoop: 1,
+  },
+  transferSpawning: {
+    body: [CARRY, MOVE,MOVE],
+    cost: 200,
+    reqBodyPartPerLoop: 1,
+  },
+  repair: {
+    body: [CARRY, MOVE,MOVE],
+    cost: 200,
     reqBodyPartPerLoop: 1,
   },
 };

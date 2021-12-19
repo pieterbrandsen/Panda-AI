@@ -8,6 +8,8 @@ import CacheManager from "../cache/updateCache";
 import IsMyRoom from "./helpers/isMyRoom";
 import SpawnManager from "./managers/spawnManager/manager";
 import SourceManager from "./managers/sourceManager/manager";
+import IsRoomSetup from "./helpers/isRoomSetup";
+import UpdateSpawningQueue from "./managers/spawnManager/update";
 
 export default class ExecuteRooms {
   public static ExecuteAll(): void {
@@ -46,12 +48,12 @@ export default class ExecuteRooms {
       return;
     }
 
-    // TODO: IS this needed when body is already adjusted
-    // if (memory.isSpawningPioneers) {
-    //   if (room.energyAvailable <= 1000) UpdateSpawningQueue.Update(room, "pioneer", "pioneer");
-    //   else memory.isSpawningPioneers = false;
-    // }
-    // else if (room.energyAvailable <= 1000) memory.isSpawningPioneers = true
+    const isRoomSetup = IsRoomSetup(room);
+    if (memory.isSpawningPioneers) {
+      if (!isRoomSetup) UpdateSpawningQueue.Update(room, "pioneer", "pioneer");
+      else memory.isSpawningPioneers = false;
+    }
+    else if (!isRoomSetup) memory.isSpawningPioneers = true
 
     // Update cache
 
