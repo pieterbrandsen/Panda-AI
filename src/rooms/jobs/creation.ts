@@ -176,4 +176,21 @@ export default class JobCreatorHelper {
       amountLeft,
     };
   }
+  public static Upgrade(
+    roomController: StructureController,
+  ): Job {
+    return {
+      available: true,
+      creationTime: Game.time,
+      hasPriority: false,
+      id: roomController.id,
+      targetId: roomController.id,
+      latestStructureOrCreepAssignedAtTick: 0,
+      type: "harvestSource",
+      pos: roomController.pos,
+      nextUpdateTick: Game.time + 1000,
+      amountLeft: roomController.level * 500,
+      hasNeedOfFulfillment: true,
+    };
+  }
 }

@@ -10,6 +10,7 @@ import SpawnManager from "./managers/spawnManager/manager";
 import SourceManager from "./managers/sourceManager/manager";
 import IsRoomSetup from "./helpers/isRoomSetup";
 import UpdateSpawningQueue from "./managers/spawnManager/update";
+import ControllerManager from './managers/controllerManager/manager';
 
 export default class ExecuteRooms {
   public static ExecuteAll(): void {
@@ -62,10 +63,11 @@ export default class ExecuteRooms {
     // Source manager
     // Mineral manager
 
+    SourceManager.Run(room);
     if (IsMyRoom(room.controller)) {
-      SourceManager.Run(room);
       MineralManager.Run(room);
       SpawnManager.Run(room);
+      ControllerManager.Run(room);
     }
     // Controller manager
 

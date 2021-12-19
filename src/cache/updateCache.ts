@@ -2,6 +2,7 @@ import UpdateRoomCache from "./types/rooms";
 import UpdateMineralManagerCache from "./types/mineralManager";
 import UpdateSpawnManagerCache from "./types/spawnManager";
 import UpdateSourceManagerCache from "./types/sourceManager";
+import UpdateControllerManagerCache from "./types/controllerManager";
 
 export default class CacheManager {
   /**
@@ -25,5 +26,6 @@ export default class CacheManager {
    * Update the spawn manager cache
    * @param room - The room to update
    */
-  public static UpdateSpawnManager = UpdateSpawnManagerCache;
-}
+   public static UpdateSpawnManager = UpdateSpawnManagerCache;
+   public static UpdateControllerManager = UpdateControllerManagerCache;
+  }
