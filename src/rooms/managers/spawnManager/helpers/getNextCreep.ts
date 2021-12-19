@@ -2,29 +2,30 @@
  * Return an QueueCreep to spawn next
  * @param roomName - name of the room
  */
-export default function GetNextCreep(roomName: string): QueueCreep {
+export default function GetNextCreep(roomName: string,isPioneerCreep:boolean): QueueCreep |undefined {
   const cache = Memory.roomsData.data[roomName].managersMemory.spawn;
-  const { queue } = cache;
+  const queue = !isPioneerCreep ? cache.queue :  cache.queue.filter((crp) => crp.managerName === "pioneer");
 
   let creep: QueueCreep | undefined;
-  while (creep === undefined) {
+  const checkQueueForType = (creepType:CreepType):void => {
+    creep = queue.find((crp) => crp.creepType === creepType);
+  }
+
     switch (cache.lastSpawnedType) {
       case "work":
-        cache.lastSpawnedType = "carry";
+        if (cache.lastSpawnedType === "work") break;
+        checkQueueForType("carry");
         break;
       case "carry":
-        cache.lastSpawnedType = "harvest";
+        if (cache.lastSpawnedType === "carry") break;
+        checkQueueForType("harvest");
         break;
         case "harvest":
-          cache.lastSpawnedType = "work";
+        if (cache.lastSpawnedType === "harvest") break;
+        checkQueueForType("work");
           break;
-      default:
-        cache.lastSpawnedType = "work";
-        break;
+          // skip default case
     }
-
-    creep = queue.find((crp) => crp.creepType === cache.lastSpawnedType);
-  }
 
   return creep;
 }

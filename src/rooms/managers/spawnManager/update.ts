@@ -36,7 +36,7 @@ export default class UpdateSpawningQueue {
         (bodyParts: BodyPartConstant[], name: string): BodyPartConstant[] => {
           const creep = Game.creeps[name];
           if (creep) {
-            if (Memory.creepsData.data[name].creepType === "pioneer") {
+            if (Memory.creepsData.data[name].manager.name === "pioneer") {
               alivePioneerBodyParts.push(
                 ...creep.body.map((part) => part.type)
               );
@@ -54,7 +54,7 @@ export default class UpdateSpawningQueue {
       spawnCache.queue
         .filter(
           (creep) =>
-            creep.creepType === "pioneer" && creep.managerName === managerName
+            creep.managerName === "pioneer" && creep.managerName === managerName
         )
         .map((creep) => creep.body)
         .flat()
@@ -73,12 +73,6 @@ export default class UpdateSpawningQueue {
     let creepType: CreepType = "work";
     let bodyPart: BodyPartConstant = WORK;
     switch (jobType) {
-      case "pioneer":
-        requiredBodyPartCount = 5;
-        queuedBodyPartCount = queuedPioneerBodyParts[bodyPart] || 0;
-        aliveBodyPartCount = alivePioneerBodyParts[bodyPart] || 0;
-        creepType = "pioneer";
-        break;
       case "harvestMineral":
         multiplier = 5;
         per1Lifetime = 1500;
@@ -107,11 +101,15 @@ export default class UpdateSpawningQueue {
       case "repair":
         per1Lifetime = 150000;
         break;
+        case "upgrade":
+        per1Lifetime = 1000;
+        break;
+        
 
       // skip default case
     }
 
-    if (jobType !== "pioneer") {
+    // if (managerName !== "pioneer") {
       requiredBodyPartCount =
         sum(
           managerCache.jobs
@@ -121,13 +119,15 @@ export default class UpdateSpawningQueue {
         (per1Lifetime * multiplier);
       queuedBodyPartCount = queuedBodyParts[bodyPart] || 0;
       aliveBodyPartCount = aliveBodyParts[bodyPart] || 0;
-    }
+    // }
+      // console.log(jobType,requiredBodyPartCount, queuedBodyPartCount, aliveBodyPartCount, queuedBodyParts[bodyPart], aliveBodyParts[bodyPart],alivePioneerBodyParts[bodyPart],queuedPioneerBodyParts[bodyPart]);
 
+    
     const missingBodyParts =
-      Math.ceil(
-        (requiredBodyPartCount - aliveBodyPartCount - queuedBodyPartCount) / 5
+    Math.ceil(
+      (requiredBodyPartCount - aliveBodyPartCount - queuedBodyPartCount) / 5
       ) * 5;
-    if (missingBodyParts <= 0) return;
+      if (missingBodyParts <= 0) return;
     const bodies = BodyHelper.Generate(room, missingBodyParts, jobType);
     forEach(bodies, (body) => {
       if (body.length > 0) {

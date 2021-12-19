@@ -12,7 +12,8 @@ export default class SpawnManager {
    * @param room - The room to manage spawns for
    */
   public static Run(room: Room): void {
-    const cache = Memory.roomsData.data[room.name].managersMemory.spawn;
+    const roomMem = Memory.roomsData.data[room.name]
+    const cache = roomMem.managersMemory.spawn;
 
     JobUpdater.Run(cache.jobs);
 
@@ -34,13 +35,11 @@ export default class SpawnManager {
       if (cache.queue.length === 0 || spawn.spawning) return;
 
       const pioneersInQueue = cache.queue.filter(
-        (c) => c.creepType === "pioneer"
+        (c) => c.managerName === "pioneer"
       );
       if (room.energyAvailable < 300) return;
-      const queueCreep =
-        pioneersInQueue.length > 0
-          ? pioneersInQueue[0]
-          : GetNextCreep(room.name);
+      const queueCreep =GetNextCreep(room.name,pioneersInQueue.length > 0 || roomMem.isSpawningPioneers);
+      if (!queueCreep) return;
       const result = spawn.spawnCreep(queueCreep.body, queueCreep.name);
       if (result !== OK) return;
 
