@@ -11,8 +11,8 @@ import { ErrorMapper } from "./utils/external/errorMapper";
 export const loop = ErrorMapper.wrapLoop((): void => {
   if (
     !MemoryValidator.IsMemoryValid(Memory.version, VersionedMemoryTypeName.Root)
-  ) {
-    MemoryInitializer.SetupRootMemory();
+    ) {
+      MemoryInitializer.SetupRootMemory();
     if (
       !MemoryValidator.IsMemoryValid(
         Memory.version,
