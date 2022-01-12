@@ -7,6 +7,38 @@
 // TODO: Update (to path)
 // TODO: Delete (with option for garbage collection) (to path)
 
-interface IMemory {}
+import { forEach } from "lodash";
 
-export default class implements IMemory {}
+export interface IMemory {
+    Validate(data:StringMap<MemoryObjects>,type:MemoryTypes): {isValid:boolean,nonValidMemoryObjects:string[]}
+    MinimumMemoryVersion(type:MemoryTypes):number;
+}
+
+export default abstract class implements IMemory {
+    MinimumMemoryVersion(type: MemoryTypes): number {
+        switch (type) {
+            case "Creep":
+                return Memory.CreepsData.version;
+            case "Structure":
+                return Memory.StructuresData.version;
+            case "Room":
+                return Memory.RoomsData.version;
+            default:
+                return 999;
+        }
+    }
+    Validate(data: StringMap<MemoryObjects>,type:MemoryTypes) {
+        const minimumVersion = this.MinimumMemoryVersion(type);
+        let isValid = true;
+        const nonValidMemoryObjects:string[] = [];
+        forEach(data, (value,key) => {
+            if (value.version < minimumVersion) {
+                isValid = false;
+                nonValidMemoryObjects.push(key);
+            }
+        });
+
+        return {isValid,nonValidMemoryObjects};
+    }
+
+}
