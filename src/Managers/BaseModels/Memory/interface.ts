@@ -11,6 +11,7 @@ import { forEach } from "lodash";
 
 export interface IMemory {
     Validate(data:StringMap<MemoryObjects>,type:MemoryTypes): {isValid:boolean,nonValidMemoryObjects:string[]}
+    ValidateSingle(data:MemoryObjects,type:MemoryTypes): boolean
     MinimumMemoryVersion(type:MemoryTypes):number;
 }
 
@@ -39,6 +40,15 @@ export default abstract class implements IMemory {
         });
 
         return {isValid,nonValidMemoryObjects};
+    }
+    ValidateSingle(data: MemoryObjects,type:MemoryTypes) {
+        const minimumVersion = this.MinimumMemoryVersion(type);
+        let isValid = true;
+        if (data.version < minimumVersion) {
+            isValid = false;
+        }
+
+        return isValid;
     }
 
 }
