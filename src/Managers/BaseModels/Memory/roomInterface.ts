@@ -2,7 +2,7 @@ import Memory from './interface';
 interface IRoomMemory {
     Validate(data:StringMap<RoomMemory>)
     ValidateSingle(data:RoomMemory)
-    CreateObject():RoomMemory
+    Generate():RoomMemory
 }
 
 export default class extends Memory implements IRoomMemory {
@@ -13,7 +13,7 @@ export default class extends Memory implements IRoomMemory {
     ValidateSingle(data: RoomMemory) {
         return super.ValidateSingle(data,this.memoryType);
     }
-    CreateObject(): RoomMemory {
+    Generate(): RoomMemory {
         return {
             version: super.MinimumMemoryVersion(this.memoryType),
         };

@@ -2,8 +2,9 @@ import Memory from './interface';
 interface ICreepMemory {
     Validate(data:StringMap<CreepMemory>)
     ValidateSingle(data:CreepMemory)
-    CreateObject():CreepMemory
-}
+    Generate():CreepMemory
+}   
+
 
 export default class extends Memory implements ICreepMemory {
     private memoryType:MemoryTypes = "Creep";
@@ -13,7 +14,7 @@ export default class extends Memory implements ICreepMemory {
     ValidateSingle(data: CreepMemory) {
         return super.ValidateSingle(data,this.memoryType);
     }
-    CreateObject(): CreepMemory {
+    Generate(): CreepMemory {
         return {
             version: super.MinimumMemoryVersion(this.memoryType),
         };
