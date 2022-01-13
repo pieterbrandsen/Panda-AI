@@ -18,6 +18,9 @@ export default class extends BaseMemory implements IStructureMemory {
     ValidateSingle(data: StructureMemory) {
         return super.ValidateSingle(data,this.memoryType);
     }
+        /**
+     * Create an new object of this type
+     */
     Generate(): StructureMemory {
         return {
             version: super.MinimumMemoryVersion(this.memoryType),

@@ -5,7 +5,7 @@
 // TODO: Update (to id)
 // TODO: Delete (with option for garbage collection) (to path)
 
-import { forEach } from "lodash";
+import { clone, forEach } from "lodash";
 
 export interface IMemory {
   Validate(
@@ -17,6 +17,9 @@ export interface IMemory {
 }
 
 export default abstract class implements IMemory {
+  /**
+   * Returns minimum memory version for type saved in memory
+   */
   MinimumMemoryVersion(type: MemoryTypes): number {
     switch (type) {
       case "Creep":
@@ -29,6 +32,9 @@ export default abstract class implements IMemory {
         return 999;
     }
   }
+  /**
+   * Check all data in object and return list of non valid memory objects based on version
+   */
   Validate(data: StringMap<MemoryObjects>, type: MemoryTypes) {
     const minimumVersion = this.MinimumMemoryVersion(type);
     let isValid = true;
@@ -42,6 +48,9 @@ export default abstract class implements IMemory {
 
     return { isValid, nonValidMemoryObjects };
   }
+  /**
+   * Check single object and return if its valid based on version
+   */
   ValidateSingle(data: MemoryObjects, type: MemoryTypes) {
     const minimumVersion = this.MinimumMemoryVersion(type);
     let isValid = true;

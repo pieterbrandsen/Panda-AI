@@ -18,6 +18,9 @@ export default class extends BaseMemory implements IRoomMemory {
     ValidateSingle(data: RoomMemory) {
         return super.ValidateSingle(data,this.memoryType);
     }
+        /**
+     * Create an new object of this type
+     */
     Generate(): RoomMemory {
         return {
             version: super.MinimumMemoryVersion(this.memoryType),

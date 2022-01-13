@@ -19,6 +19,9 @@ export default class extends BaseMemory implements ICreepMemory {
     ValidateSingle(data: CreepMemory) {
         return super.ValidateSingle(data,this.memoryType);
     }
+    /**
+     * Create an new object of this type
+     */
     Generate(): CreepMemory {
         return {
             version: super.MinimumMemoryVersion(this.memoryType),
