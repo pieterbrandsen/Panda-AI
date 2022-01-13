@@ -7,8 +7,20 @@ interface ValidatedMemory {
   isValid: boolean;
   nonValidMemoryObjects: string[];
 }
+
+interface MainMemoryData<MemoryType, CacheType> {
+  data: StringMap<MemoryType>;
+  version: number;
+  cache: StringMap<CacheType>;
+}
+
 interface BaseMemory {
   version: number;
+}
+interface Memory extends BaseMemory {
+  CreepsData: MainMemoryData<CreepMemory, CreepCache>;
+  StructuresData: MainMemoryData<StructureMemory, StructureCache>;
+  RoomsData: MainMemoryData<RoomMemory, RoomCache>;
 }
 
 interface CreepMemory extends BaseMemory {}
@@ -16,4 +28,4 @@ interface StructureMemory extends BaseMemory {}
 interface RoomMemory extends BaseMemory {}
 
 type MemoryObjects = CreepMemory | StructureMemory | RoomMemory;
-type MemoryTypes = "Creep" | "Structure" | "Room";
+type MemoryTypes = "Creep" | "Structure" | "Room" | "Global";
