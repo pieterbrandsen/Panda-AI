@@ -1,17 +1,9 @@
-//* Types of cache: Creep, Room, Global, Jobs
-//* For each are the following functions
-// TODO: Get (from id)
-// TODO: Create (to id)
-// TODO: Update (to id)
-// TODO: Delete (with option for garbage collection) (to path)
+/* eslint-disable class-methods-use-this */
 
-import { clone, forEach } from "lodash";
+import { forEach } from "lodash";
 
 export interface IMemory {
-  Validate(
-    data: StringMap<MemoryObjects>,
-    type: MemoryTypes
-  ): { isValid: boolean; nonValidMemoryObjects: string[] };
+  Validate(data: StringMap<MemoryObjects>, type: MemoryTypes): ValidatedMemory;
   ValidateSingle(data: MemoryObjects, type: MemoryTypes): boolean;
   MinimumMemoryVersion(type: MemoryTypes): number;
 }
@@ -32,10 +24,11 @@ export default abstract class implements IMemory {
         return 999;
     }
   }
+
   /**
    * Check all data in object and return list of non valid memory objects based on version
    */
-  Validate(data: StringMap<MemoryObjects>, type: MemoryTypes) {
+  Validate(data: StringMap<MemoryObjects>, type: MemoryTypes): ValidatedMemory {
     const minimumVersion = this.MinimumMemoryVersion(type);
     let isValid = true;
     const nonValidMemoryObjects: string[] = [];
@@ -48,10 +41,11 @@ export default abstract class implements IMemory {
 
     return { isValid, nonValidMemoryObjects };
   }
+
   /**
    * Check single object and return if its valid based on version
    */
-  ValidateSingle(data: MemoryObjects, type: MemoryTypes) {
+  ValidateSingle(data: MemoryObjects, type: MemoryTypes): boolean {
     const minimumVersion = this.MinimumMemoryVersion(type);
     let isValid = true;
     if (data.version < minimumVersion) {
