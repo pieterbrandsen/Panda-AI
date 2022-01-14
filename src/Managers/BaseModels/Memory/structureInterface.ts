@@ -2,20 +2,20 @@ import { clone } from "lodash";
 import BaseMemory from "./interface";
 
 interface IStructureMemory {
-  Validate(data: StringMap<StructureMemory>): ValidatedMemory;
+  Validate(data: StringMap<StructureMemory>): ValidatedData;
   ValidateSingle(data: StructureMemory): boolean;
   Generate(): StructureMemory;
 }
 
 export default class extends BaseMemory implements IStructureMemory {
-  private memoryType: MemoryTypes = "Structure";
+  private type: MemoryTypes = "Structure";
 
-  Validate(data: StringMap<StructureMemory>): ValidatedMemory {
-    return super.Validate(data, this.memoryType);
+  Validate(data: StringMap<StructureMemory>): ValidatedData {
+    return super.Validate(data, this.type);
   }
 
   ValidateSingle(data: StructureMemory): boolean {
-    return super.ValidateSingle(data, this.memoryType);
+    return super.ValidateSingle(data, this.type);
   }
 
   /**
@@ -23,7 +23,7 @@ export default class extends BaseMemory implements IStructureMemory {
    */
   Generate(): StructureMemory {
     return {
-      version: super.MinimumMemoryVersion(this.memoryType),
+      version: super.MinimumVersion(this.type),
     };
   }
 

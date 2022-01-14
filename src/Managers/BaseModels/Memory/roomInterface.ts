@@ -2,20 +2,20 @@ import { clone } from "lodash";
 import BaseMemory from "./interface";
 
 interface IRoomMemory {
-  Validate(data: StringMap<RoomMemory>): ValidatedMemory;
+  Validate(data: StringMap<RoomMemory>): ValidatedData;
   ValidateSingle(data: RoomMemory): boolean;
   Generate(): RoomMemory;
 }
 
 export default class extends BaseMemory implements IRoomMemory {
-  private memoryType: MemoryTypes = "Room";
+  private type: MemoryTypes = "Room";
 
-  Validate(data: StringMap<RoomMemory>): ValidatedMemory {
-    return super.Validate(data, this.memoryType);
+  Validate(data: StringMap<RoomMemory>): ValidatedData {
+    return super.Validate(data, this.type);
   }
 
   ValidateSingle(data: RoomMemory): boolean {
-    return super.ValidateSingle(data, this.memoryType);
+    return super.ValidateSingle(data, this.type);
   }
 
   /**
@@ -23,7 +23,7 @@ export default class extends BaseMemory implements IRoomMemory {
    */
   Generate(): RoomMemory {
     return {
-      version: super.MinimumMemoryVersion(this.memoryType),
+      version: super.MinimumVersion(this.type),
     };
   }
 

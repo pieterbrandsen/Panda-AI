@@ -6,10 +6,10 @@ interface ICreepMemory {
 }
 
 export default class extends BaseMemory implements ICreepMemory {
-  private memoryType: MemoryTypes = "Global";
+  private type: MemoryTypes = "Global";
 
   ValidateSingle(data: Memory): boolean {
-    return super.MinimumMemoryVersion(this.memoryType) === data.version;
+    return super.MinimumVersion(this.type) === data.version;
   }
 
   /**

@@ -2,20 +2,20 @@ import { clone } from "lodash";
 import BaseMemory from "./interface";
 
 interface ICreepMemory {
-  Validate(data: StringMap<CreepMemory>): ValidatedMemory;
+  Validate(data: StringMap<CreepMemory>): ValidatedData;
   ValidateSingle(data: CreepMemory): boolean;
   Generate(): CreepMemory;
 }
 
 export default class extends BaseMemory implements ICreepMemory {
-  private memoryType: MemoryTypes = "Creep";
+  private type: MemoryTypes = "Creep";
 
-  Validate(data: StringMap<CreepMemory>): ValidatedMemory {
-    return super.Validate(data, this.memoryType);
+  Validate(data: StringMap<CreepMemory>): ValidatedData {
+    return super.Validate(data, this.type);
   }
 
   ValidateSingle(data: CreepMemory): boolean {
-    return super.ValidateSingle(data, this.memoryType);
+    return super.ValidateSingle(data, this.type);
   }
 
   /**
@@ -23,7 +23,7 @@ export default class extends BaseMemory implements ICreepMemory {
    */
   Generate(): CreepMemory {
     return {
-      version: super.MinimumMemoryVersion(this.memoryType),
+      version: super.MinimumVersion(this.type),
     };
   }
 

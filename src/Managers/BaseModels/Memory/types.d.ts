@@ -3,10 +3,6 @@ interface CRUDResult<T> {
   success: boolean;
   data: T | undefined;
 }
-interface ValidatedMemory {
-  isValid: boolean;
-  nonValidMemoryObjects: string[];
-}
 
 interface MainMemoryData<MemoryType, CacheType> {
   data: StringMap<MemoryType>;
