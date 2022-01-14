@@ -1,22 +1,22 @@
 //* Types of cache: Creep, Room
 //* For each are the following functions
-// TODO: CRUD
 // TODO: Update All
+// *^ LATER
 // TODO: GetAll ... (structureType? via predicate)
 
 import { forEach } from "lodash";
 
 interface ICache {
-  Validate(data: StringMap<CacheObjects>, type: CacheTypes): ValidateData;
+  Validate(data: StringMap<CacheObjects>, type: CacheTypes): ValidatedData;
   ValidateSingle(data: CacheObjects, type: CacheTypes): boolean;
-  MinimumCacheVersion(type: CacheTypes): number;
+  MinimumVersion(type: CacheTypes): number;
 }
 
 export default class implements ICache {
   /**
    * Returns minimum cache version for type saved in cache
    */
-  MinimumCacheVersion(type: CacheTypes): number {
+  MinimumVersion(type: CacheTypes): number {
     switch (type) {
       case "Creep":
         return Memory.CreepsData.version;
@@ -34,8 +34,8 @@ export default class implements ICache {
   /**
    * Check all data in object and return list of non valid cache objects based on version
    */
-  Validate(data: StringMap<CacheObjects>, type: CacheTypes): ValidateData {
-    const minimumVersion = this.MinimumCacheVersion(type);
+  Validate(data: StringMap<CacheObjects>, type: CacheTypes): ValidatedData {
+    const minimumVersion = this.MinimumVersion(type);
     let isValid = true;
     const nonValidObjects: string[] = [];
     forEach(data, (value, key) => {
@@ -52,7 +52,7 @@ export default class implements ICache {
    * Check single object and return if its valid based on version
    */
   ValidateSingle(data: CacheObjects, type: CacheTypes): boolean {
-    const minimumVersion = this.MinimumCacheVersion(type);
+    const minimumVersion = this.MinimumVersion(type);
     let isValid = true;
     if (data.version < minimumVersion) {
       isValid = false;
