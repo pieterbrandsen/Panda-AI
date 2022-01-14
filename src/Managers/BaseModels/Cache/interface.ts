@@ -1,8 +1,5 @@
-//* Types of cache: Creep, Room
-//* For each are the following functions
 // TODO: Update All
 // *^ LATER
-// TODO: GetAll ... (structureType? via predicate)
 
 import { forEach } from "lodash";
 

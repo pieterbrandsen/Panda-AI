@@ -1,4 +1,4 @@
-import { clone } from "lodash";
+import { clone, pickBy } from "lodash";
 import BaseCache from "./interface";
 
 interface ICreepCache {
@@ -49,5 +49,14 @@ export default class extends BaseCache implements ICreepCache {
   static Delete(id: string): CRUDResult<CreepCache> {
     delete Memory.CreepsData.cache[id];
     return { success: true, data: undefined };
+  }
+
+  static GetAll(predicate?: Predicate<CreepCache>): StringMap<CreepCache> {
+    const data = Memory.CreepsData.cache;
+    if (!predicate) {
+      return data;
+    }
+
+    return pickBy(data,predicate);
   }
 }

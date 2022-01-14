@@ -1,4 +1,4 @@
-import { clone } from "lodash";
+import { clone, pickBy } from "lodash";
 import BaseCache from "./interface";
 
 interface IRoomCache {
@@ -49,5 +49,14 @@ export default class extends BaseCache implements IRoomCache {
   static Delete(id: string): CRUDResult<RoomCache> {
     delete Memory.RoomsData.cache[id];
     return { success: true, data: undefined };
+  }
+
+  static GetAll(predicate?: Predicate<RoomCache>): StringMap<RoomCache> {
+    const data = Memory.RoomsData.cache;
+    if (!predicate) {
+      return data;
+    }
+
+    return pickBy(data,predicate);
   }
 }

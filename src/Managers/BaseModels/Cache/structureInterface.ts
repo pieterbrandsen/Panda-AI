@@ -1,10 +1,11 @@
-import { clone } from "lodash";
+import { clone, filter, pickBy } from "lodash";
 import BaseMemory from "./interface";
+import Predicates from "./predicates";
 
 interface IStructureCache {
   Validate(data: StringMap<StructureCache>): ValidatedData;
   ValidateSingle(data: StructureCache): boolean;
-  Generate(): StructureCache;
+  Generate(structure:Structure): StructureCache;
 }
 
 export default class extends BaseMemory implements IStructureCache {
@@ -21,8 +22,9 @@ export default class extends BaseMemory implements IStructureCache {
   /**
    * Create an new object of this type
    */
-  Generate(): StructureCache {
+  Generate(structure:Structure): StructureCache {
     return {
+      type: structure.structureType,
       version: super.MinimumVersion(this.memoryType),
     };
   }
@@ -55,5 +57,14 @@ export default class extends BaseMemory implements IStructureCache {
   static Delete(id: string): CRUDResult<StructureCache> {
     delete Memory.StructuresData.cache[id];
     return { success: true, data: undefined };
+  }
+
+  static GetAll(predicate?: Predicate<StructureCache>): StringMap<StructureCache> {
+    const data = Memory.StructuresData.cache;
+    if (!predicate) {
+      return data;
+    }
+
+    return pickBy(data,predicate);
   }
 }
