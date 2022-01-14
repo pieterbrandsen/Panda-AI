@@ -1,11 +1,11 @@
 import { clone, forEach } from "lodash";
 import BaseMemory from "./interface";
 
-interface ICreepMemory {
+interface IGlobalMemory {
   ValidateSingle(data: Memory): boolean;
 }
 
-export default class extends BaseMemory implements ICreepMemory {
+export default class extends BaseMemory implements IGlobalMemory {
   private type: MemoryTypes = "Global";
 
   ValidateSingle(data: Memory): boolean {
