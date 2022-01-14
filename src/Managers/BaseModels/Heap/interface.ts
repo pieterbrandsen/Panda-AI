@@ -1,12 +1,24 @@
 //* Types of cache: Creep, Room, Global, Jobs
 //* For each are the following functions
-// TODO: Validate
 // TODO: Create object
-// TODO: Get (from path)
-// TODO: Add (to path)
-// TODO: Update (to path)
-// TODO: Delete (to path)
+// TODO: CRUD
 
-interface IHeap {}
+interface IHeap {
+  ValidateSingle(id: string, type: HeapTypes): boolean;
+}
 
-export default class implements IHeap {}
+export default class implements IHeap {
+    ValidateSingle(id: string, type: HeapTypes): boolean {
+        switch (type) {
+          case "Creep":
+            return global.CreepsData[id] !== undefined; 
+          case "Structure":
+            return global.StructuresData[id] !== undefined;
+          case "Room":
+            return global.RoomsData[id] !== undefined;
+          case "Global":
+            return global.Version !== undefined;
+          // skip default case;
+          }
+    }
+}
