@@ -55,4 +55,7 @@ export default class extends BaseMemory implements ICreepMemory {
     });
     return { success: true, data };
   }
+  static Initialize():boolean {
+    return this.Update(this.Generate()).success;
+  }
 }
