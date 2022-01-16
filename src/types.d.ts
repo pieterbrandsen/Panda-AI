@@ -9,3 +9,8 @@ interface ValidatedData {
 interface Predicate<T> {
   (data:T):boolean;
 }
+
+interface SingleObject<T> {
+  key:string;
+  value?:T
+}
