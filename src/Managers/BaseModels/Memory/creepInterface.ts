@@ -4,7 +4,7 @@ import BaseMemory from "./interface";
 interface ICreepMemory {
   Validate(data: StringMap<CreepMemory>): ValidatedData;
   ValidateSingle(data: CreepMemory): boolean;
-  Generate(): CreepMemory;
+  Generate(type: CreepTypes): CreepMemory;
 }
 
 export default class extends BaseMemory implements ICreepMemory {
@@ -21,9 +21,10 @@ export default class extends BaseMemory implements ICreepMemory {
   /**
    * Create an new object of this type
    */
-  Generate(): CreepMemory {
+  Generate(type: CreepTypes): CreepMemory {
     return {
       version: super.MinimumVersion(this.type),
+      type
     };
   }
 
@@ -49,5 +50,11 @@ export default class extends BaseMemory implements ICreepMemory {
   static Delete(id: string): CRUDResult<CreepMemory> {
     delete Memory.CreepsData.data[id];
     return { success: true, data: undefined };
+  }
+
+  static GetAll(predicate?: Predicate<JobCache>): StringMap<JobCache> {
+    let data =Memory.JobsData.cache;
+    data= super.GetAllData(data,predicate);
+    return data;
   }
 }

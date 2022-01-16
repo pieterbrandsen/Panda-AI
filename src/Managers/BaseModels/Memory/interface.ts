@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
 
-import { forEach } from "lodash";
+import Predicates from "./predicates";
+import { forEach, pickBy } from "lodash";
 
 export interface IMemory {
   Validate(data: StringMap<MemoryObjects>, type: MemoryTypes): ValidatedData;
@@ -55,5 +56,13 @@ export default abstract class implements IMemory {
     }
 
     return isValid;
+  }
+
+  static GetAllData<T extends CacheObjects>(data:StringMap<T>,predicate?: Predicate<T>): StringMap<T> {
+    if (!predicate) {
+      return data;
+    }
+
+    return pickBy(data,predicate);
   }
 }

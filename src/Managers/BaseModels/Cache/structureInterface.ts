@@ -5,27 +5,28 @@ import Predicates from "./predicates";
 interface IStructureCache {
   Validate(data: StringMap<StructureCache>): ValidatedData;
   ValidateSingle(data: StructureCache): boolean;
-  Generate(structure:Structure): StructureCache;
+  Generate(structure:Structure,executer:string): StructureCache;
 }
 
 export default class extends BaseMemory implements IStructureCache {
-  private memoryType: MemoryTypes = "Structure";
+  private type: CacheTypes = "Structure";
 
   Validate(data: StringMap<StructureCache>): ValidatedData {
-    return super.Validate(data, this.memoryType);
+    return super.Validate(data, this.type);
   }
 
   ValidateSingle(data: StructureCache): boolean {
-    return super.ValidateSingle(data, this.memoryType);
+    return super.ValidateSingle(data, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(structure:Structure): StructureCache {
+  Generate(structure:Structure,executer:string): StructureCache {
     return {
       type: structure.structureType,
-      version: super.MinimumVersion(this.memoryType),
+      version: super.MinimumVersion(this.type),
+      executer
     };
   }
 
@@ -59,12 +60,9 @@ export default class extends BaseMemory implements IStructureCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(predicate?: Predicate<StructureCache>): StringMap<StructureCache> {
-    const data = Memory.StructuresData.cache;
-    if (!predicate) {
-      return data;
-    }
-
-    return pickBy(data,predicate);
+  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<JobCache>): StringMap<StructureCache> {
+    let data =Memory.StructuresData.cache;
+    data= super.GetAllData(data,executer,getOnlyExecuterJobs,predicate);
+    return data;
   }
 }

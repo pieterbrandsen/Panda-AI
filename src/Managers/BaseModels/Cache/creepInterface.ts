@@ -1,10 +1,11 @@
 import { clone, pickBy } from "lodash";
 import BaseCache from "./interface";
+import Predicates from "./predicates";
 
 interface ICreepCache {
   Validate(data: StringMap<CreepCache>): ValidatedData;
   ValidateSingle(data: CreepCache): boolean;
-  Generate(): CreepCache;
+  Generate(executer:string): CreepCache;
 }
 
 export default class extends BaseCache implements ICreepCache {
@@ -21,9 +22,10 @@ export default class extends BaseCache implements ICreepCache {
   /**
    * Create an new object of this type
    */
-  Generate(): CreepCache {
+  Generate(executer:string): CreepCache {
     return {
       version: super.MinimumVersion(this.type),
+executer
     };
   }
 
@@ -51,12 +53,9 @@ export default class extends BaseCache implements ICreepCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(predicate?: Predicate<CreepCache>): StringMap<CreepCache> {
-    const data = Memory.CreepsData.cache;
-    if (!predicate) {
-      return data;
-    }
-
-    return pickBy(data,predicate);
+  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<JobCache>): StringMap<JobCache> {
+    let data =Memory.CreepsData.cache;
+    data= super.GetAllData(data,executer,getOnlyExecuterJobs,predicate);
+    return data;
   }
 }

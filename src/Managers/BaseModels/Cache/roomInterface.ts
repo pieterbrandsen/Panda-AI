@@ -8,14 +8,14 @@ interface IRoomCache {
 }
 
 export default class extends BaseCache implements IRoomCache {
-  private memoryType: MemoryTypes = "Room";
+  private type: CacheTypes = "Room";
 
   Validate(data: StringMap<RoomCache>): ValidatedData {
-    return super.Validate(data, this.memoryType);
+    return super.Validate(data, this.type);
   }
 
   ValidateSingle(data: RoomCache): boolean {
-    return super.ValidateSingle(data, this.memoryType);
+    return super.ValidateSingle(data, this.type);
   }
 
   /**
@@ -23,7 +23,8 @@ export default class extends BaseCache implements IRoomCache {
    */
   Generate(): RoomCache {
     return {
-      version: super.MinimumVersion(this.memoryType),
+      version: super.MinimumVersion(this.type),
+      executer: "",
     };
   }
 
@@ -51,12 +52,9 @@ export default class extends BaseCache implements IRoomCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(predicate?: Predicate<RoomCache>): StringMap<RoomCache> {
-    const data = Memory.RoomsData.cache;
-    if (!predicate) {
-      return data;
-    }
-
-    return pickBy(data,predicate);
+  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<JobCache>): StringMap<RoomCache> {
+    let data =Memory.RoomsData.cache;
+    data= super.GetAllData(data,executer,getOnlyExecuterJobs,predicate);
+    return data;
   }
 }

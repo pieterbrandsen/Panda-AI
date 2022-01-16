@@ -39,6 +39,10 @@ export default class extends BaseMemory implements IGlobalMemory {
           ...defaultMainMemoryData,
           version: 0,
         },
+        JobsData: {
+          ...defaultMainMemoryData,
+          version: 0,
+        }
       },
       ...defaultObject,
     };

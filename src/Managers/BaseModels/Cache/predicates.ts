@@ -7,4 +7,9 @@ export default class  {
             return structureCache.type === structureType;
         };
     };
+    static IsExecuter = (executer?: string) => {
+        return (cache: CacheObjects) => {
+            return cache.executer === "" || cache.executer === undefined || cache.executer === executer;
+        };
+    };
 }

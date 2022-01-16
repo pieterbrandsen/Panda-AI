@@ -1,7 +1,8 @@
 // TODO: Update All
 // *^ LATER
 
-import { forEach } from "lodash";
+import Predicates from "./predicates";
+import { forEach, pickBy } from "lodash";
 
 interface ICache {
   Validate(data: StringMap<CacheObjects>, type: CacheTypes): ValidatedData;
@@ -21,8 +22,6 @@ export default class implements ICache {
         return Memory.StructuresData.version;
       case "Room":
         return Memory.RoomsData.version;
-      case "Global":
-        return Memory.version;
       default:
         return 999;
     }
@@ -56,5 +55,21 @@ export default class implements ICache {
     }
 
     return isValid;
+  }
+
+  static GetAllData<T extends CacheObjects>(data:StringMap<T>,executer?:string,getOnlyExecuterJobs = true,predicate?: Predicate<T>,predicate2?:Predicate<T>): StringMap<T> {
+    if (getOnlyExecuterJobs) {
+      data = pickBy(data,Predicates.IsExecuter(executer));
+    }
+
+    if (!predicate) {
+      return data;
+    }
+    const filterData = pickBy(data, predicate);
+    if (!predicate2) {
+      return filterData;
+    }
+
+    return pickBy(filterData,predicate2);
   }
 }
