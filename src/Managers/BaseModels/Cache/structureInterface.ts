@@ -1,6 +1,7 @@
 import { clone, filter, pickBy } from "lodash";
 import BaseMemory from "./interface";
 import Predicates from "./predicates";
+import IRoomHelper from "../Helper/roomInterface";
 
 interface IStructureCache {
   Validate(data: StringMap<StructureCache>): ValidatedData;
@@ -26,7 +27,8 @@ export default class extends BaseMemory implements IStructureCache {
     return {
       type: structure.structureType,
       version: super.MinimumVersion(this.type),
-      executer
+      executer,
+      pos: IRoomHelper.FreezeRoomPosition(structure.pos)
     };
   }
 
@@ -60,7 +62,7 @@ export default class extends BaseMemory implements IStructureCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<JobCache>): StringMap<StructureCache> {
+  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<StructureCache>): StringMap<StructureCache> {
     let data =Memory.StructuresData.cache;
     data= super.GetAllData(data,executer,getOnlyExecuterJobs,predicate);
     return data;

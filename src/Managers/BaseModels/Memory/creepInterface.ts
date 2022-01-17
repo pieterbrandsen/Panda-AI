@@ -52,8 +52,8 @@ export default class extends BaseMemory implements ICreepMemory {
     return { success: true, data: undefined };
   }
 
-  static GetAll(predicate?: Predicate<JobCache>): StringMap<JobCache> {
-    let data =Memory.JobsData.cache;
+  static GetAll(predicate?: Predicate<CreepMemory>): StringMap<CreepMemory> {
+    let data =Memory.CreepsData.data;
     data= super.GetAllData(data,predicate);
     return data;
   }

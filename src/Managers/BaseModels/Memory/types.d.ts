@@ -24,7 +24,9 @@ interface CreepMemory extends BaseMemory {
   jobId?:string;
   type: CreepTypes;
 }
-interface StructureMemory extends BaseMemory {}
+interface StructureMemory extends BaseMemory {
+  isSourceStructure?: boolean;
+}
 interface RoomMemory extends BaseMemory {}
 
 interface FreezedRoomPosition {

@@ -56,4 +56,9 @@ export default class extends BaseMemory implements IStructureMemory {
     delete Memory.StructuresData.data[id];
     return { success: true, data: undefined };
   }
+  static GetAll(predicate?: Predicate<StructureMemory>): StringMap<StructureMemory> {
+    let data =Memory.StructuresData.data;
+    data= super.GetAllData(data,predicate);
+    return data;
+  }
 }

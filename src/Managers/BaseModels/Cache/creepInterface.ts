@@ -53,7 +53,7 @@ executer
     return { success: true, data: undefined };
   }
 
-  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<JobCache>): StringMap<JobCache> {
+  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<CreepCache>): StringMap<CreepCache> {
     let data =Memory.CreepsData.cache;
     data= super.GetAllData(data,executer,getOnlyExecuterJobs,predicate);
     return data;

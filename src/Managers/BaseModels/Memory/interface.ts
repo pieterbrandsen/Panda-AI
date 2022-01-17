@@ -58,7 +58,7 @@ export default abstract class implements IMemory {
     return isValid;
   }
 
-  static GetAllData<T extends CacheObjects>(data:StringMap<T>,predicate?: Predicate<T>): StringMap<T> {
+  protected static GetAllData<T extends MemoryObjects>(data:StringMap<T>,predicate?: Predicate<T>): StringMap<T> {
     if (!predicate) {
       return data;
     }

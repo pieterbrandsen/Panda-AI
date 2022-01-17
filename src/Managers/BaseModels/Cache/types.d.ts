@@ -7,6 +7,7 @@ interface CreepCache extends BaseCache {
 }
 interface StructureCache extends BaseCache {
   type:StructureConstant;
+  pos:FreezedRoomPosition
 }
 interface RoomCache extends BaseCache {
 

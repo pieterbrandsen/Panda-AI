@@ -50,4 +50,9 @@ export default class extends BaseMemory implements IRoomMemory {
     delete Memory.RoomsData.data[id];
     return { success: true, data: undefined };
   }
+  static GetAll(predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
+    let data =Memory.RoomsData.data;
+    data= super.GetAllData(data,predicate);
+    return data;
+  }
 }

@@ -52,7 +52,7 @@ export default class extends BaseCache implements IRoomCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<JobCache>): StringMap<RoomCache> {
+  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<RoomCache>): StringMap<RoomCache> {
     let data =Memory.RoomsData.cache;
     data= super.GetAllData(data,executer,getOnlyExecuterJobs,predicate);
     return data;

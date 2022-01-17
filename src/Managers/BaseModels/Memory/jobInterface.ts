@@ -55,4 +55,9 @@ export default class extends BaseMemory implements IJobMemory {
     delete Memory.JobsData.data[id];
     return { success: true, data: undefined };
   }
+  static GetAll(predicate?: Predicate<JobMemory>): StringMap<JobMemory> {
+    let data =Memory.JobsData.data;
+    data= super.GetAllData(data,predicate);
+    return data;
+  }
 }

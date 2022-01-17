@@ -12,4 +12,9 @@ export default class  {
             return cache.executer === "" || cache.executer === undefined || cache.executer === executer;
         };
     };
+    static IsStructureTypes = (structureTypes:StructureConstant[],shouldBe:boolean) => {
+        return (cache: StructureCache) => {
+            return structureTypes.includes(cache.type) === shouldBe;
+        };
+    };
 }
