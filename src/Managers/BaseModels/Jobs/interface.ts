@@ -55,14 +55,14 @@ export default class implements IJobs {
   static FindNewJob(
     executer: string,
     creepType:CreepTypes
-  ): string | undefined {
+  ): {id:string,job:JobCache} | undefined {
     // get for creep type
     let jobs = IJobCache.GetAll(true, executer,Predicates.IsCreepType(creepType));
     if (!jobs.success) {
       return undefined;
     }
 
-    let jobId: string | undefined = undefined;
+    let jobId: string | undefined;
     let lastAssigned: number = Infinity;
     let jobIds = Object.keys(jobs);
     forEach(jobIds, (id) => {
@@ -77,7 +77,7 @@ export default class implements IJobs {
     });
 
     if (jobId !== undefined) {
-        return jobId;
+      return {id:jobId,job:jobs[jobId]};
     }
 
     lastAssigned = Infinity;
@@ -94,7 +94,10 @@ export default class implements IJobs {
       }
     });
 
-    return jobId;
+    if (jobId !== undefined) {
+      return {id:jobId,job:jobs[jobId]};
+    }
+    return undefined;
   }
 
   static FindJobForCreep(creep:Creep, creepMemory:CreepMemory):boolean {
@@ -102,18 +105,21 @@ export default class implements IJobs {
       if (!creepCacheResult.success) {
           return false;
       }
-        const creepCache = creepCacheResult.data as CreepCache;
+      const creepCache = creepCacheResult.data as CreepCache;
 
-    const jobId = this.FindNewJob(creepCache.executer, creep.memory.type);
-    if (jobId !== undefined) {
-      creepMemory.jobId = jobId;
-      ICreepMemory.Update(creep.name, creepMemory);
-      const jobMemory = IJobMemory.Get(jobId);
+    const newJob = this.FindNewJob(creepCache.executer, creep.memory.type);
+    if (newJob !== undefined) {
+      creepMemory.jobId = newJob.id;
+      creepCache.executer = newJob.job.executer;
+      const jobMemory = IJobMemory.Get(newJob.id);
       if (!jobMemory.success) {
-          return false;
+        return false;
       }
-        const job = jobMemory.data as JobMemory;
-        job.lastAssigned = Game.time;
+      const job = jobMemory.data as JobMemory;
+      job.lastAssigned = Game.time;
+      IJobMemory.Update(newJob.id, job);
+      ICreepMemory.Update(creep.name, creepMemory);
+      ICreepCache.Update(creep.name, creepCache);
       return true;
     }
     else return false;
