@@ -6,7 +6,7 @@
 // TODO: RequestCreep
 
 // TODO: GetRequiredBodyPartsForJobs
-// TODO: GetCreepMemory
+// TODO: GetCreepMemoryForSpawning
 
 interface ICreepSpawning {}
 

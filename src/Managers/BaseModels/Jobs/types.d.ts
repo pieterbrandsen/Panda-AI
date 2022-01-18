@@ -4,5 +4,15 @@ interface JobMemory extends BaseMemory {
     pos:FreezedRoomPosition;
     lastAssigned:number;
 }
+interface JobInitializationData {
+    type: JobTypes;
+    pos: FreezedRoomPosition;
+    executer:string;
+    targetId:string;
+    
+    // ResourceStorage
+    fromTargetId?:string;
+    amountToTransfer?:number;
+}
 
-type JobTypes = "HarvestSource"|"TransferSpawn";
+type JobTypes = "HarvestSource"|"TransferSpawn" | "TransferStructure";

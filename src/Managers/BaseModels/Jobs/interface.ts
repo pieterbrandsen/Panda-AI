@@ -16,7 +16,9 @@ export default class implements IJobs {
   static GetJobId(type: JobTypes, pos: FreezedRoomPosition): string {
     return `${type}_${pos.x}_${pos.y}_${pos.roomName}`;
   }
-  static Create(id: string, data: JobMemory): CRUDResult<JobMemory> {
+  static Create(id: string, data: JobMemory,cache:JobCache): CRUDResult<JobMemory> {
+    // TODO: Check return later and revert if failed later
+    IJobCache.Create(id, cache);
     return IJobMemory.Create(id, data);
   }
   static Update(id: string, data: JobMemory): CRUDResult<JobMemory> {
@@ -48,9 +50,12 @@ export default class implements IJobs {
   static Generate(type, pos: FreezedRoomPosition): JobMemory {
     return new IJobMemory().Generate(type, pos);
   }
-  static Initialize(type: JobTypes, pos: FreezedRoomPosition): void {
-    const job = new IJobMemory().Generate(type, pos);
-    this.Create(this.GetJobId(type, pos), job);
+  static Initialize(data:JobInitializationData): string {
+    const job = new IJobMemory().Generate(data.type, data.pos);
+    const cache = new IJobCache().Generate(data.executer);
+    const id = this.GetJobId(data.type, data.pos);
+    this.Create(id, job,cache);
+    return id;
   }
   static FindNewJob(
     executer: string,

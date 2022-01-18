@@ -26,6 +26,8 @@ interface CreepMemory extends BaseMemory {
 }
 interface StructureMemory extends BaseMemory {
   isSourceStructure?: boolean;
+  energyIncoming: StringMap<number>;
+  energyOutgoing: StringMap<number>;
 }
 interface RoomMemory extends BaseMemory {}
 
