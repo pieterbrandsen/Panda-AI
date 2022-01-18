@@ -35,6 +35,8 @@ export default class implements IResourceStorage {
   requiredStorageLevel: StorageLevels;
   executer: string;
   type: "creep" | "structure";
+  memory:StructureMemory | CreepMemory | undefined;
+  cache:StructureCache |CreepCache | undefined;
   constructor(
     object: StructuresWithStorage | Creep,
     type: "creep" | "structure",
@@ -44,6 +46,14 @@ export default class implements IResourceStorage {
     this.requiredStorageLevel = this.GetRequiredStorageLevels(object);
     this.executer = executer;
     this.type = type;
+    if (type === "structure") {
+      this.memory = IStructureMemory.Get(object.id).data;
+      this.cache = IStructureCache.Get(object.id).data;
+    }
+    else {
+      this.memory = ICreepMemory.Get(object.id).data;
+      this.cache = ICreepCache.Get(object.id).data;
+    }
   }
 
   GetRequiredStorageLevels(
@@ -145,10 +155,11 @@ export default class implements IResourceStorage {
     const bestLevel = bestStructure.levels;
     if (isFilling ? level.max === -1 : level.min === -1) return bestStructure;
 
+    // TODO: Get level based on % filled
     const newScore =
-      (distance / bestDistance) * 60 + (bestLevel.current / level.current) * 40;
+      (distance / bestDistance) * 60 + ((bestLevel.current / bestLevel.max) / (level.current / level.max)) * 40;
     const bestScore =
-      (bestDistance / distance) * 60 + (level.current / bestLevel.current) * 40;
+      (bestDistance / distance) * 60 + ((level.current / level.max) / (bestLevel.current / bestLevel.max)) * 40;
 
     if (isFilling ? newScore < bestScore : newScore > bestScore) {
       return structure;
@@ -215,12 +226,13 @@ export default class implements IResourceStorage {
     return bestStructure;
   }
   Manage() {
-    if (this.type === "structure") {
-      const structureMemoryResult = IStructureMemory.Get(this.object.id);
-      const structureCacheResult = IStructureCache.Get(this.object.id);
-      if (!structureMemoryResult.success) return;
-      const structureMemory = structureMemoryResult.data as StructureMemory;
-      const structureCache = structureCacheResult.data as StructureCache;
+      // const structureMemoryResult = IStructureMemory.Get(this.object.id);
+      // const structureCacheResult = IStructureCache.Get(this.object.id);
+      // if (!structureMemoryResult.success) return;
+      // const structureMemory = structureMemoryResult.data as StructureMemory;
+      // const structureCache = structureCacheResult.data as StructureCache;
+
+      if (!this.memory ||  !this.cache) return;
 
       const isFullEnough = this.IsStructureFullEnough();
       const isEmptyEnough = this.IsStructureEmptyEnough();
@@ -247,14 +259,14 @@ export default class implements IResourceStorage {
             );
             const jobId = IJob.Initialize({
               executer: this.executer,
-              pos: structureCache.pos,
+              pos: this.cache.pos,
               targetId: targetStructureInformation.id,
               type: isTypeSpawning ? "TransferSpawn" : "TransferStructure",
               amountToTransfer: amountToTransfer,
               fromTargetId: this.object.id,
             });
             targetMemory.energyIncoming[jobId] = amountToTransfer;
-            structureMemory.energyOutgoing[jobId] = amountToTransfer;
+            this.memory.energyOutgoing[jobId] = amountToTransfer;
           }
         } else {
           // create job without target
@@ -277,21 +289,18 @@ export default class implements IResourceStorage {
             );
             const jobId = IJob.Initialize({
               executer: this.executer,
-              pos: structureCache.pos,
+              pos: this.cache.pos,
               targetId: this.object.id,
               type: "TransferStructure",
               amountToTransfer: amountToTransfer,
               fromTargetId: targetStructureInformation.id,
             });
             targetMemory.energyOutgoing[jobId] = amountToTransfer;
-            structureMemory.energyIncoming[jobId] = amountToTransfer;
+            this.memory.energyIncoming[jobId] = amountToTransfer;
           }
         } else {
           // create job without target
         }
       } 
-    }
-    else {
-    }
   }
 }

@@ -4,6 +4,7 @@ interface BaseCache {
   executer:string;
 }
 interface CreepCache extends BaseCache {
+  pos:FreezedRoomPosition
 }
 interface StructureCache extends BaseCache {
   type:StructureConstant;
