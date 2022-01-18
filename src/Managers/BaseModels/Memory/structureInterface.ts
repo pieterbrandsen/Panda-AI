@@ -24,6 +24,8 @@ export default class extends BaseMemory implements IStructureMemory {
   Generate(): StructureMemory {
     return {
       version: super.MinimumVersion(this.type),
+      energyIncoming:{},
+      energyOutgoing:{},
     };
   }
 
