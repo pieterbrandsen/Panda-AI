@@ -8,26 +8,29 @@ import IJob from "../Jobs/interface";
 import { forOwn, sum } from "lodash";
 
 interface IResourceStorage {
-  // object: StructuresWithStorage | Creep;
-  // memory: StructureMemory | undefined;
-  // cache: StructureCache | undefined;
-  // requiredStorageLevel:StorageLevels;
-  // GetRequiredStorageLevels(
-  //   forcedStructure?: StructuresWithStorage
-  // ): StorageLevels
-  // IsStructureEmptyEnough(
-  //   structure?: StructuresWithStorage
-  // ): { emptyEnough: boolean; levels: StorageLevels }
-  // IsStructureFullEnough(
-  //   structure?: StructuresWithStorage
-  // ): { fullEnough: boolean; levels: StorageLevels }
-  // GetClosestBestStructure(
-  //   structure: BestStructureLoop,
-  //   bestStructure: BestStructureLoop,
-  //   isFilling:boolean
-  // ): BestStructureLoop
-  // FindStructureToFillFrom(): BestStructureLoop | null
-  // FindStructureToEmptyTo(): BestStructureLoop | null
+  object: StructuresWithStorage | Creep;
+  requiredStorageLevel: StorageLevels;
+  executer: string;
+  type: "creep" | "structure";
+  memory:StructureMemory | CreepMemory | undefined;
+  cache:StructureCache |CreepCache | undefined;
+  GetRequiredStorageLevels(
+    object: StructuresWithStorage | Creep
+  ): StorageLevels
+  IsStructureEmptyEnough(
+    structure?: StructuresWithStorage
+  ): { emptyEnough: boolean; levels: StorageLevels }
+  IsStructureFullEnough(
+    structure?: StructuresWithStorage
+  ): { fullEnough: boolean; levels: StorageLevels }
+  GetClosestBestStructure(
+    structure: BestStructureLoop,
+    bestStructure: BestStructureLoop,
+    isFilling:boolean
+  ): BestStructureLoop
+  FindStructureToFillFrom(): BestStructureLoop | null
+  FindStructureToEmptyTo(): BestStructureLoop | null
+  Manage() 
 }
 
 export default class implements IResourceStorage {
