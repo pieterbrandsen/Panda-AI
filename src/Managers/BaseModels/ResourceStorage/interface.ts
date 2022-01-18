@@ -5,7 +5,7 @@ import ICreepCache from "../Cache/creepInterface";
 import IRoomHelper from "../Helper/roomInterface";
 import Predicates from "../Cache/predicates";
 import IJob from "../Jobs/interface";
-import { forOwn } from "lodash";
+import { forOwn, sum } from "lodash";
 
 interface IResourceStorage {
   // object: StructuresWithStorage | Creep;
@@ -60,7 +60,7 @@ export default class implements IResourceStorage {
     object: StructuresWithStorage | Creep
   ): StorageLevels {
     const capacity = object.store.getCapacity() ?? -1;
-    const used = object.store.getUsedCapacity() ?? -1;
+    const used = object.store.getUsedCapacity() ?? 0 + (this.memory ? sum(Object.values(this.memory.energyIncoming)) - sum(Object.values(this.memory.energyOutgoing)) : 0 );
 
     const fillToCapacity: StorageLevels = {
       max: -1,
@@ -79,9 +79,8 @@ export default class implements IResourceStorage {
 
     if (this.type === "structure") {
       const structure = object as StructuresWithStorage;
-      const memory = IStructureMemory.Get(object.id).data;
-
-      if (memory && (memory as StructureMemory).isSourceStructure) {
+      const structureMemory = this.memory as StructureMemory;
+      if (structureMemory && structureMemory.isSourceStructure) {
         return emptyToZero;
         // return {
         //     max: Math.min(capacity /2, 1000),
