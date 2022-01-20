@@ -64,7 +64,8 @@ export default class implements IJobs {
     creepType:CreepTypes
   ): {id:string,job:JobCache} | undefined {
     // get for creep type
-    let jobs = IJobCache.GetAll(true, executer,Predicates.IsCreepType(creepType));
+    const roomName = IRoomInterface.GetRoom(executer).key;
+    let jobs = IJobCache.GetAll(true, executer,[roomName],Predicates.IsCreepType(creepType));
     if (!jobs.success) {
       return undefined;
     }
@@ -88,7 +89,7 @@ export default class implements IJobs {
     }
 
     lastAssigned = Infinity;
-    jobs = IJobCache.GetAll(false, executer,Predicates.IsCreepType(creepType));
+    jobs = IJobCache.GetAll(false, executer,[roomName],Predicates.IsCreepType(creepType));
     jobIds = Object.keys(jobs);
     forEach(jobIds, (id) => {
       const jobMemoryResult = IJobMemory.Get(id);

@@ -60,9 +60,9 @@ export default class extends BaseMemory implements IJobCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(getOnlyExecuterJobs = true,executer?:string,predicate?: Predicate<JobCache>,predicate2?:Predicate<JobCache>): StringMap<JobCache> {
+  static GetAll(getOnlyExecuterJobs = true,executer?:string,roomsToCheck:string[]=[],predicate?: Predicate<JobCache>,predicate2?:Predicate<JobCache>): StringMap<JobCache> {
     let data =Memory.JobsData.cache;
-    data= super.GetAllData(data,executer,getOnlyExecuterJobs,predicate,predicate2);
+    data= super.GetAllData(data,executer,getOnlyExecuterJobs,roomsToCheck,predicate,predicate2);
     return data;
   }
 }

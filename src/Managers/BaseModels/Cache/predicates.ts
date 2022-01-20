@@ -1,3 +1,4 @@
+import IRoomHelper from "../Helper/roomInterface";
 export default class  {
     /**
      * Checks if inputted structureType is equal to structure's structureType
@@ -10,6 +11,16 @@ export default class  {
     static IsExecuter = (executer?: string) => {
         return (cache: CacheObjects) => {
             return cache.executer === "" || cache.executer === undefined || cache.executer === executer;
+        };
+    };
+    static IsRoomName = (roomName: string) => {
+        return (cache: CacheObjects) => {
+            return IRoomHelper.GetRoom(cache.executer).key === roomName;
+        };
+    };
+    static IsInRoomNameArray = (roomNames: string[]) => {
+        return (cache: CacheObjects) => {
+            return roomNames.includes(IRoomHelper.GetRoom(cache.executer).key);
         };
     };
     static IsStructureTypes = (structureTypes:StructureConstant[],shouldBe:boolean) => {

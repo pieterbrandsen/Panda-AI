@@ -62,9 +62,9 @@ export default class extends BaseMemory implements IStructureCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<StructureCache>): StringMap<StructureCache> {
+  static GetAll(executer:string,getOnlyExecuterJobs = true,roomsToCheck:string[]=[],predicate?: Predicate<StructureCache>): StringMap<StructureCache> {
     let data =Memory.StructuresData.cache;
-    data= super.GetAllData(data,executer,getOnlyExecuterJobs,predicate);
+    data= super.GetAllData(data,executer,getOnlyExecuterJobs,roomsToCheck,predicate);
     return data;
   }
 }

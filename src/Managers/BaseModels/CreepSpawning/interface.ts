@@ -92,9 +92,11 @@ export default class implements ICreepSpawning {
   spawns: StructureSpawn[] = [];
   constructor(roomName: string, areRemotes?: boolean) {
     this.spawnRoom = Game.rooms[roomName];
+    const roomsToCheck = !areRemotes ? [roomName] : [roomName];
     const spawnsCache = IStructureCache.GetAll(
       "",
       false,
+      [roomName],
       CachePredicates.IsStructureType(STRUCTURE_SPAWN)
     );
     forEach(Object.keys(spawnsCache), (id) => {
@@ -102,8 +104,7 @@ export default class implements ICreepSpawning {
       if (spawn) this.spawns.push(spawn);
     });
 
-    const jobsCache = IJobCache.GetAll(false, "");
-    const jobIds = Object.keys(jobsCache);
+    const jobsCache = IJobCache.GetAll(false, "", roomsToCheck);
     this.jobsCache = jobsCache;
     this.jobsMemory = IJobMemory.GetAll();
 

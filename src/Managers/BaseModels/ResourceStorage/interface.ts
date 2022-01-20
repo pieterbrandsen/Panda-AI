@@ -174,6 +174,7 @@ export default class implements IResourceStorage {
       IStructureCache.GetAll(
         "",
         false,
+        [this.object.room.name],
         Predicates.IsStructureTypes(
           ["spawn", "extension", "tower", "lab"],
           false
@@ -204,7 +205,7 @@ export default class implements IResourceStorage {
   FindStructureToEmptyTo(): BestStructureLoop | null {
     let bestStructure: BestStructureLoop | null = null;
     forOwn(
-      IStructureCache.GetAll("", false),
+      IStructureCache.GetAll("", false,[this.object.room.name],),
       (cache: StructureCache, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
         if (structure) {

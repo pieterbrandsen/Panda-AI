@@ -56,9 +56,9 @@ type
     return { success: true, data: undefined };
   }
 
-  static GetAll(executer:string,getOnlyExecuterJobs = true,predicate?: Predicate<CreepCache>): StringMap<CreepCache> {
+  static GetAll(executer:string,getOnlyExecuterJobs = true,roomsToCheck:string[]=[],predicate?: Predicate<CreepCache>): StringMap<CreepCache> {
     let data =Memory.CreepsData.cache;
-    data= super.GetAllData(data,executer,getOnlyExecuterJobs,predicate);
+    data= super.GetAllData(data,executer,getOnlyExecuterJobs,roomsToCheck,predicate);
     return data;
   }
 }

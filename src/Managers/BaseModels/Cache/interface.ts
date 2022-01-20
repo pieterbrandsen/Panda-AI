@@ -57,7 +57,10 @@ export default class implements ICache {
     return isValid;
   }
 
-  protected static GetAllData<T extends CacheObjects>(data:StringMap<T>,executer?:string,getOnlyExecuterJobs = true,predicate?: Predicate<T>,predicate2?:Predicate<T>): StringMap<T> {
+  protected static GetAllData<T extends CacheObjects>(data:StringMap<T>,executer?:string,getOnlyExecuterJobs = true,roomsToCheck:string[]=[],predicate?: Predicate<T>,predicate2?:Predicate<T>): StringMap<T> {
+    if (roomsToCheck.length > 0) {
+      data = pickBy(data,Predicates.IsInRoomNameArray(roomsToCheck))
+    }
     if (getOnlyExecuterJobs) {
       data = pickBy(data,Predicates.IsExecuter(executer));
     }
