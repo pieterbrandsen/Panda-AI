@@ -90,9 +90,10 @@ export default class implements ICreepSpawning {
   aliveBodyParts: StringMapGeneric<BodyParts, CreepTypes> = this
     .emptyBodyPartsPerType;
   spawns: StructureSpawn[] = [];
-  constructor(roomName: string, areRemotes?: boolean) {
+  constructor(roomName: string, spawnRemotes?: boolean) {
     this.spawnRoom = Game.rooms[roomName];
-    const roomsToCheck = !areRemotes ? [roomName] : [roomName];
+    const roomMemory = IRoomMemory.Get(roomName).data as RoomMemory;
+    const roomsToCheck = !spawnRemotes ? [roomName] : Object.keys(roomMemory.remoteRooms);
     const spawnsCache = IStructureCache.GetAll(
       "",
       false,
@@ -402,15 +403,18 @@ export default class implements ICreepSpawning {
     }
     return false;
   }
-  SpawnCreeps() {
-    if (this.spawns.length === 0) return;
+  SpawnCreeps():boolean {
+    if (this.spawns.length === 0) return false;
     const nextType = this.GetNextCreepTypeToSpawn();
     if (nextType) {
       const creep = this.CreateCreep(nextType);
       const spawned = this.SpawnCreep(creep);
       if (spawned) {
-        this.SpawnCreeps();
+        return this.SpawnCreeps();
       }
     }
+    else return true;
+
+    return false;
   }
 }
