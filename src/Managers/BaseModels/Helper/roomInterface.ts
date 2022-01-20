@@ -26,4 +26,7 @@ interface IRoomHelper {
     static UnfreezeRoomPosition(pos: FreezedRoomPosition):RoomPosition {
       return new RoomPosition(pos.x, pos.y, pos.roomName);
     }
+    static GetMiddlePosition(roomName: string): FreezedRoomPosition {
+      return {x:25,y:25,roomName}
+    }
   }

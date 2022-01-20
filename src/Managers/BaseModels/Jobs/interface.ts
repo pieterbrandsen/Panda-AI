@@ -47,13 +47,15 @@ export default class implements IJobs {
     job.executer = IRoomInterface.GetExecuter(room, manager as ManagerTypes);
     return IJobCache.Update(id, job);
   }
-  static Generate(type, pos: FreezedRoomPosition): JobMemory {
+  static Generate(type:JobTypes, pos: FreezedRoomPosition): JobMemory {
     return new IJobMemory().Generate(type, pos);
   }
-  static Initialize(data:JobInitializationData): string {
-    const job = new IJobMemory().Generate(data.type, data.pos);
-    const cache = new IJobCache().Generate(data.executer);
+  static Initialize(data:JobInitializationData): string | undefined {
     const id = this.GetJobId(data.type, data.pos);
+    const existingJob = IJobMemory.Get(id);
+    if (existingJob.success) return undefined;
+    const job = new IJobMemory().GenerateObject(data);
+    const cache = new IJobCache().Generate(data);
     this.Create(id, job,cache);
     return id;
   }
@@ -112,7 +114,7 @@ export default class implements IJobs {
       }
       const creepCache = creepCacheResult.data as CreepCache;
 
-    const newJob = this.FindNewJob(creepCache.executer, creep.memory.type);
+    const newJob = this.FindNewJob(creepCache.executer, creepCache.type);
     if (newJob !== undefined) {
       creepMemory.jobId = newJob.id;
       creepCache.executer = newJob.job.executer;

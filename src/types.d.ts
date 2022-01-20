@@ -1,6 +1,9 @@
 interface StringMap<T> {
   [key: string]: T;
 }
+type StringMapGeneric<V, K extends string> = {
+  [key in K]: V;
+};
 interface ValidatedData {
   isValid: boolean;
   nonValidObjects: string[];

@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars */
 interface JobMemory extends BaseMemory {
-    type:JobTypes;
     pos:FreezedRoomPosition;
     lastAssigned:number;
+    targetId:string;
+    
+    fromTargetId?:string;
+    amountToTransfer?:number;
 }
 interface JobInitializationData {
     type: JobTypes;

@@ -267,6 +267,7 @@ export default class implements IResourceStorage {
               amountToTransfer: amountToTransfer,
               fromTargetId: this.object.id,
             });
+            if (jobId === undefined) return;
             targetMemory.energyIncoming[jobId] = amountToTransfer;
             this.memory.energyOutgoing[jobId] = amountToTransfer;
           }
@@ -297,6 +298,7 @@ export default class implements IResourceStorage {
               amountToTransfer: amountToTransfer,
               fromTargetId: targetStructureInformation.id,
             });
+            if (jobId === undefined) return;
             targetMemory.energyOutgoing[jobId] = amountToTransfer;
             this.memory.energyIncoming[jobId] = amountToTransfer;
           }
