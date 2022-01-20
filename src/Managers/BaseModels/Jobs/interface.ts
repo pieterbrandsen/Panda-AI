@@ -1,10 +1,10 @@
+import { forEach } from "lodash";
 import IJobMemory from "../Memory/jobInterface";
 import ICreepMemory from "../Memory/creepInterface";
 import ICreepCache from "../Cache/creepInterface";
 import IJobCache from "../Cache/jobInterface";
 import IRoomInterface from "../Helper/roomInterface";
 import Predicates from "./predicates";
-import { forEach } from "lodash";
 
 // TODO: Update (all/single)
 // TODO: GenerateObject (update whenever something needs to be added, assign in this function the missing data that is optional?)
@@ -16,20 +16,29 @@ export default class implements IJobs {
   static GetJobId(type: JobTypes, pos: FreezedRoomPosition): string {
     return `${type}_${pos.x}_${pos.y}_${pos.roomName}`;
   }
-  static Create(id: string, data: JobMemory,cache:JobCache): CRUDResult<JobMemory> {
+
+  static Create(
+    id: string,
+    data: JobMemory,
+    cache: JobCache
+  ): CRUDResult<JobMemory> {
     // TODO: Check return later and revert if failed later
     IJobCache.Create(id, cache);
     return IJobMemory.Create(id, data);
   }
+
   static Update(id: string, data: JobMemory): CRUDResult<JobMemory> {
     return IJobMemory.Update(id, data);
   }
+
   static Get(id: string): CRUDResult<JobMemory> {
     return IJobMemory.Get(id);
   }
+
   static Delete(id: string): CRUDResult<JobMemory> {
     return IJobMemory.Delete(id);
   }
+
   static MoveJob(
     id: string,
     type: "Room" | "Manager",
@@ -47,31 +56,39 @@ export default class implements IJobs {
     job.executer = IRoomInterface.GetExecuter(room, manager as ManagerTypes);
     return IJobCache.Update(id, job);
   }
-  static Generate(type:JobTypes, pos: FreezedRoomPosition): JobMemory {
+
+  static Generate(type: JobTypes, pos: FreezedRoomPosition): JobMemory {
     return new IJobMemory().Generate(type, pos);
   }
-  static Initialize(data:JobInitializationData): string | undefined {
+
+  static Initialize(data: JobInitializationData): string | undefined {
     const id = this.GetJobId(data.type, data.pos);
     const existingJob = IJobMemory.Get(id);
     if (existingJob.success) return undefined;
     const job = new IJobMemory().GenerateObject(data);
     const cache = new IJobCache().Generate(data);
-    this.Create(id, job,cache);
+    this.Create(id, job, cache);
     return id;
   }
+
   static FindNewJob(
     executer: string,
-    creepType:CreepTypes
-  ): {id:string,job:JobCache} | undefined {
+    creepType: CreepTypes
+  ): { id: string; job: JobCache } | undefined {
     // get for creep type
     const roomName = IRoomInterface.GetRoom(executer).key;
-    let jobs = IJobCache.GetAll(true, executer,[roomName],Predicates.IsCreepType(creepType));
+    let jobs = IJobCache.GetAll(
+      true,
+      executer,
+      [roomName],
+      Predicates.IsCreepType(creepType)
+    );
     if (!jobs.success) {
       return undefined;
     }
 
     let jobId: string | undefined;
-    let lastAssigned: number = Infinity;
+    let lastAssigned = Infinity;
     let jobIds = Object.keys(jobs);
     forEach(jobIds, (id) => {
       const jobMemoryResult = IJobMemory.Get(id);
@@ -85,11 +102,16 @@ export default class implements IJobs {
     });
 
     if (jobId !== undefined) {
-      return {id:jobId,job:jobs[jobId]};
+      return { id: jobId, job: jobs[jobId] };
     }
 
     lastAssigned = Infinity;
-    jobs = IJobCache.GetAll(false, executer,[roomName],Predicates.IsCreepType(creepType));
+    jobs = IJobCache.GetAll(
+      false,
+      executer,
+      [roomName],
+      Predicates.IsCreepType(creepType)
+    );
     jobIds = Object.keys(jobs);
     forEach(jobIds, (id) => {
       const jobMemoryResult = IJobMemory.Get(id);
@@ -103,17 +125,17 @@ export default class implements IJobs {
     });
 
     if (jobId !== undefined) {
-      return {id:jobId,job:jobs[jobId]};
+      return { id: jobId, job: jobs[jobId] };
     }
     return undefined;
   }
 
-  static FindJobForCreep(creep:Creep, creepMemory:CreepMemory):boolean {
-      const creepCacheResult = ICreepCache.Get(creep.name);
-      if (!creepCacheResult.success) {
-          return false;
-      }
-      const creepCache = creepCacheResult.data as CreepCache;
+  static FindJobForCreep(creep: Creep, creepMemory: CreepMemory): boolean {
+    const creepCacheResult = ICreepCache.Get(creep.name);
+    if (!creepCacheResult.success) {
+      return false;
+    }
+    const creepCache = creepCacheResult.data as CreepCache;
 
     const newJob = this.FindNewJob(creepCache.executer, creepCache.type);
     if (newJob !== undefined) {
@@ -130,6 +152,6 @@ export default class implements IJobs {
       ICreepCache.Update(creep.name, creepCache);
       return true;
     }
-    else return false;
+    return false;
   }
 }

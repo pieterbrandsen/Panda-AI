@@ -27,6 +27,7 @@
         "jest"
     ],
     "rules": {
+        "@typescript-eslint/no-empty-interface": 0,
         "no-shadow": "off",
         "@typescript-eslint/no-shadow": ["error"],
         "default-case": ["error", { "commentPattern": "^skip\\sdefault" }],

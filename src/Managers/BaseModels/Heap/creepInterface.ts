@@ -1,24 +1,20 @@
 import { clone } from "lodash";
 import BaseHeap from "./interface";
 
-interface ICreepHeap {
-  ValidateSingle(id: string): boolean;
-  Generate(): CreepHeap;
-}
+interface ICreepHeap {}
 
 export default class extends BaseHeap implements ICreepHeap {
-  private type: HeapTypes = "Creep";
+  private static type: HeapTypes = "Creep";
 
-  ValidateSingle(id: string): boolean {
+  static ValidateSingle(id: string): boolean {
     return super.ValidateSingle(id, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(): CreepHeap {
-    return {
-    };
+  static Generate(): CreepHeap {
+    return {};
   }
 
   static Get(id: string): CRUDResult<CreepHeap> {

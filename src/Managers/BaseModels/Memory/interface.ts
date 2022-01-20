@@ -1,16 +1,14 @@
 /* eslint-disable class-methods-use-this */
 
-import Predicates from "./predicates";
 import { forEach, pickBy } from "lodash";
 
-export interface IMemory {
-}
+export interface IMemory {}
 
 export default abstract class implements IMemory {
   /**
    * Returns minimum memory version for type saved in memory
    */
-   protected MinimumVersion(type: MemoryTypes): number {
+  protected MinimumVersion(type: MemoryTypes): number {
     switch (type) {
       case "Creep":
         return Memory.CreepsData.version;
@@ -28,7 +26,10 @@ export default abstract class implements IMemory {
   /**
    * Check all data in object and return list of non valid memory objects based on version
    */
-   protected Validate(data: StringMap<MemoryObjects>, type: MemoryTypes): ValidatedData {
+  protected Validate(
+    data: StringMap<MemoryObjects>,
+    type: MemoryTypes
+  ): ValidatedData {
     const minimumVersion = this.MinimumVersion(type);
     let isValid = true;
     const nonValidObjects: string[] = [];
@@ -55,12 +56,14 @@ export default abstract class implements IMemory {
     return isValid;
   }
 
-  protected static GetAllData<T extends MemoryObjects>(data:StringMap<T>,predicate?: Predicate<T>): StringMap<T> {
-    
+  protected static GetAllData<T extends MemoryObjects>(
+    data: StringMap<T>,
+    predicate?: Predicate<T>
+  ): StringMap<T> {
     if (!predicate) {
       return data;
     }
 
-    return pickBy(data,predicate);
+    return pickBy(data, predicate);
   }
 }

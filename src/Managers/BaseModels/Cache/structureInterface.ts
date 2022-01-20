@@ -1,34 +1,29 @@
-import { clone, filter, pickBy } from "lodash";
+import { clone } from "lodash";
 import BaseMemory from "./interface";
-import Predicates from "./predicates";
 import IRoomHelper from "../Helper/roomInterface";
 
-interface IStructureCache {
-  Validate(data: StringMap<StructureCache>): ValidatedData;
-  ValidateSingle(data: StructureCache): boolean;
-  Generate(structure:Structure,executer:string): StructureCache;
-}
+interface IStructureCache {}
 
 export default class extends BaseMemory implements IStructureCache {
-  private type: CacheTypes = "Structure";
+  private static type: CacheTypes = "Structure";
 
-  Validate(data: StringMap<StructureCache>): ValidatedData {
+  static Validate(data: StringMap<StructureCache>): ValidatedData {
     return super.Validate(data, this.type);
   }
 
-  ValidateSingle(data: StructureCache): boolean {
+  static ValidateSingle(data: StructureCache): boolean {
     return super.ValidateSingle(data, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(structure:Structure,executer:string): StructureCache {
+  static Generate(structure: Structure, executer: string): StructureCache {
     return {
       type: structure.structureType,
       version: super.MinimumVersion(this.type),
       executer,
-      pos: IRoomHelper.FreezeRoomPosition(structure.pos)
+      pos: IRoomHelper.FreezeRoomPosition(structure.pos),
     };
   }
 
@@ -37,10 +32,7 @@ export default class extends BaseMemory implements IStructureCache {
     return { success: !!data, data };
   }
 
-  static Create(
-    id: string,
-    data: StructureCache
-  ): CRUDResult<StructureCache> {
+  static Create(id: string, data: StructureCache): CRUDResult<StructureCache> {
     const dataAtId = this.Get(id);
     if (dataAtId.success) {
       return { success: false, data: dataAtId.data };
@@ -49,10 +41,7 @@ export default class extends BaseMemory implements IStructureCache {
     return { success: result.success, data: clone(result.data) };
   }
 
-  static Update(
-    id: string,
-    data: StructureCache
-  ): CRUDResult<StructureCache> {
+  static Update(id: string, data: StructureCache): CRUDResult<StructureCache> {
     Memory.StructuresData.cache[id] = data;
     return { success: true, data };
   }
@@ -62,9 +51,20 @@ export default class extends BaseMemory implements IStructureCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(executer:string,getOnlyExecuterJobs = true,roomsToCheck:string[]=[],predicate?: Predicate<StructureCache>): StringMap<StructureCache> {
-    let data =Memory.StructuresData.cache;
-    data= super.GetAllData(data,executer,getOnlyExecuterJobs,roomsToCheck,predicate);
+  static GetAll(
+    executer: string,
+    getOnlyExecuterJobs = true,
+    roomsToCheck: string[] = [],
+    predicate?: Predicate<StructureCache>
+  ): StringMap<StructureCache> {
+    let data = Memory.StructuresData.cache;
+    data = super.GetAllData(
+      data,
+      executer,
+      getOnlyExecuterJobs,
+      roomsToCheck,
+      predicate
+    );
     return data;
   }
 }

@@ -1,27 +1,23 @@
-import { clone, pickBy } from "lodash";
+import { clone } from "lodash";
 import BaseCache from "./interface";
 
-interface IRoomCache {
-  Validate(data: StringMap<RoomCache>): ValidatedData;
-  ValidateSingle(data: RoomCache): boolean;
-  Generate(): RoomCache;
-}
+interface IRoomCache {}
 
 export default class extends BaseCache implements IRoomCache {
-  private type: CacheTypes = "Room";
+  private static type: CacheTypes = "Room";
 
-  Validate(data: StringMap<RoomCache>): ValidatedData {
+  static Validate(data: StringMap<RoomCache>): ValidatedData {
     return super.Validate(data, this.type);
   }
 
-  ValidateSingle(data: RoomCache): boolean {
+  static ValidateSingle(data: RoomCache): boolean {
     return super.ValidateSingle(data, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(): RoomCache {
+  static Generate(): RoomCache {
     return {
       version: super.MinimumVersion(this.type),
       executer: "",
@@ -52,9 +48,20 @@ export default class extends BaseCache implements IRoomCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(executer:string,getOnlyExecuterJobs = true,roomsToCheck:string[]=[],predicate?: Predicate<RoomCache>): StringMap<RoomCache> {
-    let data =Memory.RoomsData.cache;
-    data= super.GetAllData(data,executer,getOnlyExecuterJobs,roomsToCheck,predicate);
+  static GetAll(
+    executer: string,
+    getOnlyExecuterJobs = true,
+    roomsToCheck: string[] = [],
+    predicate?: Predicate<RoomCache>
+  ): StringMap<RoomCache> {
+    let data = Memory.RoomsData.cache;
+    data = super.GetAllData(
+      data,
+      executer,
+      getOnlyExecuterJobs,
+      roomsToCheck,
+      predicate
+    );
     return data;
   }
 }

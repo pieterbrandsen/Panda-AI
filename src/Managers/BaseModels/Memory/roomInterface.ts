@@ -21,7 +21,7 @@ export default class extends BaseMemory implements IRoomMemory {
   /**
    * Create an new object of this type
    */
-  Generate(remoteRooms?:StringMap<RemoteRoom>): RoomMemory {
+  Generate(remoteRooms?: StringMap<RemoteRoom>): RoomMemory {
     return {
       version: super.MinimumVersion(this.type),
       remoteRooms: remoteRooms ?? {},
@@ -51,9 +51,10 @@ export default class extends BaseMemory implements IRoomMemory {
     delete Memory.RoomsData.data[id];
     return { success: true, data: undefined };
   }
+
   static GetAll(predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
-    let data =Memory.RoomsData.data;
-    data= super.GetAllData(data,predicate);
+    let { data } = Memory.RoomsData;
+    data = super.GetAllData(data, predicate);
     return data;
   }
 }

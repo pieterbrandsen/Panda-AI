@@ -1,20 +1,17 @@
-import { clone, forEach } from "lodash";
+import { forEach } from "lodash";
 import BaseHeap from "./interface";
 
-interface IGlobalHeap {
-  MinimumVersion():number;  
-  ValidateSingle(): boolean;
-}
+interface IGlobalHeap {}
 
 export default class extends BaseHeap implements IGlobalHeap {
-  private type: MemoryTypes = "Global";
+  private static type: HeapTypes = "Global";
 
-  MinimumVersion():number {
+  static MinimumVersion(): number {
     return 0;
   }
 
-  ValidateSingle(): boolean {
-    return super.ValidateSingle("",this.type);
+  static ValidateSingle(): boolean {
+    return super.ValidateSingle("", this.type);
   }
 
   /**
@@ -22,18 +19,20 @@ export default class extends BaseHeap implements IGlobalHeap {
    */
   static Generate(): GlobalData {
     return {
-        Version: 0,
-        CreepsData: {
-        },
-        RoomsData: {
-        },
-        StructuresData: {
-        },
+      Version: 0,
+      CreepsData: {},
+      RoomsData: {},
+      StructuresData: {},
     };
   }
 
   static Get(): CRUDResult<GlobalData> {
-    const data:GlobalData = {CreepsData:global.CreepsData,RoomsData:global.RoomsData,StructuresData:global.StructuresData,Version:global.Version};
+    const data: GlobalData = {
+      CreepsData: global.CreepsData,
+      RoomsData: global.RoomsData,
+      StructuresData: global.StructuresData,
+      Version: global.Version,
+    };
     return { success: !!data, data };
   }
 
@@ -43,7 +42,8 @@ export default class extends BaseHeap implements IGlobalHeap {
     });
     return { success: true, data };
   }
-  static Initialize():boolean {
+
+  static Initialize(): boolean {
     return this.Update(this.Generate()).success;
   }
 }

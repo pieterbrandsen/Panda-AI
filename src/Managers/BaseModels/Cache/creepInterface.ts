@@ -1,34 +1,34 @@
-import { clone, pickBy } from "lodash";
+import { clone } from "lodash";
 import BaseCache from "./interface";
-import Predicates from "./predicates";
 
-interface ICreepCache {
-  Validate(data: StringMap<CreepCache>): ValidatedData;
-  ValidateSingle(data: CreepCache): boolean;
-  Generate(executer:string,body:BodyParts,pos:FreezedRoomPosition,type:CreepTypes): CreepCache;
-}
+interface ICreepCache {}
 
 export default class extends BaseCache implements ICreepCache {
-  private type: CacheTypes = "Creep";
+  private static type: CacheTypes = "Creep";
 
-  Validate(data: StringMap<CreepCache>): ValidatedData {
+  static Validate(data: StringMap<CreepCache>): ValidatedData {
     return super.Validate(data, this.type);
   }
 
-  ValidateSingle(data: CreepCache): boolean {
+  static ValidateSingle(data: CreepCache): boolean {
     return super.ValidateSingle(data, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(executer:string,body:BodyParts,pos:FreezedRoomPosition,type:CreepTypes): CreepCache {
+  static Generate(
+    executer: string,
+    body: BodyParts,
+    pos: FreezedRoomPosition,
+    type: CreepTypes
+  ): CreepCache {
     return {
       version: super.MinimumVersion(this.type),
-executer,
-body,
-pos,
-type
+      executer,
+      body,
+      pos,
+      type,
     };
   }
 
@@ -56,9 +56,20 @@ type
     return { success: true, data: undefined };
   }
 
-  static GetAll(executer:string,getOnlyExecuterJobs = true,roomsToCheck:string[]=[],predicate?: Predicate<CreepCache>): StringMap<CreepCache> {
-    let data =Memory.CreepsData.cache;
-    data= super.GetAllData(data,executer,getOnlyExecuterJobs,roomsToCheck,predicate);
+  static GetAll(
+    executer: string,
+    getOnlyExecuterJobs = true,
+    roomsToCheck: string[] = [],
+    predicate?: Predicate<CreepCache>
+  ): StringMap<CreepCache> {
+    let data = Memory.CreepsData.cache;
+    data = super.GetAllData(
+      data,
+      executer,
+      getOnlyExecuterJobs,
+      roomsToCheck,
+      predicate
+    );
     return data;
   }
 }

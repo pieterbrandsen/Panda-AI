@@ -42,7 +42,7 @@ export default class extends BaseMemory implements IGlobalMemory {
         JobsData: {
           ...defaultMainMemoryData,
           version: 0,
-        }
+        },
       },
       ...defaultObject,
     };
@@ -59,7 +59,8 @@ export default class extends BaseMemory implements IGlobalMemory {
     });
     return { success: true, data };
   }
-  static Initialize():boolean {
+
+  static Initialize(): boolean {
     return this.Update(this.Generate()).success;
   }
 }

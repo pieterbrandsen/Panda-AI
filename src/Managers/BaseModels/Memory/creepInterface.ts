@@ -21,11 +21,11 @@ export default class extends BaseMemory implements ICreepMemory {
   /**
    * Create an new object of this type
    */
-  Generate(type: CreepTypes): CreepMemory {
+  Generate(): CreepMemory {
     return {
       version: super.MinimumVersion(this.type),
-      energyIncoming:{},
-      energyOutgoing:{},
+      energyIncoming: {},
+      energyOutgoing: {},
     };
   }
 
@@ -54,8 +54,8 @@ export default class extends BaseMemory implements ICreepMemory {
   }
 
   static GetAll(predicate?: Predicate<CreepMemory>): StringMap<CreepMemory> {
-    let data =Memory.CreepsData.data;
-    data= super.GetAllData(data,predicate);
+    let { data } = Memory.CreepsData;
+    data = super.GetAllData(data, predicate);
     return data;
   }
 }

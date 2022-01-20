@@ -22,26 +22,27 @@ export default class extends BaseMemory implements IJobMemory {
   /**
    * Create an new object of this type
    */
-  GenerateObject(data:JobInitializationData): JobMemory {
+  GenerateObject(data: JobInitializationData): JobMemory {
     return {
-      pos:data.pos,
+      pos: data.pos,
       lastAssigned: Game.time,
-      targetId:data.targetId,
-      amountToTransfer:data.amountToTransfer,
-      fromTargetId:data.fromTargetId,
+      targetId: data.targetId,
+      amountToTransfer: data.amountToTransfer,
+      fromTargetId: data.fromTargetId,
       version: super.MinimumVersion(this.type),
     };
   }
-  Generate(type:JobTypes, pos: FreezedRoomPosition): JobMemory {
+
+  Generate(type: JobTypes, pos: FreezedRoomPosition): JobMemory {
     return this.GenerateObject({
       type,
       pos,
       executer: "",
-      targetId:"",
-      amountToTransfer:0,
-      fromTargetId:"",
+      targetId: "",
+      amountToTransfer: 0,
+      fromTargetId: "",
     });
-  };
+  }
 
   static Get(id: string): CRUDResult<JobMemory> {
     const data = clone(Memory.JobsData.data[id]);
@@ -67,9 +68,10 @@ export default class extends BaseMemory implements IJobMemory {
     delete Memory.JobsData.data[id];
     return { success: true, data: undefined };
   }
+
   static GetAll(predicate?: Predicate<JobMemory>): StringMap<JobMemory> {
-    let data =Memory.JobsData.data;
-    data= super.GetAllData(data,predicate);
+    let { data } = Memory.JobsData;
+    data = super.GetAllData(data, predicate);
     return data;
   }
 }

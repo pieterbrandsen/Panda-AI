@@ -1,31 +1,26 @@
-import { clone, filter, pickBy } from "lodash";
+import { clone } from "lodash";
 import BaseMemory from "./interface";
-import Predicates from "./predicates";
 
-interface IJobCache {
-  Validate(data: StringMap<JobCache>): ValidatedData;
-  ValidateSingle(data: JobCache): boolean;
-  Generate(data:JobInitializationData): JobCache;
-}
+interface IJobCache {}
 
 export default class extends BaseMemory implements IJobCache {
-  private type: CacheTypes = "Job";
+  private static type: CacheTypes = "Job";
 
-  Validate(data: StringMap<JobCache>): ValidatedData {
+  static Validate(data: StringMap<JobCache>): ValidatedData {
     return super.Validate(data, this.type);
   }
 
-  ValidateSingle(data: JobCache): boolean {
+  static ValidateSingle(data: JobCache): boolean {
     return super.ValidateSingle(data, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(data: JobInitializationData) : JobCache {
+  static Generate(data: JobInitializationData): JobCache {
     return {
-      type:data.type,
-        executer:data.executer ,
+      type: data.type,
+      executer: data.executer,
       version: super.MinimumVersion(this.type),
     };
   }
@@ -35,10 +30,7 @@ export default class extends BaseMemory implements IJobCache {
     return { success: !!data, data };
   }
 
-  static Create(
-    id: string,
-    data: JobCache
-  ): CRUDResult<JobCache> {
+  static Create(id: string, data: JobCache): CRUDResult<JobCache> {
     const dataAtId = this.Get(id);
     if (dataAtId.success) {
       return { success: false, data: dataAtId.data };
@@ -47,10 +39,7 @@ export default class extends BaseMemory implements IJobCache {
     return { success: result.success, data: clone(result.data) };
   }
 
-  static Update(
-    id: string,
-    data: JobCache
-  ): CRUDResult<JobCache> {
+  static Update(id: string, data: JobCache): CRUDResult<JobCache> {
     Memory.JobsData.cache[id] = data;
     return { success: true, data };
   }
@@ -60,9 +49,22 @@ export default class extends BaseMemory implements IJobCache {
     return { success: true, data: undefined };
   }
 
-  static GetAll(getOnlyExecuterJobs = true,executer?:string,roomsToCheck:string[]=[],predicate?: Predicate<JobCache>,predicate2?:Predicate<JobCache>): StringMap<JobCache> {
-    let data =Memory.JobsData.cache;
-    data= super.GetAllData(data,executer,getOnlyExecuterJobs,roomsToCheck,predicate,predicate2);
+  static GetAll(
+    getOnlyExecuterJobs = true,
+    executer?: string,
+    roomsToCheck: string[] = [],
+    predicate?: Predicate<JobCache>,
+    predicate2?: Predicate<JobCache>
+  ): StringMap<JobCache> {
+    let data = Memory.JobsData.cache;
+    data = super.GetAllData(
+      data,
+      executer,
+      getOnlyExecuterJobs,
+      roomsToCheck,
+      predicate,
+      predicate2
+    );
     return data;
   }
 }

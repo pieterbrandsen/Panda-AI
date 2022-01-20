@@ -5,7 +5,6 @@
 // TODO: CRUD
 // TODO: Revert to original location (dont update if already present) then remove from memory
 
-interface IGarbageCollection {
-}
+interface IGarbageCollection {}
 
 export default class implements IGarbageCollection {}

@@ -1,24 +1,20 @@
 import { clone } from "lodash";
 import BaseHeap from "./interface";
 
-interface IRoomHeap {
-  ValidateSingle(id:string): boolean;
-  Generate(): RoomHeap;
-}
+interface IRoomHeap {}
 
 export default class extends BaseHeap implements IRoomHeap {
-  private type: HeapTypes = "Room";
+  private static type: HeapTypes = "Room";
 
-  ValidateSingle(id:string): boolean {
+  static ValidateSingle(id: string): boolean {
     return super.ValidateSingle(id, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(): RoomHeap {
-    return {
-    };
+  static Generate(): RoomHeap {
+    return {};
   }
 
   static Get(id: string): CRUDResult<RoomHeap> {

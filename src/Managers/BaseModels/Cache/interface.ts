@@ -1,20 +1,16 @@
 // TODO: Update All
 // *^ LATER
 
-import Predicates from "./predicates";
 import { forEach, pickBy } from "lodash";
+import Predicates from "./predicates";
 
-interface ICache {
-  Validate(data: StringMap<CacheObjects>, type: CacheTypes): ValidatedData;
-  ValidateSingle(data: CacheObjects, type: CacheTypes): boolean;
-  MinimumVersion(type: CacheTypes): number;
-}
+interface ICache {}
 
 export default class implements ICache {
   /**
    * Returns minimum cache version for type saved in cache
    */
-  MinimumVersion(type: CacheTypes): number {
+  static MinimumVersion(type: CacheTypes): number {
     switch (type) {
       case "Creep":
         return Memory.CreepsData.version;
@@ -30,7 +26,10 @@ export default class implements ICache {
   /**
    * Check all data in object and return list of non valid cache objects based on version
    */
-  Validate(data: StringMap<CacheObjects>, type: CacheTypes): ValidatedData {
+  static Validate(
+    data: StringMap<CacheObjects>,
+    type: CacheTypes
+  ): ValidatedData {
     const minimumVersion = this.MinimumVersion(type);
     let isValid = true;
     const nonValidObjects: string[] = [];
@@ -47,7 +46,7 @@ export default class implements ICache {
   /**
    * Check single object and return if its valid based on version
    */
-  ValidateSingle(data: CacheObjects, type: CacheTypes): boolean {
+  static ValidateSingle(data: CacheObjects, type: CacheTypes): boolean {
     const minimumVersion = this.MinimumVersion(type);
     let isValid = true;
     if (data.version < minimumVersion) {
@@ -57,12 +56,19 @@ export default class implements ICache {
     return isValid;
   }
 
-  protected static GetAllData<T extends CacheObjects>(data:StringMap<T>,executer?:string,getOnlyExecuterJobs = true,roomsToCheck:string[]=[],predicate?: Predicate<T>,predicate2?:Predicate<T>): StringMap<T> {
+  protected static GetAllData<T extends CacheObjects>(
+    data: StringMap<T>,
+    executer?: string,
+    getOnlyExecuterJobs = true,
+    roomsToCheck: string[] = [],
+    predicate?: Predicate<T>,
+    predicate2?: Predicate<T>
+  ): StringMap<T> {
     if (roomsToCheck.length > 0) {
-      data = pickBy(data,Predicates.IsInRoomNameArray(roomsToCheck))
+      data = pickBy(data, Predicates.IsInRoomNameArray(roomsToCheck));
     }
     if (getOnlyExecuterJobs) {
-      data = pickBy(data,Predicates.IsExecuter(executer));
+      data = pickBy(data, Predicates.IsExecuter(executer));
     }
 
     if (!predicate) {
@@ -73,6 +79,6 @@ export default class implements ICache {
       return filterData;
     }
 
-    return pickBy(filterData,predicate2);
+    return pickBy(filterData, predicate2);
   }
 }

@@ -13,15 +13,9 @@ interface MainMemoryData<MemoryType, CacheType> {
 interface BaseMemory {
   version: number;
 }
-interface Memory extends BaseMemory {
-  CreepsData: MainMemoryData<CreepMemory, CreepCache>;
-  StructuresData: MainMemoryData<StructureMemory, StructureCache>;
-  RoomsData: MainMemoryData<RoomMemory, RoomCache>;
-  JobsData: MainMemoryData<JobMemory, JobCache>;
-}
 
 interface CreepMemory extends BaseMemory {
-  jobId?:string;
+  jobId?: string;
   energyIncoming: StringMap<number>;
   energyOutgoing: StringMap<number>;
 }
@@ -31,10 +25,16 @@ interface StructureMemory extends BaseMemory {
   energyOutgoing: StringMap<number>;
 }
 interface RemoteRoom {
-  distance:number;
+  distance: number;
 }
 interface RoomMemory extends BaseMemory {
-  remoteRooms:StringMap<RemoteRoom>
+  remoteRooms: StringMap<RemoteRoom>;
+}
+interface Memory extends BaseMemory {
+  CreepsData: MainMemoryData<CreepMemory, CreepCache>;
+  StructuresData: MainMemoryData<StructureMemory, StructureCache>;
+  RoomsData: MainMemoryData<RoomMemory, RoomCache>;
+  JobsData: MainMemoryData<JobMemory, JobCache>;
 }
 
 interface FreezedRoomPosition {

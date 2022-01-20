@@ -24,8 +24,8 @@ export default class extends BaseMemory implements IStructureMemory {
   Generate(): StructureMemory {
     return {
       version: super.MinimumVersion(this.type),
-      energyIncoming:{},
-      energyOutgoing:{},
+      energyIncoming: {},
+      energyOutgoing: {},
     };
   }
 
@@ -58,9 +58,12 @@ export default class extends BaseMemory implements IStructureMemory {
     delete Memory.StructuresData.data[id];
     return { success: true, data: undefined };
   }
-  static GetAll(predicate?: Predicate<StructureMemory>): StringMap<StructureMemory> {
-    let data =Memory.StructuresData.data;
-    data= super.GetAllData(data,predicate);
+
+  static GetAll(
+    predicate?: Predicate<StructureMemory>
+  ): StringMap<StructureMemory> {
+    let { data } = Memory.StructuresData;
+    data = super.GetAllData(data, predicate);
     return data;
   }
 }
