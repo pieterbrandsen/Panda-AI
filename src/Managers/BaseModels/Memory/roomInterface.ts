@@ -21,9 +21,10 @@ export default class extends BaseMemory implements IRoomMemory {
   /**
    * Create an new object of this type
    */
-  Generate(): RoomMemory {
+  Generate(remoteRooms?:StringMap<RemoteRoom>): RoomMemory {
     return {
       version: super.MinimumVersion(this.type),
+      remoteRooms: remoteRooms ?? {},
     };
   }
 

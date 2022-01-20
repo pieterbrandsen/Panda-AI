@@ -5,7 +5,7 @@ import RoomHelper from "../Helper/roomInterface";
 interface IJobMemory {
   Validate(data: StringMap<JobMemory>): ValidatedData;
   ValidateSingle(data: JobMemory): boolean;
-  Generate(type:JobTypes,pos: FreezedRoomPosition): JobMemory;
+  // Generate(data:JobInitializationData): JobMemory;
 }
 
 export default class extends BaseMemory implements IJobMemory {
@@ -22,14 +22,26 @@ export default class extends BaseMemory implements IJobMemory {
   /**
    * Create an new object of this type
    */
-  Generate(type:JobTypes,pos: FreezedRoomPosition): JobMemory {
+  GenerateObject(data:JobInitializationData): JobMemory {
     return {
-        type,
-        pos,
-        lastAssigned: Game.time,
+      pos:data.pos,
+      lastAssigned: Game.time,
+      targetId:data.targetId,
+      amountToTransfer:data.amountToTransfer,
+      fromTargetId:data.fromTargetId,
       version: super.MinimumVersion(this.type),
     };
   }
+  Generate(type:JobTypes, pos: FreezedRoomPosition): JobMemory {
+    return this.GenerateObject({
+      type,
+      pos,
+      executer: "",
+      targetId:"",
+      amountToTransfer:0,
+      fromTargetId:"",
+    });
+  };
 
   static Get(id: string): CRUDResult<JobMemory> {
     const data = clone(Memory.JobsData.data[id]);

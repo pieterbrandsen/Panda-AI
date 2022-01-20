@@ -5,7 +5,7 @@ import Predicates from "./predicates";
 interface ICreepCache {
   Validate(data: StringMap<CreepCache>): ValidatedData;
   ValidateSingle(data: CreepCache): boolean;
-  Generate(executer:string): CreepCache;
+  Generate(executer:string,body:BodyParts,pos:FreezedRoomPosition,type:CreepTypes): CreepCache;
 }
 
 export default class extends BaseCache implements ICreepCache {
@@ -22,10 +22,13 @@ export default class extends BaseCache implements ICreepCache {
   /**
    * Create an new object of this type
    */
-  Generate(executer:string): CreepCache {
+  Generate(executer:string,body:BodyParts,pos:FreezedRoomPosition,type:CreepTypes): CreepCache {
     return {
       version: super.MinimumVersion(this.type),
-executer
+executer,
+body,
+pos,
+type
     };
   }
 

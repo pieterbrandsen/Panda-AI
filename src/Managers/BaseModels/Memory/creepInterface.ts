@@ -26,7 +26,6 @@ export default class extends BaseMemory implements ICreepMemory {
       version: super.MinimumVersion(this.type),
       energyIncoming:{},
       energyOutgoing:{},
-      type
     };
   }
 

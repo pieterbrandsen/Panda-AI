@@ -5,7 +5,7 @@ import Predicates from "./predicates";
 interface IJobCache {
   Validate(data: StringMap<JobCache>): ValidatedData;
   ValidateSingle(data: JobCache): boolean;
-  Generate(type:JobTypes): JobCache;
+  Generate(data:JobInitializationData): JobCache;
 }
 
 export default class extends BaseMemory implements IJobCache {
@@ -22,9 +22,10 @@ export default class extends BaseMemory implements IJobCache {
   /**
    * Create an new object of this type
    */
-  Generate(executer:string): JobCache {
+  Generate(data: JobInitializationData) : JobCache {
     return {
-        executer ,
+      type:data.type,
+        executer:data.executer ,
       version: super.MinimumVersion(this.type),
     };
   }

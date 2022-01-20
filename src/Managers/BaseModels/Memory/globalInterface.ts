@@ -2,14 +2,14 @@ import { clone, forEach } from "lodash";
 import BaseMemory from "./interface";
 
 interface IGlobalMemory {
-  ValidateSingle(data: Memory): boolean;
+  ValidateSingle(): boolean;
 }
 
 export default class extends BaseMemory implements IGlobalMemory {
   private type: MemoryTypes = "Global";
 
-  ValidateSingle(data: Memory): boolean {
-    return super.MinimumVersion(this.type) === data.version;
+  ValidateSingle(): boolean {
+    return super.MinimumVersion(this.type) === Memory.version;
   }
 
   /**

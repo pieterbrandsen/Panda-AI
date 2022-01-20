@@ -4,7 +4,10 @@ interface BaseCache {
   executer:string;
 }
 interface CreepCache extends BaseCache {
-  pos:FreezedRoomPosition
+  pos:FreezedRoomPosition;
+  body:BodyParts;
+  type: CreepTypes;
+  remoteOrigin?:string
 }
 interface StructureCache extends BaseCache {
   type:StructureConstant;
@@ -14,6 +17,7 @@ interface RoomCache extends BaseCache {
 
 }
 interface JobCache extends BaseCache {
+  type:JobTypes;
 }
 
 type CacheObjects = CreepCache | StructureCache | RoomCache | JobCache;

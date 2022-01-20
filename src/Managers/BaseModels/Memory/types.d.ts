@@ -22,7 +22,6 @@ interface Memory extends BaseMemory {
 
 interface CreepMemory extends BaseMemory {
   jobId?:string;
-  type: CreepTypes;
   energyIncoming: StringMap<number>;
   energyOutgoing: StringMap<number>;
 }
@@ -31,7 +30,12 @@ interface StructureMemory extends BaseMemory {
   energyIncoming: StringMap<number>;
   energyOutgoing: StringMap<number>;
 }
-interface RoomMemory extends BaseMemory {}
+interface RemoteRoom {
+  distance:number;
+}
+interface RoomMemory extends BaseMemory {
+  remoteRooms:StringMap<RemoteRoom>
+}
 
 interface FreezedRoomPosition {
   x: number;
@@ -39,6 +43,5 @@ interface FreezedRoomPosition {
   roomName: string;
 }
 
-type CreepTypes = "worker" | "transferer";
 type MemoryObjects = CreepMemory | StructureMemory | RoomMemory | JobMemory;
 type MemoryTypes = "Creep" | "Structure" | "Room" | "Global" | "Job";
