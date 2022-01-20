@@ -15,6 +15,10 @@ interface ICreepSpawning {}
 // TODO: Check which creeps are missing for an functioning room and spawn those.
 
 export default class CreepSpawning implements ICreepSpawning {
+  isRemoteCreep = false;
+
+  roomNames: string[];
+
   defaultIteratee: StringMapGeneric<BodyCost, CreepTypes> = {
     transferer: {
       body: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
@@ -91,11 +95,15 @@ export default class CreepSpawning implements ICreepSpawning {
   spawns: StructureSpawn[] = [];
 
   constructor(roomName: string, spawnRemotes?: boolean) {
+    if (spawnRemotes) {
+      this.isRemoteCreep = true;
+    }
     this.spawnRoom = Game.rooms[roomName];
     const roomMemory = IRoomMemory.Get(roomName).data as RoomMemory;
     const roomsToCheck = !spawnRemotes
       ? [roomName]
       : Object.keys(roomMemory.remoteRooms);
+    this.roomNames = roomsToCheck;
     const spawnsCache = IStructureCache.GetAll(
       "",
       false,
@@ -306,7 +314,10 @@ export default class CreepSpawning implements ICreepSpawning {
   }
 
   SetupCreepMemory(creep: SpawningObject, executer?: string): boolean {
-    ICreepMemory.Create(creep.name, new ICreepMemory().Generate());
+    ICreepMemory.Create(
+      creep.name,
+      new ICreepMemory().Generate(this.isRemoteCreep)
+    );
     ICreepCache.Create(
       creep.name,
       ICreepCache.Generate(
@@ -339,6 +350,7 @@ export default class CreepSpawning implements ICreepSpawning {
       defaultIteratee.maxLoopCount * defaultIteratee.reqBodyPartPerLoop +
       loopIteratee.maxLoopCount * loopIteratee.reqBodyPartPerLoop;
 
+    // TODO: Get different body for remote creeps (this.isRemoteCreep)
     let { body } = defaultIteratee;
     let currentCost = defaultIteratee.cost;
     let i = defaultIteratee.reqBodyPartPerLoop;
@@ -417,7 +429,7 @@ export default class CreepSpawning implements ICreepSpawning {
     const spawn = this.spawns[0];
     const result = spawn.spawnCreep(creep.body, creep.name);
     if (result === OK) {
-      const job = IJob.FindNewJob("", creep.type);
+      const job = IJob.FindNewJob("", creep.type, this.roomNames);
       const executer = job ? job.job.executer : undefined;
       this.SetupCreepMemory(creep, executer);
       this.UpdateMissingBodyParts(creep.type, creep.body);

@@ -4,7 +4,7 @@ import BaseMemory from "./interface";
 interface ICreepMemory {
   Validate(data: StringMap<CreepMemory>): ValidatedData;
   ValidateSingle(data: CreepMemory): boolean;
-  Generate(type: CreepTypes): CreepMemory;
+  Generate(isRemoteCreep: boolean): CreepMemory;
 }
 
 export default class extends BaseMemory implements ICreepMemory {
@@ -21,11 +21,12 @@ export default class extends BaseMemory implements ICreepMemory {
   /**
    * Create an new object of this type
    */
-  Generate(): CreepMemory {
+  Generate(isRemoteCreep: boolean): CreepMemory {
     return {
       version: super.MinimumVersion(this.type),
       energyIncoming: {},
       energyOutgoing: {},
+      isRemoteCreep,
     };
   }
 

@@ -4,6 +4,7 @@ import ICreepMemory from "../Memory/creepInterface";
 import ICreepCache from "../Cache/creepInterface";
 import IJobCache from "../Cache/jobInterface";
 import IRoomInterface from "../Helper/roomInterface";
+import IRoomMemory from "../Memory/roomInterface";
 import Predicates from "./predicates";
 
 // TODO: Update (all/single)
@@ -66,21 +67,20 @@ export default class implements IJobs {
     const existingJob = IJobMemory.Get(id);
     if (existingJob.success) return undefined;
     const job = new IJobMemory().GenerateObject(data);
-    const cache = new IJobCache().Generate(data);
+    const cache = IJobCache.Generate(data);
     this.Create(id, job, cache);
     return id;
   }
 
   static FindNewJob(
     executer: string,
-    creepType: CreepTypes
+    creepType: CreepTypes,
+    roomNames: string[]
   ): { id: string; job: JobCache } | undefined {
-    // get for creep type
-    const roomName = IRoomInterface.GetRoom(executer).key;
     let jobs = IJobCache.GetAll(
       true,
       executer,
-      [roomName],
+      roomNames,
       Predicates.IsCreepType(creepType)
     );
     if (!jobs.success) {
@@ -109,7 +109,7 @@ export default class implements IJobs {
     jobs = IJobCache.GetAll(
       false,
       executer,
-      [roomName],
+      roomNames,
       Predicates.IsCreepType(creepType)
     );
     jobIds = Object.keys(jobs);
@@ -136,8 +136,17 @@ export default class implements IJobs {
       return false;
     }
     const creepCache = creepCacheResult.data as CreepCache;
+    let roomNames = [creep.room.name];
+    if (creepMemory.isRemoteCreep) {
+      const roomMemory = IRoomMemory.Get(creep.room.name).data as RoomMemory;
+      roomNames = Object.keys(roomMemory.remoteRooms);
+    }
 
-    const newJob = this.FindNewJob(creepCache.executer, creepCache.type);
+    const newJob = this.FindNewJob(
+      creepCache.executer,
+      creepCache.type,
+      roomNames
+    );
     if (newJob !== undefined) {
       creepMemory.jobId = newJob.id;
       creepCache.executer = newJob.job.executer;
