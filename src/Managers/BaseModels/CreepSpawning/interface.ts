@@ -425,8 +425,23 @@ export default class CreepSpawning implements ICreepSpawning {
     }
   }
 
+  static SortBody(body: BodyPartConstant[]): BodyPartConstant[] {
+    const bodyValues: BodyParts = {
+      attack: 2,
+      carry: 1,
+      claim: 2,
+      heal: 1,
+      move: 2,
+      ranged_attack: 2,
+      tough: 0,
+      work: 1,
+    };
+    return body.sort((a, b) => bodyValues[a] - bodyValues[b]);
+  }
+
   SpawnCreep(creep: SpawningObject): boolean {
     const spawn = this.spawns[0];
+    creep.body = CreepSpawning.SortBody(creep.body);
     const result = spawn.spawnCreep(creep.body, creep.name);
     if (result === OK) {
       const job = IJob.FindNewJob("", creep.type, this.roomNames);
