@@ -1,30 +1,35 @@
 import { clone } from "lodash";
 import BaseMemory from "./interface";
+import IControllerManager from "../../ControllerManager/interface";
+import IMineralManager from "../../MineralManager/interface";
+import ISourceManager from "../../SourceManager/interface";
+import ISpawnManager from "../../SpawnManager/interface";
 
 interface IRoomMemory {
-  Validate(data: StringMap<RoomMemory>): ValidatedData;
-  ValidateSingle(data: RoomMemory): boolean;
-  Generate(): RoomMemory;
 }
 
 export default class extends BaseMemory implements IRoomMemory {
-  private type: MemoryTypes = "Room";
+  private static type: MemoryTypes = "Room";
 
-  Validate(data: StringMap<RoomMemory>): ValidatedData {
+  static Validate(data: StringMap<RoomMemory>): ValidatedData {
     return super.Validate(data, this.type);
   }
 
-  ValidateSingle(data: RoomMemory): boolean {
+  static ValidateSingle(data: RoomMemory): boolean {
     return super.ValidateSingle(data, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(remoteRooms?: StringMap<RemoteRoom>): RoomMemory {
+  static Generate(room:Room,remoteRooms: StringMap<RemoteRoom> = {}): RoomMemory {
     return {
       version: super.MinimumVersion(this.type),
-      remoteRooms: remoteRooms ?? {},
+      remoteRooms: remoteRooms,
+      controllerManager: IControllerManager.SetupMemory(room),
+      mineralManager: IMineralManager.SetupMemory(room),
+      sourceManager: ISourceManager.SetupMemory(room),
+      spawnManager: ISpawnManager.SetupMemory(room),
     };
   }
 
@@ -56,5 +61,10 @@ export default class extends BaseMemory implements IRoomMemory {
     let { data } = Memory.RoomsData;
     data = super.GetAllData(data, predicate);
     return data;
+  }
+  static Initialize(id:string,room:Room,remoteRooms?: StringMap<RemoteRoom>): CRUDResult<RoomMemory> {
+    const data = this.Generate(room,remoteRooms);
+    const result = this.Create(id, data);
+    return { success: result.success, data:result.data };
   }
 }

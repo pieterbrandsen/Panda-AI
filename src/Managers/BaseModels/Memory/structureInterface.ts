@@ -2,26 +2,23 @@ import { clone } from "lodash";
 import BaseMemory from "./interface";
 
 interface IStructureMemory {
-  Validate(data: StringMap<StructureMemory>): ValidatedData;
-  ValidateSingle(data: StructureMemory): boolean;
-  Generate(): StructureMemory;
 }
 
 export default class extends BaseMemory implements IStructureMemory {
-  private type: MemoryTypes = "Structure";
+  private static type: MemoryTypes = "Structure";
 
-  Validate(data: StringMap<StructureMemory>): ValidatedData {
+  static Validate(data: StringMap<StructureMemory>): ValidatedData {
     return super.Validate(data, this.type);
   }
 
-  ValidateSingle(data: StructureMemory): boolean {
+  static ValidateSingle(data: StructureMemory): boolean {
     return super.ValidateSingle(data, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(): StructureMemory {
+  static Generate(): StructureMemory {
     return {
       version: super.MinimumVersion(this.type),
       energyIncoming: {},
@@ -66,4 +63,10 @@ export default class extends BaseMemory implements IStructureMemory {
     data = super.GetAllData(data, predicate);
     return data;
   }
+
+    static Initialize(id:string): CRUDResult<StructureMemory> {
+      const cache = this.Generate();
+      const result = this.Create(id,cache);
+      return {data:result.data,success:result.success};
+    }
 }

@@ -3,6 +3,11 @@ interface CRUDResult<T> {
   success: boolean;
   data: T | undefined;
 }
+interface DoubleCRUDResult<M extends MemoryObjects,C extends CacheObjects> {
+  success: boolean;
+  memory: M | undefined;
+  cache: C | undefined;
+}
 
 interface MainMemoryData<MemoryType, CacheType> {
   data: StringMap<MemoryType>;
@@ -17,7 +22,6 @@ interface BaseMemory {
 interface CreepMemory extends BaseMemory {
   jobId?: string;
   isRemoteCreep: boolean;
-  energyIncoming: StringMap<number>;
   energyOutgoing: StringMap<number>;
 }
 interface StructureMemory extends BaseMemory {
@@ -29,7 +33,13 @@ interface RemoteRoom {
   distance: number;
 }
 interface RoomMemory extends BaseMemory {
-  remoteRooms: StringMap<RemoteRoom>;
+  remoteRooms?: StringMap<RemoteRoom>;
+  remoteOriginRoom?: string;
+
+  sourceManager: SourceManager;
+  controllerManager: ControllerManager;
+  mineralManager: MineralManager;
+  spawnManager: SpawnManager;
 }
 interface Memory extends BaseMemory {
   CreepsData: MainMemoryData<CreepMemory, CreepCache>;

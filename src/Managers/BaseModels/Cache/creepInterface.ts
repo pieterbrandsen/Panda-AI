@@ -72,4 +72,9 @@ export default class extends BaseCache implements ICreepCache {
     );
     return data;
   }
+  static Initialize(id: string,executer:string,body:BodyParts,pos:FreezedRoomPosition,type:CreepTypes): CRUDResult<CreepCache> {
+    const cache = this.Generate(executer,body,pos,type);
+    const result = this.Create(id, cache);
+    return { data: result.data, success: result.success };
+  }
 }

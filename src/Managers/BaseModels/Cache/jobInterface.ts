@@ -17,10 +17,10 @@ export default class extends BaseMemory implements IJobCache {
   /**
    * Create an new object of this type
    */
-  static Generate(data: JobInitializationData): JobCache {
+  static Generate(executer: string,type:JobTypes): JobCache {
     return {
-      type: data.type,
-      executer: data.executer,
+      type: type,
+      executer:executer,
       version: super.MinimumVersion(this.type),
     };
   }
@@ -66,5 +66,10 @@ export default class extends BaseMemory implements IJobCache {
       predicate2
     );
     return data;
+  }
+  static Initialize(id:string,executer: string,type:JobTypes): CRUDResult<JobCache> {
+    const cache = this.Generate(executer,type);
+    const result = this.Create(id, cache);
+    return { data: result.data, success: result.success };
   }
 }

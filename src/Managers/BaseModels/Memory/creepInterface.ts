@@ -2,29 +2,25 @@ import { clone } from "lodash";
 import BaseMemory from "./interface";
 
 interface ICreepMemory {
-  Validate(data: StringMap<CreepMemory>): ValidatedData;
-  ValidateSingle(data: CreepMemory): boolean;
-  Generate(isRemoteCreep: boolean): CreepMemory;
 }
 
 export default class extends BaseMemory implements ICreepMemory {
-  private type: MemoryTypes = "Creep";
+  private static type: MemoryTypes = "Creep";
 
-  Validate(data: StringMap<CreepMemory>): ValidatedData {
+  static Validate(data: StringMap<CreepMemory>): ValidatedData {
     return super.Validate(data, this.type);
   }
 
-  ValidateSingle(data: CreepMemory): boolean {
+  static ValidateSingle(data: CreepMemory): boolean {
     return super.ValidateSingle(data, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  Generate(isRemoteCreep: boolean): CreepMemory {
+  static Generate(isRemoteCreep: boolean): CreepMemory {
     return {
       version: super.MinimumVersion(this.type),
-      energyIncoming: {},
       energyOutgoing: {},
       isRemoteCreep,
     };
@@ -58,5 +54,10 @@ export default class extends BaseMemory implements ICreepMemory {
     let { data } = Memory.CreepsData;
     data = super.GetAllData(data, predicate);
     return data;
+  }
+  static Initialize(id:string,isRemoteCreep:boolean): CRUDResult<CreepMemory> {
+    const data = this.Generate(isRemoteCreep);
+    const result = this.Create(id, data);
+    return { success: result.success, data:result.data };
   }
 }

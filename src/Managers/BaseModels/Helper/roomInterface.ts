@@ -1,5 +1,5 @@
 import IRoomCache from "../Cache/roomInterface";
-import IJobs from "../Jobs/interface";
+import IJobMemory from "../Helper/jobMemory";
 
 interface IRoomHelper {}
 
@@ -42,15 +42,22 @@ export default class implements IRoomHelper {
   ): string | undefined {
     const result = room.createConstructionSite(pos.x, pos.y, type);
     if (result === OK) {
-      const job = IJobs.Initialize({
+      const job = IJobMemory.Initialize({
         executer,
         pos,
         targetId: "",
         type: "Build",
         amountToTransfer: CONSTRUCTION_COST[type],
       });
-      return job;
+      if (job.success && job.cache && job.memory) {
+        const jobId = IJobMemory.GetJobId(job.cache.type, job.memory.pos);
+        return jobId;
+      }
+      return undefined;
     }
     return undefined;
+  }
+  static GetCsSiteAtLocation(room:Room,pos:FreezedRoomPosition): ConstructionSite| null {
+    return room.lookForAt(LOOK_CONSTRUCTION_SITES, pos.x, pos.y)[0];
   }
 }

@@ -3,45 +3,21 @@ import BaseMemory from "./interface";
 import RoomHelper from "../Helper/roomInterface";
 
 interface IJobMemory {
-  Validate(data: StringMap<JobMemory>): ValidatedData;
-  ValidateSingle(data: JobMemory): boolean;
-  // Generate(data:JobInitializationData): JobMemory;
 }
 
 export default class extends BaseMemory implements IJobMemory {
-  private type: MemoryTypes = "Job";
+  private static type: MemoryTypes = "Job";
 
-  Validate(data: StringMap<JobMemory>): ValidatedData {
+  static Validate(data: StringMap<JobMemory>): ValidatedData {
     return super.Validate(data, this.type);
   }
 
-  ValidateSingle(data: JobMemory): boolean {
+  static ValidateSingle(data: JobMemory): boolean {
     return super.ValidateSingle(data, this.type);
   }
 
-  /**
-   * Create an new object of this type
-   */
-  GenerateObject(data: JobInitializationData): JobMemory {
-    return {
-      pos: data.pos,
-      lastAssigned: Game.time,
-      targetId: data.targetId,
-      amountToTransfer: data.amountToTransfer,
-      fromTargetId: data.fromTargetId,
-      version: super.MinimumVersion(this.type),
-    };
-  }
-
-  Generate(type: JobTypes, pos: FreezedRoomPosition): JobMemory {
-    return this.GenerateObject({
-      type,
-      pos,
-      executer: "",
-      targetId: "",
-      amountToTransfer: 0,
-      fromTargetId: "",
-    });
+  static Generate(targetId:string,pos:FreezedRoomPosition,amountToTransfer?:number,fromTargetId?:string): JobMemory {
+    return {lastAssigned: Game.time, targetId,pos,version: super.MinimumVersion(this.type),amountToTransfer,fromTargetId};
   }
 
   static Get(id: string): CRUDResult<JobMemory> {
@@ -73,5 +49,10 @@ export default class extends BaseMemory implements IJobMemory {
     let { data } = Memory.JobsData;
     data = super.GetAllData(data, predicate);
     return data;
+  }
+  static Initialize(id:string,targetId:string,pos:FreezedRoomPosition,amountToTransfer?:number,fromTargetId?:string): CRUDResult<JobMemory> {
+    const cache = this.Generate(targetId,pos,amountToTransfer,fromTargetId);
+    const result = this.Create(id, cache);
+    return { data: result.data, success: result.success };
   }
 }
