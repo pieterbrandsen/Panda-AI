@@ -1,1 +1,1 @@
-type ManagerTypes = "Controller" | "Mineral";
+type ManagerTypes = "Controller" | "Mineral" | "Source" | "Spawn";
