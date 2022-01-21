@@ -5,10 +5,9 @@ interface IExecuteStructures {}
 export default class implements IExecuteStructures {
   static ExecuteStructure(structure: Structure, cache: StructureCache): void {
     console.log(structure, cache);
-    // TODO: Do job here
   }
 
-  static ExecuteStructures(structures: StringMap<StructureCache>): void {
+  static ExecuterAllStructures(structures: StringMap<StructureCache>): void {
     forOwn(structures, (cache: StructureCache, id: string) => {
       const structure = Game.getObjectById<Structure | null>(id);
       if (structure) {

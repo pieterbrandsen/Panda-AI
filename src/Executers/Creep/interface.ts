@@ -1,14 +1,13 @@
 import { forOwn } from "lodash";
 
-interface IExecuteCreeps {}
+interface ICreepExecuter {}
 
-export default class implements IExecuteCreeps {
+export default class implements ICreepExecuter {
   static ExecuteCreep(creep: Creep, cache: CreepCache): void {
     console.log(creep, cache);
-    // TODO: Do job here
   }
 
-  static ExecuteCreeps(creeps: StringMap<CreepCache>): void {
+  static ExecuterAllCreeps(creeps: StringMap<CreepCache>): void {
     forOwn(creeps, (cache: CreepCache, id: string) => {
       const creep = Game.getObjectById<Creep | null>(id);
       if (creep) {

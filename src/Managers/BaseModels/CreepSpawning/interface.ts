@@ -12,9 +12,6 @@ import bodyIteratee from "./bodyConstants";
 
 interface ICreepSpawning {}
 
-// TODO: generate actual creep body at spawn instead of pre.
-// TODO: Check which creeps are missing for an functioning room and spawn those.
-
 export default class CreepSpawning implements ICreepSpawning {
   isRemoteCreep = false;
 
@@ -395,11 +392,9 @@ export default class CreepSpawning implements ICreepSpawning {
     if (creep.body.length == 0) return false;
     const spawn = this.spawns[0];
     creep.body = CreepSpawning.SortBody(creep.body);
-    const job = IJob.FindNewJob("", creep.type, this.roomNames);
-    if (!job) return false;
+    const executer = Object.values(this.jobsCache)[0].executer;
     const result = spawn.spawnCreep(creep.body, creep.name);
     if (result === OK) {
-      const executer = job.job.executer;
       this.SetupCreepMemory(creep, executer);
       this.UpdateMissingBodyParts(creep.type, creep.body);
       this.spawns.shift();

@@ -32,7 +32,10 @@ export default class implements ISpawnManager {
     }
 
     Run():void {
-        new ICreepSpawning(this.room.name).SpawnCreeps();
+        const resultOwnedCreeps = new ICreepSpawning(this.room.name,false).SpawnCreeps();
+        if (resultOwnedCreeps) {
+          new ICreepSpawning(this.room.name,true).SpawnCreeps()
+        }
     }
   }
   
