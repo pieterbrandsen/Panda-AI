@@ -1,4 +1,5 @@
 import IRoomCache from "../Cache/roomInterface";
+import IJobs from "../Jobs/interface";
 
 interface IRoomHelper {}
 
@@ -31,5 +32,25 @@ export default class implements IRoomHelper {
 
   static GetMiddlePosition(roomName: string): FreezedRoomPosition {
     return { x: 25, y: 25, roomName };
+  }
+
+  static CreateConstructionSite(
+    room: Room,
+    pos: FreezedRoomPosition,
+    type: BuildableStructureConstant,
+    executer: string
+  ): string | undefined {
+    const result = room.createConstructionSite(pos.x, pos.y, type);
+    if (result === OK) {
+      const job = IJobs.Initialize({
+        executer,
+        pos,
+        targetId: "",
+        type: "Build",
+        amountToTransfer: CONSTRUCTION_COST[type],
+      });
+      return job;
+    }
+    return undefined;
   }
 }
