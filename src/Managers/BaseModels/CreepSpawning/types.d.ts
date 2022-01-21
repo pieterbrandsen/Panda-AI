@@ -3,7 +3,6 @@ interface SpawningObject {
   type: CreepTypes;
   name: string;
   body: BodyPartConstant[];
-  executer: string;
 }
 interface BodyCost {
   cost: number;
@@ -11,5 +10,14 @@ interface BodyCost {
   reqBodyPartPerLoop: number;
   maxLoopCount: number;
 }
+interface BodyCostRoomTypes {
+  default: BodyCost;
+  loop: BodyCost;
+}
 
 type BodyParts = StringMapGeneric<number, BodyPartConstant>;
+
+interface CreepBodyIteratee {
+  remote?: BodyCostRoomTypes;
+  owned?: BodyCostRoomTypes;
+}

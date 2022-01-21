@@ -6,8 +6,9 @@ import IJobCache from "../Cache/jobInterface";
 import CachePredicates from "../Cache/predicates";
 import ICreepCache from "../Cache/creepInterface";
 import IStructureCache from "../Cache/structureInterface";
-import ICreepMemory from "../Memory/creepInterface";
+import ICreepMemory from "../Helper/creepMemory";
 import IJob from "../Jobs/interface";
+import bodyIteratee from "./bodyConstants";
 
 interface ICreepSpawning {}
 
@@ -18,48 +19,6 @@ export default class CreepSpawning implements ICreepSpawning {
   isRemoteCreep = false;
 
   roomNames: string[];
-
-  defaultIteratee: StringMapGeneric<BodyCost, CreepTypes> = {
-    transferer: {
-      body: [CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
-      cost: 300,
-      reqBodyPartPerLoop: 3,
-      maxLoopCount: 1,
-    },
-    worker: {
-      body: [WORK, MOVE, CARRY, MOVE, CARRY],
-      cost: 300,
-      reqBodyPartPerLoop: 1,
-      maxLoopCount: 1,
-    },
-    miner: {
-      body: [WORK, WORK, MOVE],
-      cost: 250,
-      reqBodyPartPerLoop: 2,
-      maxLoopCount: 1,
-    },
-  };
-
-  loopIteratee: StringMapGeneric<BodyCost, CreepTypes> = {
-    transferer: {
-      body: [CARRY, MOVE],
-      cost: 100,
-      reqBodyPartPerLoop: 1,
-      maxLoopCount: 20,
-    },
-    worker: {
-      body: [WORK, MOVE, CARRY],
-      cost: 200,
-      reqBodyPartPerLoop: 1,
-      maxLoopCount: 10,
-    },
-    miner: {
-      body: [WORK, MOVE],
-      cost: 150,
-      reqBodyPartPerLoop: 1,
-      maxLoopCount: 4,
-    },
-  };
 
   spawnRoom: Room;
 
@@ -102,7 +61,7 @@ export default class CreepSpawning implements ICreepSpawning {
     const roomMemory = IRoomMemory.Get(roomName).data as RoomMemory;
     const roomsToCheck = !spawnRemotes
       ? [roomName]
-      : Object.keys(roomMemory.remoteRooms);
+      : Object.keys(roomMemory.remoteRooms ?? {});
     this.roomNames = roomsToCheck;
     const spawnsCache = IStructureCache.GetAll(
       "",
@@ -313,21 +272,9 @@ export default class CreepSpawning implements ICreepSpawning {
     return body;
   }
 
-  SetupCreepMemory(creep: SpawningObject, executer?: string): boolean {
-    ICreepMemory.Create(
-      creep.name,
-      new ICreepMemory().Generate(this.isRemoteCreep)
-    );
-    ICreepCache.Create(
-      creep.name,
-      ICreepCache.Generate(
-        executer ?? creep.type,
-        CreepSpawning.ConvertBodyToStringMap(creep.body),
-        IRoomHelper.GetMiddlePosition(this.spawnRoom.name),
-        creep.type
-      )
-    );
-    return true;
+  SetupCreepMemory(creep: SpawningObject,executer:string): boolean {
+      const memory: CreepInitializationData = {body:CreepSpawning.ConvertBodyToStringMap(creep.body),executer:executer,isRemoteCreep:this.isRemoteCreep,name:creep.name,pos:IRoomHelper.GetMiddlePosition(this.spawnRoom.name),type:creep.type};    
+      return ICreepMemory.Initialize(memory).success;
   }
 
   RequestCreep(type: CreepTypes): SpawningObject | undefined {
@@ -339,29 +286,35 @@ export default class CreepSpawning implements ICreepSpawning {
     return undefined;
   }
 
+  GetBodyLoop(type:CreepTypes):BodyCostRoomTypes | undefined {
+    return !this.isRemoteCreep ? bodyIteratee[type].owned : bodyIteratee[type].remote;
+  }
+
   GenerateBody(type: CreepTypes): BodyPartConstant[] {
     const maxCost =
       this.spawnRoom.energyCapacityAvailable / 2 > 300
         ? this.spawnRoom.energyCapacityAvailable / 2
         : 300;
-    const defaultIteratee = this.defaultIteratee[type];
-    const loopIteratee = this.loopIteratee[type];
-    const maxCount =
-      defaultIteratee.maxLoopCount * defaultIteratee.reqBodyPartPerLoop +
-      loopIteratee.maxLoopCount * loopIteratee.reqBodyPartPerLoop;
 
-    // TODO: Get different body for remote creeps (this.isRemoteCreep)
-    let { body } = defaultIteratee;
-    let currentCost = defaultIteratee.cost;
-    let i = defaultIteratee.reqBodyPartPerLoop;
+        const bodyLoop:BodyCostRoomTypes | undefined = this.GetBodyLoop(type);
+        if(!bodyLoop) {
+            return [];
+        }
+    const maxCount =
+    bodyLoop.default.maxLoopCount * bodyLoop.default.reqBodyPartPerLoop +
+    bodyLoop.loop.maxLoopCount * bodyLoop.loop.reqBodyPartPerLoop;
+
+    let { body } = bodyLoop.default;
+    let currentCost = bodyLoop.default.cost;
+    let i = bodyLoop.default.reqBodyPartPerLoop;
     while (
-      body.length + loopIteratee.body.length < 50 &&
-      currentCost + loopIteratee.cost < maxCost &&
-      i + loopIteratee.reqBodyPartPerLoop < maxCount
+      body.length + bodyLoop.loop.body.length < 50 &&
+      currentCost + bodyLoop.loop.cost < maxCost &&
+      i + bodyLoop.loop.reqBodyPartPerLoop < maxCount
     ) {
-      body = body.concat(loopIteratee.body);
-      currentCost += loopIteratee.cost;
-      i += loopIteratee.reqBodyPartPerLoop;
+      body = body.concat(bodyLoop.loop.body);
+      currentCost += bodyLoop.loop.cost;
+      i += bodyLoop.loop.reqBodyPartPerLoop;
     }
 
     return body;
@@ -375,7 +328,6 @@ export default class CreepSpawning implements ICreepSpawning {
     const name = this.GetCreepName(type);
     const creep: SpawningObject = {
       name,
-      executer: this.spawnRoom.name,
       type,
       body: this.GenerateBody(type),
     };
@@ -440,12 +392,14 @@ export default class CreepSpawning implements ICreepSpawning {
   }
 
   SpawnCreep(creep: SpawningObject): boolean {
+    if (creep.body.length == 0) return false;
     const spawn = this.spawns[0];
     creep.body = CreepSpawning.SortBody(creep.body);
+    const job = IJob.FindNewJob("", creep.type, this.roomNames);
+    if (!job) return false;
     const result = spawn.spawnCreep(creep.body, creep.name);
     if (result === OK) {
-      const job = IJob.FindNewJob("", creep.type, this.roomNames);
-      const executer = job ? job.job.executer : undefined;
+      const executer = job.job.executer;
       this.SetupCreepMemory(creep, executer);
       this.UpdateMissingBodyParts(creep.type, creep.body);
       this.spawns.shift();
@@ -458,7 +412,7 @@ export default class CreepSpawning implements ICreepSpawning {
     if (this.spawns.length === 0) return false;
     const nextType = this.GetNextCreepTypeToSpawn();
     if (nextType) {
-      const creep = this.CreateCreep(nextType);
+      const creep = this.CreateCreep(nextType,);
       const spawned = this.SpawnCreep(creep);
       if (spawned) {
         return this.SpawnCreeps();
