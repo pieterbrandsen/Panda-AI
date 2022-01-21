@@ -2,8 +2,7 @@ import { clone } from "lodash";
 import BaseMemory from "./interface";
 import RoomHelper from "../Helper/roomInterface";
 
-interface IJobMemory {
-}
+interface IJobMemory {}
 
 export default class extends BaseMemory implements IJobMemory {
   private static type: MemoryTypes = "Job";
@@ -16,8 +15,20 @@ export default class extends BaseMemory implements IJobMemory {
     return super.ValidateSingle(data, this.type);
   }
 
-  static Generate(targetId:string,pos:FreezedRoomPosition,amountToTransfer?:number,fromTargetId?:string): JobMemory {
-    return {lastAssigned: Game.time, targetId,pos,version: super.MinimumVersion(this.type),amountToTransfer,fromTargetId};
+  static Generate(
+    targetId: string,
+    pos: FreezedRoomPosition,
+    amountToTransfer?: number,
+    fromTargetId?: string
+  ): JobMemory {
+    return {
+      lastAssigned: Game.time,
+      targetId,
+      pos,
+      version: super.MinimumVersion(this.type),
+      amountToTransfer,
+      fromTargetId,
+    };
   }
 
   static Get(id: string): CRUDResult<JobMemory> {
@@ -50,8 +61,15 @@ export default class extends BaseMemory implements IJobMemory {
     data = super.GetAllData(data, predicate);
     return data;
   }
-  static Initialize(id:string,targetId:string,pos:FreezedRoomPosition,amountToTransfer?:number,fromTargetId?:string): CRUDResult<JobMemory> {
-    const cache = this.Generate(targetId,pos,amountToTransfer,fromTargetId);
+
+  static Initialize(
+    id: string,
+    targetId: string,
+    pos: FreezedRoomPosition,
+    amountToTransfer?: number,
+    fromTargetId?: string
+  ): CRUDResult<JobMemory> {
+    const cache = this.Generate(targetId, pos, amountToTransfer, fromTargetId);
     const result = this.Create(id, cache);
     return { data: result.data, success: result.success };
   }

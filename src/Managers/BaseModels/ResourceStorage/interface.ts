@@ -291,7 +291,7 @@ export default class implements IResourceStorage {
             fromTargetId: this.object.id,
           });
           if (!jobResult.success) return false;
-          const jobId = IJobMemory.GetJobId(type,this.cache.pos);
+          const jobId = IJobMemory.GetJobId(type, this.cache.pos);
           targetMemory.energyIncoming[jobId] = amountToTransfer;
           IStructureMemory.Update(targetStructureInformation.id, targetMemory);
           if (this.type === "structure") {
@@ -336,7 +336,7 @@ export default class implements IResourceStorage {
             fromTargetId: targetStructureInformation.id,
           });
           if (!jobResult.success) return false;
-          const jobId = IJobMemory.GetJobId(jobType,this.cache.pos);
+          const jobId = IJobMemory.GetJobId(jobType, this.cache.pos);
           targetMemory.energyOutgoing[jobId] = amountToTransfer;
           IStructureMemory.Update(targetStructureInformation.id, targetMemory);
           if (this.type === "structure") {

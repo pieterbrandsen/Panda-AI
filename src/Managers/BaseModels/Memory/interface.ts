@@ -46,7 +46,10 @@ export default abstract class implements IMemory {
   /**
    * Check single object and return if its valid based on version
    */
-  protected static ValidateSingle(data: MemoryObjects, type: MemoryTypes): boolean {
+  protected static ValidateSingle(
+    data: MemoryObjects,
+    type: MemoryTypes
+  ): boolean {
     const minimumVersion = this.MinimumVersion(type);
     let isValid = true;
     if (data.version < minimumVersion) {

@@ -1,29 +1,29 @@
 interface JobInitializationData {
-    type: JobTypes;
-    pos: FreezedRoomPosition;
-    executer: string;
-    targetId: string;
-  
-    // ResourceStorage
-    fromTargetId?: string;
-    amountToTransfer?: number;
-  }
+  type: JobTypes;
+  pos: FreezedRoomPosition;
+  executer: string;
+  targetId: string;
 
-  interface StructureInitializationData {
-    structure:Structure;
-    executer: string;
-  }
+  // ResourceStorage
+  fromTargetId?: string;
+  amountToTransfer?: number;
+}
 
-  interface CreepInitializationData { 
-      name:string;
-    isRemoteCreep:boolean;
-    executer: string;
-    body:BodyParts
-    pos: FreezedRoomPosition;
-    type: CreepTypes;
-  }
+interface StructureInitializationData {
+  structure: Structure;
+  executer: string;
+}
 
-  interface RoomInitializationData { 
-      room:Room;
-      remoteRooms?:StringMap<RemoteRoom>;
-  }
+interface CreepInitializationData {
+  name: string;
+  isRemoteCreep: boolean;
+  executer: string;
+  body: BodyParts;
+  pos: FreezedRoomPosition;
+  type: CreepTypes;
+}
+
+interface RoomInitializationData {
+  room: Room;
+  remoteRooms?: StringMap<RemoteRoom>;
+}

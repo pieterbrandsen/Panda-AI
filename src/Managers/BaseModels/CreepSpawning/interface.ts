@@ -7,7 +7,6 @@ import CachePredicates from "../Cache/predicates";
 import ICreepCache from "../Cache/creepInterface";
 import IStructureCache from "../Cache/structureInterface";
 import ICreepMemory from "../Helper/creepMemory";
-import IJob from "../Jobs/interface";
 import bodyIteratee from "./bodyConstants";
 
 interface ICreepSpawning {}
@@ -269,9 +268,16 @@ export default class CreepSpawning implements ICreepSpawning {
     return body;
   }
 
-  SetupCreepMemory(creep: SpawningObject,executer:string): boolean {
-      const memory: CreepInitializationData = {body:CreepSpawning.ConvertBodyToStringMap(creep.body),executer:executer,isRemoteCreep:this.isRemoteCreep,name:creep.name,pos:IRoomHelper.GetMiddlePosition(this.spawnRoom.name),type:creep.type};    
-      return ICreepMemory.Initialize(memory).success;
+  SetupCreepMemory(creep: SpawningObject, executer: string): boolean {
+    const memory: CreepInitializationData = {
+      body: CreepSpawning.ConvertBodyToStringMap(creep.body),
+      executer,
+      isRemoteCreep: this.isRemoteCreep,
+      name: creep.name,
+      pos: IRoomHelper.GetMiddlePosition(this.spawnRoom.name),
+      type: creep.type,
+    };
+    return ICreepMemory.Initialize(memory).success;
   }
 
   RequestCreep(type: CreepTypes): SpawningObject | undefined {
@@ -283,8 +289,10 @@ export default class CreepSpawning implements ICreepSpawning {
     return undefined;
   }
 
-  GetBodyLoop(type:CreepTypes):BodyCostRoomTypes | undefined {
-    return !this.isRemoteCreep ? bodyIteratee[type].owned : bodyIteratee[type].remote;
+  GetBodyLoop(type: CreepTypes): BodyCostRoomTypes | undefined {
+    return !this.isRemoteCreep
+      ? bodyIteratee[type].owned
+      : bodyIteratee[type].remote;
   }
 
   GenerateBody(type: CreepTypes): BodyPartConstant[] {
@@ -293,13 +301,13 @@ export default class CreepSpawning implements ICreepSpawning {
         ? this.spawnRoom.energyCapacityAvailable / 2
         : 300;
 
-        const bodyLoop:BodyCostRoomTypes | undefined = this.GetBodyLoop(type);
-        if(!bodyLoop) {
-            return [];
-        }
+    const bodyLoop: BodyCostRoomTypes | undefined = this.GetBodyLoop(type);
+    if (!bodyLoop) {
+      return [];
+    }
     const maxCount =
-    bodyLoop.default.maxLoopCount * bodyLoop.default.reqBodyPartPerLoop +
-    bodyLoop.loop.maxLoopCount * bodyLoop.loop.reqBodyPartPerLoop;
+      bodyLoop.default.maxLoopCount * bodyLoop.default.reqBodyPartPerLoop +
+      bodyLoop.loop.maxLoopCount * bodyLoop.loop.reqBodyPartPerLoop;
 
     let { body } = bodyLoop.default;
     let currentCost = bodyLoop.default.cost;
@@ -389,10 +397,10 @@ export default class CreepSpawning implements ICreepSpawning {
   }
 
   SpawnCreep(creep: SpawningObject): boolean {
-    if (creep.body.length == 0) return false;
+    if (creep.body.length === 0) return false;
     const spawn = this.spawns[0];
     creep.body = CreepSpawning.SortBody(creep.body);
-    const executer = Object.values(this.jobsCache)[0].executer;
+    const { executer } = Object.values(this.jobsCache)[0];
     const result = spawn.spawnCreep(creep.body, creep.name);
     if (result === OK) {
       this.SetupCreepMemory(creep, executer);
@@ -407,7 +415,7 @@ export default class CreepSpawning implements ICreepSpawning {
     if (this.spawns.length === 0) return false;
     const nextType = this.GetNextCreepTypeToSpawn();
     if (nextType) {
-      const creep = this.CreateCreep(nextType,);
+      const creep = this.CreateCreep(nextType);
       const spawned = this.SpawnCreep(creep);
       if (spawned) {
         return this.SpawnCreeps();

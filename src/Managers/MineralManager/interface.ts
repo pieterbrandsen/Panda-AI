@@ -29,15 +29,18 @@ export default class implements IMineralManager {
 
   static SetupMemory(room: Room): MineralManager {
     const mineral = room.find(FIND_MINERALS)[0];
-      return {
-        extractorBuildJobId: undefined,
-        extractorId: undefined,
-        mineral: mineral ? {
-        jobId: undefined,
-        id: mineral.id,
-        pos: IRoomHelper.FreezeRoomPosition(mineral.pos),
-        type: mineral.mineralType,
-      } : undefined};
+    return {
+      extractorBuildJobId: undefined,
+      extractorId: undefined,
+      mineral: mineral
+        ? {
+            jobId: undefined,
+            id: mineral.id,
+            pos: IRoomHelper.FreezeRoomPosition(mineral.pos),
+            type: mineral.mineralType,
+          }
+        : undefined,
+    };
   }
 
   UpdateController(): void {
@@ -84,7 +87,10 @@ export default class implements IMineralManager {
           amountToTransfer: mineral ? mineral.mineralAmount : 0,
         });
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
-        const jobId = IJobMemory.GetJobId(jobResult.cache.type, jobResult.memory.pos);
+        const jobId = IJobMemory.GetJobId(
+          jobResult.cache.type,
+          jobResult.memory.pos
+        );
         if (jobId) {
           mineralMemory.jobId = jobId;
           this.updatedMemory = true;

@@ -68,9 +68,13 @@ export default class extends BaseMemory implements IStructureCache {
     return data;
   }
 
-  static Initialize(id:string,structure:Structure,executer: string): CRUDResult<StructureCache> {
-    const cache = this.Generate(structure,executer);
-    const result = this.Create(id,cache);
-    return {data:result.data,success:result.success};
-}
+  static Initialize(
+    id: string,
+    structure: Structure,
+    executer: string
+  ): CRUDResult<StructureCache> {
+    const cache = this.Generate(structure, executer);
+    const result = this.Create(id, cache);
+    return { data: result.data, success: result.success };
+  }
 }

@@ -7,6 +7,7 @@ interface IControllerManager {}
 
 export default class implements IControllerManager {
   isRemote: boolean;
+
   updatedMemory = false;
 
   executer: string;
@@ -25,19 +26,22 @@ export default class implements IControllerManager {
     this.cache = IRoomCache.Get(roomName).data as RoomCache;
     this.managerMemory = this.memory.controllerManager;
 
-    this.isRemote = this.memory.remoteOriginRoom !== undefined
+    this.isRemote = this.memory.remoteOriginRoom !== undefined;
     this.executer = IRoomHelper.GetExecuter(this.room.name, "Controller");
   }
 
   static SetupMemory(room: Room): ControllerManager {
     const { controller } = room;
-      return {
-        controller: controller ? {
-        jobId: undefined,
-        id: controller.id,
-        pos: IRoomHelper.FreezeRoomPosition(controller.pos),
-        isOwned: controller.my,
-      } : undefined};
+    return {
+      controller: controller
+        ? {
+            jobId: undefined,
+            id: controller.id,
+            pos: IRoomHelper.FreezeRoomPosition(controller.pos),
+            isOwned: controller.my,
+          }
+        : undefined,
+    };
   }
 
   UpdateController(): void {
@@ -56,7 +60,10 @@ export default class implements IControllerManager {
           type: jobType,
         });
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
-        const jobId = IJobMemory.GetJobId(jobResult.cache.type, jobResult.memory.pos);
+        const jobId = IJobMemory.GetJobId(
+          jobResult.cache.type,
+          jobResult.memory.pos
+        );
         if (jobId) {
           controllerMemory.jobId = jobId;
           this.updatedMemory = true;
@@ -66,7 +73,11 @@ export default class implements IControllerManager {
   }
 
   Run(): void {
-    if (!this.isRemote || (this.managerMemory.controller && !this.managerMemory.controller.isOwned)) return;
+    if (
+      !this.isRemote ||
+      (this.managerMemory.controller && !this.managerMemory.controller.isOwned)
+    )
+      return;
 
     this.UpdateController();
     if (this.updatedMemory) {

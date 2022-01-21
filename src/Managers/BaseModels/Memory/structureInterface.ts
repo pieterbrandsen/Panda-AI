@@ -1,8 +1,7 @@
 import { clone } from "lodash";
 import BaseMemory from "./interface";
 
-interface IStructureMemory {
-}
+interface IStructureMemory {}
 
 export default class extends BaseMemory implements IStructureMemory {
   private static type: MemoryTypes = "Structure";
@@ -64,9 +63,9 @@ export default class extends BaseMemory implements IStructureMemory {
     return data;
   }
 
-    static Initialize(id:string): CRUDResult<StructureMemory> {
-      const cache = this.Generate();
-      const result = this.Create(id,cache);
-      return {data:result.data,success:result.success};
-    }
+  static Initialize(id: string): CRUDResult<StructureMemory> {
+    const cache = this.Generate();
+    const result = this.Create(id, cache);
+    return { data: result.data, success: result.success };
+  }
 }

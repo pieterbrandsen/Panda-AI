@@ -29,8 +29,8 @@ export default class implements ISourceManager {
   }
 
   static SetupMemory(room: Room): SourceManager {
-      const sources = room.find(FIND_SOURCES);
-      const sourceManagerMemory:SourceManager = {sources:{}}; 
+    const sources = room.find(FIND_SOURCES);
+    const sourceManagerMemory: SourceManager = { sources: {} };
     forEach(sources, (source) => {
       sourceManagerMemory.sources[source.id] = {
         jobId: undefined,
@@ -44,23 +44,26 @@ export default class implements ISourceManager {
   UpdateSources(): void {
     const { managerMemory } = this;
     const sourceIds = Object.keys(managerMemory.sources);
-      forEach(sourceIds, (sourceId) => {
-        const sourceMemory = managerMemory.sources[sourceId];
-        if (!sourceMemory.jobId) {
-          const jobResult = IJobMemory.Initialize({
-            executer: this.executer,
-            pos: sourceMemory.pos,
-            targetId: sourceId,
-            type: "HarvestSource",
-          });
-          if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
-          const jobId = IJobMemory.GetJobId(jobResult.cache.type, jobResult.memory.pos);
-          if (jobId) {
-            sourceMemory.jobId = jobId;
-            this.updatedMemory = true;
-          }
+    forEach(sourceIds, (sourceId) => {
+      const sourceMemory = managerMemory.sources[sourceId];
+      if (!sourceMemory.jobId) {
+        const jobResult = IJobMemory.Initialize({
+          executer: this.executer,
+          pos: sourceMemory.pos,
+          targetId: sourceId,
+          type: "HarvestSource",
+        });
+        if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
+        const jobId = IJobMemory.GetJobId(
+          jobResult.cache.type,
+          jobResult.memory.pos
+        );
+        if (jobId) {
+          sourceMemory.jobId = jobId;
+          this.updatedMemory = true;
         }
-      });
+      }
+    });
   }
 
   Run(): void {

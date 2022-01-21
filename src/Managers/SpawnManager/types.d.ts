@@ -1,3 +1,1 @@
-interface SpawnManager {
-    
-}
+interface SpawnManager {}

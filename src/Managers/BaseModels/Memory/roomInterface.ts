@@ -5,8 +5,7 @@ import IMineralManager from "../../MineralManager/interface";
 import ISourceManager from "../../SourceManager/interface";
 import ISpawnManager from "../../SpawnManager/interface";
 
-interface IRoomMemory {
-}
+interface IRoomMemory {}
 
 export default class extends BaseMemory implements IRoomMemory {
   private static type: MemoryTypes = "Room";
@@ -22,10 +21,13 @@ export default class extends BaseMemory implements IRoomMemory {
   /**
    * Create an new object of this type
    */
-  static Generate(room:Room,remoteRooms: StringMap<RemoteRoom> = {}): RoomMemory {
+  static Generate(
+    room: Room,
+    remoteRooms: StringMap<RemoteRoom> = {}
+  ): RoomMemory {
     return {
       version: super.MinimumVersion(this.type),
-      remoteRooms: remoteRooms,
+      remoteRooms,
       controllerManager: IControllerManager.SetupMemory(room),
       mineralManager: IMineralManager.SetupMemory(room),
       sourceManager: ISourceManager.SetupMemory(room),
@@ -62,9 +64,14 @@ export default class extends BaseMemory implements IRoomMemory {
     data = super.GetAllData(data, predicate);
     return data;
   }
-  static Initialize(id:string,room:Room,remoteRooms?: StringMap<RemoteRoom>): CRUDResult<RoomMemory> {
-    const data = this.Generate(room,remoteRooms);
+
+  static Initialize(
+    id: string,
+    room: Room,
+    remoteRooms?: StringMap<RemoteRoom>
+  ): CRUDResult<RoomMemory> {
+    const data = this.Generate(room, remoteRooms);
     const result = this.Create(id, data);
-    return { success: result.success, data:result.data };
+    return { success: result.success, data: result.data };
   }
 }

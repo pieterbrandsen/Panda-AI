@@ -108,6 +108,7 @@ export default class implements IJobs {
           return ["Build", "UpgradeController"];
         case "transferer":
           return ["TransferSpawn", "TransferStructure"];
+        // skip default case
       }
     } else {
       switch (creepType) {
@@ -116,6 +117,7 @@ export default class implements IJobs {
         case "worker":
         case "transferer":
           break;
+        // skip default case
       }
     }
 
@@ -160,7 +162,8 @@ export default class implements IJobs {
     }
     return false;
   }
-  static UpdateAllData(room: Room) {
+
+  static UpdateAllData(room: Room): void {
     const jobIds = Object.keys(
       IJobCache.GetAll(false, "", [room.name]).data ?? {}
     );
@@ -168,6 +171,7 @@ export default class implements IJobs {
       this.UpdateData(room, id);
     });
   }
+
   static UpdateData(room: Room, id: string): boolean {
     const job = IJobHelper.GetMemory(id);
     if (!job.success) {
@@ -181,80 +185,93 @@ export default class implements IJobs {
     let updatedMemory = false;
 
     switch (jobCache.type) {
-      case "Build": {
-        const csSite = Game.getObjectById<ConstructionSite | null>(
-          jobMemory.targetId
-        );
-        if (!csSite || (jobMemory.amountToTransfer ?? 0) <= 0) {
-          const csSiteAtLocation = IRoomInterface.GetCsSiteAtLocation(
-            room,
-            jobMemory.pos
+      case "Build":
+        {
+          const csSite = Game.getObjectById<ConstructionSite | null>(
+            jobMemory.targetId
           );
-          if (csSiteAtLocation) {
-            jobMemory.targetId = csSiteAtLocation.id;
+          if (!csSite || (jobMemory.amountToTransfer ?? 0) <= 0) {
+            const csSiteAtLocation = IRoomInterface.GetCsSiteAtLocation(
+              room,
+              jobMemory.pos
+            );
+            if (csSiteAtLocation) {
+              jobMemory.targetId = csSiteAtLocation.id;
+            } else {
+              IJobHelper.DeleteMemory(id, true, true);
+            }
           } else {
+            jobMemory.amountToTransfer = csSite.progressTotal - csSite.progress;
+            updatedMemory = true;
+          }
+        }
+        break;
+      case "HarvestMineral":
+        {
+          const mineral = Game.getObjectById<Mineral | null>(
+            jobMemory.targetId
+          );
+          if (!mineral || (jobMemory.amountToTransfer ?? 0) <= 0) {
+            IJobHelper.DeleteMemory(id, true, true);
+          } else {
+            jobMemory.amountToTransfer = mineral.mineralAmount;
+            updatedMemory = true;
+          }
+        }
+        break;
+      case "HarvestSource":
+        updatedMemory = false;
+        break;
+      // case "ReserveController": {
+      // }
+      // break;
+      case "TransferSpawn":
+      case "TransferStructure":
+        {
+          const structure = Game.getObjectById<Structure | null>(
+            jobMemory.targetId
+          );
+          const targetStructure = Game.getObjectById<Structure | null>(
+            jobMemory.fromTargetId as ""
+          );
+          if (
+            !structure ||
+            !targetStructure ||
+            (jobMemory.amountToTransfer ?? 0) <= 0
+          ) {
+            IJobHelper.DeleteMemory(id, true, true);
+            const structureMemory = IStructureMemory.Get(jobMemory.targetId);
+            const targetStructureMemory = IStructureMemory.Get(
+              jobMemory.fromTargetId ?? ""
+            );
+            if (structureMemory.data) {
+              delete structureMemory.data.energyIncoming[id];
+              delete structureMemory.data.energyOutgoing[id];
+            }
+            if (targetStructureMemory.data) {
+              delete targetStructureMemory.data.energyIncoming[id];
+              delete targetStructureMemory.data.energyOutgoing[id];
+            }
+          }
+        }
+        break;
+      case "UpgradeController":
+        {
+          const controller = Game.getObjectById<StructureController | null>(
+            jobMemory.targetId
+          );
+          if (!controller || (jobMemory.amountToTransfer ?? 0) <= 0) {
             IJobHelper.DeleteMemory(id, true, true);
           }
-        } else {
-          jobMemory.amountToTransfer = csSite.progressTotal - csSite.progress;
-          updatedMemory = true;
         }
-      }
-      case "HarvestMineral": {
-        const mineral = Game.getObjectById<Mineral | null>(jobMemory.targetId);
-        if (!mineral || (jobMemory.amountToTransfer ?? 0) <= 0) {
-          IJobHelper.DeleteMemory(id, true, true);
-        } else {
-          jobMemory.amountToTransfer = mineral.mineralAmount;
-          updatedMemory = true;
-        }
-      }
-      case "HarvestSource": {
-        updatedMemory = false;
-      }
-      case "ReserveController": {
-      }
-      case "TransferSpawn":
-      case "TransferStructure": {
-        const structure = Game.getObjectById<Structure | null>(
-          jobMemory.targetId
-        );
-        const targetStructure = Game.getObjectById<Structure | null>(
-          jobMemory.fromTargetId as ""
-        );
-        if (
-          !structure ||
-          !targetStructure ||
-          (jobMemory.amountToTransfer ?? 0) <= 0
-        ) {
-          IJobHelper.DeleteMemory(id, true, true);
-          const structureMemory = IStructureMemory.Get(jobMemory.targetId);
-          const targetStructureMemory = IStructureMemory.Get(
-            jobMemory.fromTargetId ?? ""
-          );
-          if (structureMemory.data) {
-            delete structureMemory.data.energyIncoming[id];
-            delete structureMemory.data.energyOutgoing[id];
-          }
-          if (targetStructureMemory.data) {
-            delete targetStructureMemory.data.energyIncoming[id];
-            delete targetStructureMemory.data.energyOutgoing[id];
-          }
-        }
-      }
-      case "UpgradeController": {
-        const controller = Game.getObjectById<StructureController | null>(
-          jobMemory.targetId
-        );
-        if (!controller || (jobMemory.amountToTransfer ?? 0) <= 0) {
-          IJobHelper.DeleteMemory(id, true, true);
-        }
-      }
+        break;
+      // skip default case
     }
 
     if (updatedMemory) {
       IJobHelper.UpdateMemory(id, jobMemory, jobCache);
       return true;
-    } else return false;
+    }
+    return false;
   }
 }

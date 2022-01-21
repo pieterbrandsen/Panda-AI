@@ -64,9 +64,10 @@ export default class extends BaseCache implements IRoomCache {
     );
     return data;
   }
-  static Initialize(id:string): CRUDResult<RoomCache> {
+
+  static Initialize(id: string): CRUDResult<RoomCache> {
     const cache = this.Generate();
-    const result = this.Create(id,cache);
-    return {data:result.data,success:result.success};
+    const result = this.Create(id, cache);
+    return { data: result.data, success: result.success };
   }
 }

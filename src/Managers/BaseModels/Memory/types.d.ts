@@ -3,11 +3,6 @@ interface CRUDResult<T> {
   success: boolean;
   data: T | undefined;
 }
-interface DoubleCRUDResult<M extends MemoryObjects,C extends CacheObjects> {
-  success: boolean;
-  memory: M | undefined;
-  cache: C | undefined;
-}
 
 interface MainMemoryData<MemoryType, CacheType> {
   data: StringMap<MemoryType>;
@@ -48,11 +43,16 @@ interface Memory extends BaseMemory {
   JobsData: MainMemoryData<JobMemory, JobCache>;
 }
 
+type MemoryObjects = CreepMemory | StructureMemory | RoomMemory | JobMemory;
+interface DoubleCRUDResult<M extends MemoryObjects, C extends CacheObjects> {
+  success: boolean;
+  memory: M | undefined;
+  cache: C | undefined;
+}
 interface FreezedRoomPosition {
   x: number;
   y: number;
   roomName: string;
 }
 
-type MemoryObjects = CreepMemory | StructureMemory | RoomMemory | JobMemory;
 type MemoryTypes = "Creep" | "Structure" | "Room" | "Global" | "Job";

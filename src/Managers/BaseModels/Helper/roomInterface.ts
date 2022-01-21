@@ -1,5 +1,5 @@
 import IRoomCache from "../Cache/roomInterface";
-import IJobMemory from "../Helper/jobMemory";
+import IJobMemory from "./jobMemory";
 
 interface IRoomHelper {}
 
@@ -57,7 +57,11 @@ export default class implements IRoomHelper {
     }
     return undefined;
   }
-  static GetCsSiteAtLocation(room:Room,pos:FreezedRoomPosition): ConstructionSite| null {
+
+  static GetCsSiteAtLocation(
+    room: Room,
+    pos: FreezedRoomPosition
+  ): ConstructionSite | null {
     return room.lookForAt(LOOK_CONSTRUCTION_SITES, pos.x, pos.y)[0];
   }
 }

@@ -1,8 +1,7 @@
 import { clone, forEach } from "lodash";
 import BaseMemory from "./interface";
 
-interface IGlobalMemory {
-}
+interface IGlobalMemory {}
 
 export default class extends BaseMemory implements IGlobalMemory {
   private static type: MemoryTypes = "Global";

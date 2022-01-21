@@ -1,8 +1,7 @@
 import { clone } from "lodash";
 import BaseMemory from "./interface";
 
-interface ICreepMemory {
-}
+interface ICreepMemory {}
 
 export default class extends BaseMemory implements ICreepMemory {
   private static type: MemoryTypes = "Creep";
@@ -55,9 +54,13 @@ export default class extends BaseMemory implements ICreepMemory {
     data = super.GetAllData(data, predicate);
     return data;
   }
-  static Initialize(id:string,isRemoteCreep:boolean): CRUDResult<CreepMemory> {
+
+  static Initialize(
+    id: string,
+    isRemoteCreep: boolean
+  ): CRUDResult<CreepMemory> {
     const data = this.Generate(isRemoteCreep);
     const result = this.Create(id, data);
-    return { success: result.success, data:result.data };
+    return { success: result.success, data: result.data };
   }
 }
