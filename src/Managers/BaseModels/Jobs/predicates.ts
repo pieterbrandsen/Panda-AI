@@ -1,7 +1,7 @@
 export default class {
-  static IsCreepType = (type: CreepTypes) => {
-    return (cache: CacheObjects): boolean => {
-      return cache.executer === type;
+  static IsJobTypes = (jobs: JobTypes[]) => {
+    return (cache: JobCache): boolean => {
+      return jobs.includes(cache.type);
     };
   };
 }
