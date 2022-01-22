@@ -30,3 +30,7 @@ interface RoomInitializationData {
   room: Room;
   remoteRooms?: StringMap<RemoteRoom>;
 }
+
+interface GlobalInitializationData {
+  
+}

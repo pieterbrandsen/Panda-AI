@@ -58,7 +58,16 @@ export default class extends BaseMemory implements IGlobalMemory {
     return { success: true, data };
   }
 
-  static Initialize(): boolean {
-    return this.Update(this.Generate()).success;
+  static Delete(): CRUDResult<Memory> {
+    forEach(Object.keys(Memory), (key: string) => {
+      delete Memory[key];
+    });
+    return { success: true, data: undefined };
+  }
+
+  static Initialize(): CRUDResult<Memory> {
+    const data = this.Generate();
+    const result = this.Update(data);
+    return { success: result.success, data: result.data };
   }
 }
