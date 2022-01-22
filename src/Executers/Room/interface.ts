@@ -1,4 +1,4 @@
-import { forEach } from "lodash";
+import { forEach, union } from "lodash";
 import IRoomData from "../../Managers/BaseModels/Helper/roomMemory";
 import IRoomCache from "../../Managers/BaseModels/Cache/roomInterface";
 import IControllerManager from "../../Managers/ControllerManager/interface";
@@ -14,13 +14,19 @@ interface IRoomExecuter {}
 
 export default class implements IRoomExecuter {
   static ExecuteAllRooms(): boolean {
-    const roomData = IRoomCache.GetAll("", false);
-    if (!roomData.success) {
+    const roomNamesWithVision = Object.keys(Game.rooms);
+
+    const roomsCache = IRoomCache.GetAll("", false);
+    if (!roomsCache.success) {
       return false;
     }
-    const roomNames = Object.keys(roomData.data);
-    forEach(roomNames, (roomName) => {
+    const roomNames = Object.keys(roomsCache.data);
+    forEach(union(roomNames, roomNamesWithVision), (roomName) => {
       const room = Game.rooms[roomName];
+      if (!roomsCache[roomName]) {
+        IRoomData.Initialize({ room, remoteRooms: {} });
+      }
+
       this.ExecuteRoom(room);
     });
     return true;

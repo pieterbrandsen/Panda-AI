@@ -123,7 +123,8 @@ export default class implements IJobHelper {
       data.targetId,
       data.pos,
       data.amountToTransfer,
-      data.fromTargetId
+      data.fromTargetId,
+      data.structureType
     );
     if (memoryResult.success) {
       result.success = true;

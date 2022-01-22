@@ -1,4 +1,3 @@
-import IRoomCache from "../Cache/roomInterface";
 import IJobMemory from "./jobMemory";
 
 interface IRoomHelper {}
@@ -8,10 +7,9 @@ export default class implements IRoomHelper {
     return `${roomName}-${manager}`;
   }
 
-  static GetRoom(executer: string): SingleObject<RoomCache> {
+  static GetRoomName(executer: string): string {
     const roomName = executer.split("-")[0];
-    const room = IRoomCache.Get(roomName);
-    return { key: roomName, value: room.data };
+    return roomName;
   }
 
   static GetManagerName(executer: string): string {
@@ -48,6 +46,7 @@ export default class implements IRoomHelper {
         targetId: "",
         type: "Build",
         amountToTransfer: CONSTRUCTION_COST[type],
+        structureType: type,
       });
       if (job.success && job.cache && job.memory) {
         const jobId = IJobMemory.GetJobId(job.cache.type, job.memory.pos);
@@ -63,5 +62,15 @@ export default class implements IRoomHelper {
     pos: FreezedRoomPosition
   ): ConstructionSite | null {
     return room.lookForAt(LOOK_CONSTRUCTION_SITES, pos.x, pos.y)[0];
+  }
+
+  static GetStructuresAtLocation(
+    room: Room,
+    pos: FreezedRoomPosition,
+    structureType: StructureConstant
+  ): Structure | null {
+    return room
+      .lookForAt(LOOK_STRUCTURES, pos.x, pos.y)
+      .filter((structure) => structure.structureType === structureType)[0];
   }
 }

@@ -19,7 +19,8 @@ export default class extends BaseMemory implements IJobMemory {
     targetId: string,
     pos: FreezedRoomPosition,
     amountToTransfer?: number,
-    fromTargetId?: string
+    fromTargetId?: string,
+    structureType?: StructureConstant
   ): JobMemory {
     return {
       lastAssigned: Game.time,
@@ -28,6 +29,7 @@ export default class extends BaseMemory implements IJobMemory {
       version: super.MinimumVersion(this.type),
       amountToTransfer,
       fromTargetId,
+      structureType,
     };
   }
 
@@ -67,9 +69,16 @@ export default class extends BaseMemory implements IJobMemory {
     targetId: string,
     pos: FreezedRoomPosition,
     amountToTransfer?: number,
-    fromTargetId?: string
+    fromTargetId?: string,
+    structureType?: StructureConstant
   ): CRUDResult<JobMemory> {
-    const cache = this.Generate(targetId, pos, amountToTransfer, fromTargetId);
+    const cache = this.Generate(
+      targetId,
+      pos,
+      amountToTransfer,
+      fromTargetId,
+      structureType
+    );
     const result = this.Create(id, cache);
     return { data: result.data, success: result.success };
   }

@@ -27,13 +27,13 @@ export default class {
 
   static IsRoomName = (roomName: string) => {
     return (cache: CacheObjects): boolean => {
-      return IRoomHelper.GetRoom(cache.executer).key === roomName;
+      return IRoomHelper.GetRoomName(cache.executer) === roomName;
     };
   };
 
   static IsInRoomNameArray = (roomNames: string[]) => {
     return (cache: CacheObjects): boolean => {
-      return roomNames.includes(IRoomHelper.GetRoom(cache.executer).key);
+      return roomNames.includes(IRoomHelper.GetRoomName(cache.executer));
     };
   };
 

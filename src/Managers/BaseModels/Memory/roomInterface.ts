@@ -31,7 +31,7 @@ export default class extends BaseMemory implements IRoomMemory {
       controllerManager: IControllerManager.SetupMemory(room),
       mineralManager: IMineralManager.SetupMemory(room),
       sourceManager: ISourceManager.SetupMemory(room),
-      spawnManager: ISpawnManager.SetupMemory(room),
+      spawnManager: ISpawnManager.SetupMemory(),
     };
   }
 

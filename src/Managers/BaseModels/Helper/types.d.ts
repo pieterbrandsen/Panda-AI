@@ -7,6 +7,9 @@ interface JobInitializationData {
   // ResourceStorage
   fromTargetId?: string;
   amountToTransfer?: number;
+
+  // Build
+  structureType?: StructureConstant;
 }
 
 interface StructureInitializationData {

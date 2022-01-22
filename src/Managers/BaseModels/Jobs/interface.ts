@@ -8,6 +8,7 @@ import IRoomMemory from "../Memory/roomInterface";
 import Predicates from "./predicates";
 import IStructureMemory from "../Memory/structureInterface";
 import IResourceStorage from "../ResourceStorage/interface";
+import IStructureData from "../Helper/structureMemory";
 
 // TODO: Update (all/single)
 // TODO: GenerateObject (update whenever something needs to be added, assign in this function the missing data that is optional?)
@@ -27,7 +28,7 @@ export default class implements IJobs {
     }
     const job = cacheJob.data as JobCache;
     const room =
-      type === "Room" ? newExecuter : IRoomInterface.GetRoom(job.executer).key;
+      type === "Room" ? newExecuter : IRoomInterface.GetRoomName(job.executer);
     const manager =
       type === "Manager"
         ? newExecuter
@@ -198,6 +199,17 @@ export default class implements IJobs {
             if (csSiteAtLocation) {
               jobMemory.targetId = csSiteAtLocation.id;
             } else {
+              const structureAtLocation = IRoomInterface.GetStructuresAtLocation(
+                room,
+                jobMemory.pos,
+                jobMemory.structureType as StructureConstant
+              );
+              if (structureAtLocation) {
+                IStructureData.Initialize({
+                  executer: jobCache.executer,
+                  structure: structureAtLocation,
+                });
+              }
               IJobHelper.DeleteMemory(id, true, true);
             }
           } else {

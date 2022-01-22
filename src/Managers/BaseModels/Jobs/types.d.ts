@@ -14,4 +14,6 @@ interface JobMemory extends BaseMemory {
 
   fromTargetId?: string;
   amountToTransfer?: number;
+
+  structureType?: StructureConstant;
 }
