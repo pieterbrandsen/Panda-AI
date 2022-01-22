@@ -1,4 +1,4 @@
-import IRoomHelper from "../Helper/roomInterface";
+import IRoomHelper from "../Helper/Room/roomInterface";
 
 export default class {
   /**

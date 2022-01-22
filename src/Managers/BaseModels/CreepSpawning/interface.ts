@@ -1,12 +1,12 @@
 import { findKey, forEach, forOwn, groupBy, mergeWith, reduce } from "lodash";
-import IRoomHelper from "../Helper/roomInterface";
+import IRoomPosition from "../Helper/Room/roomPosition";
 import IRoomMemory from "../Memory/roomInterface";
 import IJobMemory from "../Memory/jobInterface";
 import IJobCache from "../Cache/jobInterface";
 import CachePredicates from "../Cache/predicates";
 import ICreepCache from "../Cache/creepInterface";
 import IStructureCache from "../Cache/structureInterface";
-import ICreepMemory from "../Helper/creepMemory";
+import ICreepMemory from "../Helper/Creep/creepMemory";
 import bodyIteratee from "./bodyConstants";
 
 interface ICreepSpawning {}
@@ -274,7 +274,7 @@ export default class CreepSpawning implements ICreepSpawning {
       executer,
       isRemoteCreep: this.isRemoteCreep,
       name: creep.name,
-      pos: IRoomHelper.GetMiddlePosition(this.spawnRoom.name),
+      pos: IRoomPosition.GetMiddlePosition(this.spawnRoom.name),
       type: creep.type,
     };
     return ICreepMemory.Initialize(memory).success;

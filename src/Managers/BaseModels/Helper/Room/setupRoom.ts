@@ -1,7 +1,7 @@
 import { forEach } from "lodash";
 import IRoomHelper from "./roomInterface";
 import IRoomData from "./roomMemory";
-import IStructureData from "./structureMemory";
+import IStructureData from "../Structure/structureMemory";
 
 interface IRoomSetup {}
 

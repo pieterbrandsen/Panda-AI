@@ -1,5 +1,5 @@
-import IRoomMemory from "../Memory/roomInterface";
-import IRoomCache from "../Cache/roomInterface";
+import IRoomMemory from "../../Memory/roomInterface";
+import IRoomCache from "../../Cache/roomInterface";
 
 interface IRoomHelper {}
 

@@ -1,6 +1,6 @@
 import { clone } from "lodash";
 import BaseMemory from "./interface";
-import RoomHelper from "../Helper/roomInterface";
+import RoomPosition from "../Helper/Room/roomPosition";
 
 interface IJobMemory {}
 
@@ -35,7 +35,7 @@ export default class extends BaseMemory implements IJobMemory {
 
   static Get(id: string): CRUDResult<JobMemory> {
     const data = clone(Memory.JobsData.data[id]);
-    data.pos = RoomHelper.UnfreezeRoomPosition(data.pos);
+    data.pos = RoomPosition.UnFreezeRoomPosition(data.pos);
     return { success: !!data, data };
   }
 

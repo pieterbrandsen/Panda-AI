@@ -1,6 +1,6 @@
 import { clone } from "lodash";
 import BaseMemory from "./interface";
-import IRoomHelper from "../Helper/roomInterface";
+import IRoomPosition from "../Helper/Room/roomPosition";
 
 interface IStructureCache {}
 
@@ -23,7 +23,7 @@ export default class extends BaseMemory implements IStructureCache {
       type: structure.structureType,
       version: super.MinimumVersion(this.type),
       executer,
-      pos: IRoomHelper.FreezeRoomPosition(structure.pos),
+      pos: IRoomPosition.FreezeRoomPosition(structure.pos),
     };
   }
 

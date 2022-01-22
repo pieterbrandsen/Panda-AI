@@ -1,6 +1,4 @@
-import IRoomCache from "../BaseModels/Cache/roomInterface";
-import IRoomMemory from "../BaseModels/Memory/roomInterface";
-import IRoomHelper from "../BaseModels/Helper/roomInterface";
+import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
 import ICreepSpawning from "../BaseModels/CreepSpawning/interface";
 
 interface ISpawnManager {}
@@ -18,17 +16,13 @@ export default class implements ISpawnManager {
 
   cache: RoomCache;
 
-  constructor(roomName: string) {
+  constructor(roomName: string,roomMemory:RoomMemory,roomCache:RoomCache) {
     this.room = Game.rooms[roomName];
-    this.memory = IRoomMemory.Get(roomName).data as RoomMemory;
-    this.cache = IRoomCache.Get(roomName).data as RoomCache;
+    this.memory = roomMemory
+    this.cache = roomCache;
     this.managerMemory = this.memory.spawnManager;
 
     this.executer = IRoomHelper.GetExecuter(this.room.name, "Spawn");
-  }
-
-  static SetupMemory(): SpawnManager {
-    return {};
   }
 
   Run(): void {

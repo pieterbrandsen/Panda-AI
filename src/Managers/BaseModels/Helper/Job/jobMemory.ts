@@ -1,5 +1,5 @@
-import IJobMemory from "../Memory/jobInterface";
-import IJobCache from "../Cache/jobInterface";
+import IJobMemory from "../../Memory/jobInterface";
+import IJobCache from "../../Cache/jobInterface";
 
 interface IJobHelper {}
 

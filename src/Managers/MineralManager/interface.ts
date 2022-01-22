@@ -1,7 +1,7 @@
-import IRoomCache from "../BaseModels/Cache/roomInterface";
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
-import IRoomHelper from "../BaseModels/Helper/roomInterface";
-import IJobMemory from "../BaseModels/Helper/jobMemory";
+import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
+import IJobMemory from "../BaseModels/Helper/Job/jobMemory";
+import IRoomConstruction from "../BaseModels/Helper/Room/roomConstruction";
 
 interface IMineralManager {}
 
@@ -18,29 +18,13 @@ export default class implements IMineralManager {
 
   cache: RoomCache;
 
-  constructor(roomName: string) {
+  constructor(roomName: string,roomMemory:RoomMemory,roomCache:RoomCache) {
     this.room = Game.rooms[roomName];
-    this.memory = IRoomMemory.Get(roomName).data as RoomMemory;
-    this.cache = IRoomCache.Get(roomName).data as RoomCache;
+    this.memory = roomMemory
+    this.cache = roomCache;
     this.managerMemory = this.memory.mineralManager;
 
     this.executer = IRoomHelper.GetExecuter(this.room.name, "Controller");
-  }
-
-  static SetupMemory(room: Room): MineralManager {
-    const mineral = room.find(FIND_MINERALS)[0];
-    return {
-      extractorBuildJobId: undefined,
-      extractorId: undefined,
-      mineral: mineral
-        ? {
-            jobId: undefined,
-            id: mineral.id,
-            pos: IRoomHelper.FreezeRoomPosition(mineral.pos),
-            type: mineral.mineralType,
-          }
-        : undefined,
-    };
   }
 
   UpdateController(): void {
@@ -49,7 +33,7 @@ export default class implements IMineralManager {
     const mineralMemory = managerMemory.mineral;
     if (mineralMemory) {
       if (!managerMemory.extractorId && !managerMemory.extractorBuildJobId) {
-        const createdSite = IRoomHelper.CreateConstructionSite(
+        const createdSite = IRoomConstruction.CreateConstructionSite(
           this.room,
           mineralMemory.pos,
           STRUCTURE_EXTRACTOR,
@@ -63,7 +47,7 @@ export default class implements IMineralManager {
       }
       if (managerMemory.extractorBuildJobId) {
         if (Game.time % 100) {
-          const createdSite = IRoomHelper.CreateConstructionSite(
+          const createdSite = IRoomConstruction.CreateConstructionSite(
             this.room,
             mineralMemory.pos,
             STRUCTURE_EXTRACTOR,

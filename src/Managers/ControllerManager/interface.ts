@@ -1,7 +1,6 @@
-import IRoomCache from "../BaseModels/Cache/roomInterface";
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
-import IRoomHelper from "../BaseModels/Helper/roomInterface";
-import IJobMemory from "../BaseModels/Helper/jobMemory";
+import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
+import IJobMemory from "../BaseModels/Helper/Job/jobMemory";
 
 interface IControllerManager {}
 
@@ -20,28 +19,14 @@ export default class implements IControllerManager {
 
   cache: RoomCache;
 
-  constructor(roomName: string) {
+  constructor(roomName: string,roomMemory:RoomMemory,roomCache:RoomCache) {
     this.room = Game.rooms[roomName];
-    this.memory = IRoomMemory.Get(roomName).data as RoomMemory;
-    this.cache = IRoomCache.Get(roomName).data as RoomCache;
+    this.memory = roomMemory
+    this.cache = roomCache;
     this.managerMemory = this.memory.controllerManager;
 
     this.isRemote = this.memory.remoteOriginRoom !== undefined;
     this.executer = IRoomHelper.GetExecuter(this.room.name, "Controller");
-  }
-
-  static SetupMemory(room: Room): ControllerManager {
-    const { controller } = room;
-    return {
-      controller: controller
-        ? {
-            jobId: undefined,
-            id: controller.id,
-            pos: IRoomHelper.FreezeRoomPosition(controller.pos),
-            isOwned: controller.my,
-          }
-        : undefined,
-    };
   }
 
   UpdateController(): void {

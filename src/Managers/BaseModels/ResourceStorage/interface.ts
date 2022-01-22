@@ -3,9 +3,9 @@ import IStructureMemory from "../Memory/structureInterface";
 import IStructureCache from "../Cache/structureInterface";
 import ICreepMemory from "../Memory/creepInterface";
 import ICreepCache from "../Cache/creepInterface";
-import IRoomHelper from "../Helper/roomInterface";
+import IRoomPosition from "../Helper/Room/roomPosition";
 import Predicates from "../Cache/predicates";
-import IJobMemory from "../Helper/jobMemory";
+import IJobMemory from "../Helper/Job/jobMemory";
 
 interface IResourceStorage {
   object: StructuresWithStorage | Creep;
@@ -163,8 +163,8 @@ export default class implements IResourceStorage {
     isFilling: boolean
   ): BestStructureLoop {
     const currentPos = this.object.pos;
-    const newPos = IRoomHelper.UnfreezeRoomPosition(structure.cache.pos);
-    const bestPos = IRoomHelper.UnfreezeRoomPosition(bestStructure.cache.pos);
+    const newPos = IRoomPosition.UnFreezeRoomPosition(structure.cache.pos);
+    const bestPos = IRoomPosition.UnFreezeRoomPosition(bestStructure.cache.pos);
 
     const distance = currentPos.getRangeTo(newPos);
     const bestDistance = currentPos.getRangeTo(bestPos);

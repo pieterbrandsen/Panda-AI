@@ -1,14 +1,14 @@
 import { forEach } from "lodash";
 import IJobMemory from "../Memory/jobInterface";
-import ICreepMemory from "../Helper/creepMemory";
+import ICreepMemory from "../Helper/Creep/creepMemory";
 import IJobCache from "../Cache/jobInterface";
-import IJobHelper from "../Helper/jobMemory";
-import IRoomInterface from "../Helper/roomInterface";
+import IJobHelper from "../Helper/Job/jobMemory";
+import IRoomInterface from "../Helper/Room/roomInterface";
 import IRoomMemory from "../Memory/roomInterface";
 import Predicates from "./predicates";
 import IStructureMemory from "../Memory/structureInterface";
 import IResourceStorage from "../ResourceStorage/interface";
-import IStructureData from "../Helper/structureMemory";
+import IStructureData from "../Helper/Structure/structureMemory";
 
 // TODO: Update (all/single)
 // TODO: GenerateObject (update whenever something needs to be added, assign in this function the missing data that is optional?)

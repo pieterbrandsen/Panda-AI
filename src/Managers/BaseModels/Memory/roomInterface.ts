@@ -1,9 +1,9 @@
 import { clone } from "lodash";
 import BaseMemory from "./interface";
-import IControllerManager from "../../ControllerManager/interface";
-import IMineralManager from "../../MineralManager/interface";
-import ISourceManager from "../../SourceManager/interface";
-import ISpawnManager from "../../SpawnManager/interface";
+import IControllerMemory from "../../ControllerManager/memory";
+import IMineralMemory from "../../MineralManager/memory";
+import ISourceMemory from "../../SourceManager/memory";
+import ISpawnMemory from "../../SpawnManager/memory";
 
 interface IRoomMemory {}
 
@@ -28,10 +28,10 @@ export default class extends BaseMemory implements IRoomMemory {
     return {
       version: super.MinimumVersion(this.type),
       remoteRooms,
-      controllerManager: IControllerManager.SetupMemory(room),
-      mineralManager: IMineralManager.SetupMemory(room),
-      sourceManager: ISourceManager.SetupMemory(room),
-      spawnManager: ISpawnManager.SetupMemory(),
+      controllerManager: IControllerMemory.SetupMemory(room),
+      mineralManager: IMineralMemory.SetupMemory(room),
+      sourceManager: ISourceMemory.SetupMemory(room),
+      spawnManager: ISpawnMemory.SetupMemory(),
     };
   }
 

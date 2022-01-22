@@ -1,5 +1,5 @@
 import { forEach, union } from "lodash";
-import IRoomData from "../../Managers/BaseModels/Helper/roomMemory";
+import IRoomData from "../../Managers/BaseModels/Helper/Room/roomMemory";
 import IRoomCache from "../../Managers/BaseModels/Cache/roomInterface";
 import IControllerManager from "../../Managers/ControllerManager/interface";
 import IMineralManager from "../../Managers/MineralManager/interface";
@@ -36,19 +36,19 @@ export default class implements IRoomExecuter {
     if (!room) return false;
     const roomData = IRoomData.GetMemory(room.name);
     if (!roomData.success) return false;
-    // const roomMemory = roomData.memory as RoomMemory;
-    // const roomCache = roomData.cache as RoomCache;
+    const roomMemory = roomData.memory as RoomMemory;
+    const roomCache = roomData.cache as RoomCache;
     const structuresCache = IStructuresCache.GetAll("", false, [room.name]);
     const creepsCache = ICreepCache.GetAll("", false, [room.name]);
 
     const { controller } = room;
-    new ISourceManager(room.name).Run();
+    new ISourceManager(room.name,roomMemory,roomCache).Run();
 
     if (controller) {
-      new IControllerManager(room.name).Run();
+      new IControllerManager(room.name,roomMemory,roomCache).Run();
       if (controller.my) {
-        new IMineralManager(room.name).Run();
-        new ISpawnManager(room.name).Run();
+        new IMineralManager(room.name,roomMemory,roomCache).Run();
+        new ISpawnManager(room.name,roomMemory,roomCache).Run();
       }
     }
 

@@ -1,25 +1,23 @@
-import ICreepMemory from "../Memory/creepInterface";
-import ICreepCache from "../Cache/creepInterface";
+import IStructureMemory from "../../Memory/structureInterface";
+import IStructureCache from "../../Cache/structureInterface";
 
-interface ICreepHelper {}
+interface IStructureHelper {}
 
-export default class implements ICreepHelper {
-  static GetCreepId(name: string): string {
-    return name;
-  }
-
-  static GetMemory(id: string): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
+export default class implements IStructureHelper {
+  static GetMemory(
+    id: string
+  ): DoubleCRUDResult<StructureMemory, StructureCache> {
+    const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = ICreepMemory.Get(id);
+    const memoryResult = IStructureMemory.Get(id);
     if (result.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = ICreepCache.Get(id);
+    const cacheResult = IStructureCache.Get(id);
     if (result.success) {
       result.success = true;
       result.cache = cacheResult.data;
@@ -29,22 +27,22 @@ export default class implements ICreepHelper {
 
   static CreateMemory(
     id: string,
-    memory: CreepMemory,
-    cache: CreepCache
-  ): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
+    memory: StructureMemory,
+    cache: StructureCache
+  ): DoubleCRUDResult<StructureMemory, StructureCache> {
+    const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
-    const memoryResult = ICreepMemory.Create(id, memory);
+    const memoryResult = IStructureMemory.Create(id, memory);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
       result.success = true;
     }
 
-    const cacheResult = ICreepCache.Create(id, cache);
+    const cacheResult = IStructureCache.Create(id, cache);
     if (cacheResult.success) {
       result.cache = cacheResult.data;
       result.success = true;
@@ -57,21 +55,21 @@ export default class implements ICreepHelper {
     id: string,
     isMemory: boolean,
     isCache: boolean
-  ): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
+  ): DoubleCRUDResult<StructureMemory, StructureCache> {
+    const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
     if (isMemory) {
-      const deleteResult = ICreepMemory.Delete(id);
+      const deleteResult = IStructureMemory.Delete(id);
       if (deleteResult.success) {
         result.success = true;
         result.memory = deleteResult.data;
       }
     }
     if (isCache) {
-      const deleteResult = ICreepCache.Delete(id);
+      const deleteResult = IStructureCache.Delete(id);
       if (deleteResult.success) {
         result.success = true;
         result.cache = deleteResult.data;
@@ -82,24 +80,24 @@ export default class implements ICreepHelper {
 
   static UpdateMemory(
     id: string,
-    memory?: CreepMemory,
-    cache?: CreepCache
-  ): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
+    memory?: StructureMemory,
+    cache?: StructureCache
+  ): DoubleCRUDResult<StructureMemory, StructureCache> {
+    const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
     if (memory) {
-      const updateResult = ICreepMemory.Update(id, memory);
+      const updateResult = IStructureMemory.Update(id, memory);
       if (updateResult.success) {
         result.success = true;
         result.memory = updateResult.data;
       }
     }
     if (cache) {
-      const updateResult = ICreepCache.Update(id, cache);
+      const updateResult = IStructureCache.Update(id, cache);
       if (updateResult.success) {
         result.success = true;
         result.cache = updateResult.data;
@@ -110,25 +108,23 @@ export default class implements ICreepHelper {
   }
 
   static Initialize(
-    data: CreepInitializationData
-  ): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const id = this.GetCreepId(data.name);
-    const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
+    data: StructureInitializationData
+  ): DoubleCRUDResult<StructureMemory, StructureCache> {
+    const { id } = data.structure;
+    const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = ICreepMemory.Initialize(id, data.isRemoteCreep);
+    const memoryResult = IStructureMemory.Initialize(id);
     if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = ICreepCache.Initialize(
+    const cacheResult = IStructureCache.Initialize(
       id,
-      data.executer,
-      data.body,
-      data.pos,
-      data.type
+      data.structure,
+      data.executer
     );
     if (cacheResult.success) {
       result.success = true;
