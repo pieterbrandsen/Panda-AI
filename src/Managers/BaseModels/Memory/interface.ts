@@ -16,8 +16,8 @@ export default abstract class implements IMemory {
         return Memory.StructuresData.version;
       case "Room":
         return Memory.RoomsData.version;
-      case "Global":
-        return Memory.version;
+        case "Job":
+          return Memory.JobsData.version;
       default:
         return 999;
     }

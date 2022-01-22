@@ -35,7 +35,9 @@ export default class extends BaseMemory implements IJobMemory {
 
   static Get(id: string): CRUDResult<JobMemory> {
     const data = clone(Memory.JobsData.data[id]);
-    data.pos = RoomPosition.UnFreezeRoomPosition(data.pos);
+    if (data) {
+      data.pos = RoomPosition.UnFreezeRoomPosition(data.pos);
+    }
     return { success: !!data, data };
   }
 

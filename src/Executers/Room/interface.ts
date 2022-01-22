@@ -15,12 +15,10 @@ interface IRoomExecuter {}
 export default class implements IRoomExecuter {
   static ExecuteAllRooms(): boolean {
     const roomNamesWithVision = Object.keys(Game.rooms);
-
+    
     const roomsCache = IRoomCache.GetAll("", false);
-    if (!roomsCache.success) {
-      return false;
-    }
-    const roomNames = Object.keys(roomsCache.data);
+
+    const roomNames = Object.keys(roomsCache);
     forEach(union(roomNames, roomNamesWithVision), (roomName) => {
       const room = Game.rooms[roomName];
       if (!roomsCache[roomName]) {
@@ -44,16 +42,16 @@ export default class implements IRoomExecuter {
     const { controller } = room;
     new ISourceManager(room.name,roomMemory,roomCache).Run();
 
-    if (controller) {
-      new IControllerManager(room.name,roomMemory,roomCache).Run();
-      if (controller.my) {
-        new IMineralManager(room.name,roomMemory,roomCache).Run();
-        new ISpawnManager(room.name,roomMemory,roomCache).Run();
-      }
-    }
+    // if (controller) {
+    //   new IControllerManager(room.name,roomMemory,roomCache).Run();
+    //   if (controller.my) {
+    //     new IMineralManager(room.name,roomMemory,roomCache).Run();
+    //     new ISpawnManager(room.name,roomMemory,roomCache).Run();
+    //   }
+    // }
 
-    IStructureExecuter.ExecuterAllStructures(structuresCache);
-    ICreepExecuter.ExecuterAllCreeps(creepsCache);
+    // IStructureExecuter.ExecuterAllStructures(structuresCache);
+    // ICreepExecuter.ExecuterAllCreeps(creepsCache);
 
     return true;
   }

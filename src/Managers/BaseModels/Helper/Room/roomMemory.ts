@@ -15,12 +15,12 @@ export default class implements IRoomHelper {
       cache: undefined,
     };
     const memoryResult = IRoomMemory.Get(id);
-    if (result.success) {
+    if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
     const cacheResult = IRoomCache.Get(id);
-    if (result.success) {
+    if (cacheResult.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }

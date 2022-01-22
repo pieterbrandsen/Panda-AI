@@ -7,7 +7,7 @@ export default class extends BaseMemory implements IGlobalMemory {
   private static type: MemoryTypes = "Global";
 
   static ValidateSingle(): boolean {
-    return super.MinimumVersion(this.type) === Memory.version;
+    return Memory.version !== undefined;
   }
 
   /**
