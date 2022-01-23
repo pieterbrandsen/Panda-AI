@@ -3,7 +3,7 @@ import IJobMemory from "../Job/jobMemory";
 interface IRoomStructure {}
 
 export default class implements IRoomStructure {
-static CreateConstructionSite(
+  static CreateConstructionSite(
     room: Room,
     pos: FreezedRoomPosition,
     type: BuildableStructureConstant,

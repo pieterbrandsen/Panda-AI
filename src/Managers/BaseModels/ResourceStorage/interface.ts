@@ -1,7 +1,7 @@
 import { forOwn, sum } from "lodash";
 import ICreepData from "../Helper/Creep/creepMemory";
 import IStructureData from "../Helper/Structure/structureMemory";
-import IStructureCache from "../Cache/structureInterface"
+import IStructureCache from "../Cache/structureInterface";
 import IRoomPosition from "../Helper/Room/roomPosition";
 import Predicates from "../Cache/predicates";
 import IJobMemory from "../Helper/Job/jobMemory";
@@ -59,7 +59,9 @@ export default class implements IResourceStorage {
       this.memory = result.memory as StructureMemory;
       this.cache = result.cache as StructureCache;
     } else {
-      const result = ICreepData.GetMemory(ICreepData.GetCreepId((object as Creep).name));
+      const result = ICreepData.GetMemory(
+        ICreepData.GetCreepId((object as Creep).name)
+      );
       this.memory = result.memory as CreepMemory;
       this.cache = result.cache as CreepCache;
     }
@@ -75,7 +77,9 @@ export default class implements IResourceStorage {
         (this.memory
           ? sum(
               Object.values(
-                this.type === "structure" ? (this.memory as StructureMemory).energyIncoming : {}
+                this.type === "structure"
+                  ? (this.memory as StructureMemory).energyIncoming
+                  : {}
               )
             ) - sum(Object.values(this.memory.energyOutgoing))
           : 0);
@@ -136,12 +140,12 @@ export default class implements IResourceStorage {
       }
     } else {
       return {
-        max:capacity,
-        high:capacity *0.9,
-        min:0,
-        low:capacity * 0.1,
+        max: capacity,
+        high: capacity * 0.9,
+        min: 0,
+        low: capacity * 0.1,
         current: used,
-      }
+      };
       // return {
       //   max:0,
       //   high:capacity *0.1,
@@ -243,7 +247,7 @@ export default class implements IResourceStorage {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
         if (structure) {
           const isEmptyEnough = this.IsStructureEmptyEnough(structure);
-           if (isEmptyEnough.emptyEnough) {
+          if (isEmptyEnough.emptyEnough) {
             const structureLoop: BestStructureLoop = {
               cache,
               id,
@@ -254,10 +258,11 @@ export default class implements IResourceStorage {
               structureLoop,
               bestStructure,
               true
-              );
-            }
+            );
           }
-        });
+        }
+      }
+    );
     return bestStructure;
   }
 
@@ -276,7 +281,7 @@ export default class implements IResourceStorage {
       if (targetStructureInformation) {
         const targetDataResult = IStructureData.GetMemory(
           targetStructureInformation.id
-          );
+        );
         if (targetDataResult.success) {
           const targetMemory = targetDataResult.memory as StructureMemory;
           const amountToTransfer = Math.min(
@@ -286,9 +291,12 @@ export default class implements IResourceStorage {
             targetStructureInformation.levels.max -
               targetStructureInformation.levels.current
           );
-          console.log(isFullEnough.levels.current,
-            targetStructureInformation.levels.max,            targetStructureInformation.levels.max -
-            targetStructureInformation.levels.current);
+          console.log(
+            isFullEnough.levels.current,
+            targetStructureInformation.levels.max,
+            targetStructureInformation.levels.max -
+              targetStructureInformation.levels.current
+          );
           const isTypeSpawning = ([
             "spawn",
             "extension",
@@ -307,7 +315,10 @@ export default class implements IResourceStorage {
           if (!jobResult.success) return false;
           const jobId = IJobMemory.GetJobId(type, this.cache.pos);
           targetMemory.energyIncoming[jobId] = amountToTransfer;
-          IStructureData.UpdateMemory(targetStructureInformation.id, targetMemory);
+          IStructureData.UpdateMemory(
+            targetStructureInformation.id,
+            targetMemory
+          );
           if (this.type === "structure") {
             (this.memory as StructureMemory).energyOutgoing[
               jobId
@@ -352,7 +363,10 @@ export default class implements IResourceStorage {
           if (!jobResult.success) return false;
           const jobId = IJobMemory.GetJobId(jobType, this.cache.pos);
           targetMemory.energyOutgoing[jobId] = amountToTransfer;
-          IStructureData.UpdateMemory(targetStructureInformation.id, targetMemory);
+          IStructureData.UpdateMemory(
+            targetStructureInformation.id,
+            targetMemory
+          );
           if (this.type === "structure") {
             (this.memory as StructureMemory).energyIncoming[
               jobId

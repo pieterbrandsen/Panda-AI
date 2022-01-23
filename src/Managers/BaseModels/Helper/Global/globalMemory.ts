@@ -1,4 +1,4 @@
-import IGlobalMemory from "../../Memory/GlobalInterface";
+import IGlobalMemory from "../../Memory/globalInterface";
 
 interface IGlobalHelper {}
 
@@ -8,28 +8,22 @@ export default class implements IGlobalHelper {
     return result;
   }
 
-  static CreateMemory(
-    memory: Memory,
-  ): CRUDResult<Memory> {
+  static CreateMemory(memory: Memory): CRUDResult<Memory> {
     const result = IGlobalMemory.Update(memory);
     return result;
   }
 
-  static DeleteMemory(
-  ): CRUDResult<Memory> {
-      const result = IGlobalMemory.Delete();
+  static DeleteMemory(): CRUDResult<Memory> {
+    const result = IGlobalMemory.Delete();
     return result;
   }
 
-  static UpdateMemory(
-    memory: Memory,
-  ): CRUDResult<Memory> {
-      const result = IGlobalMemory.Update(memory);
+  static UpdateMemory(memory: Memory): CRUDResult<Memory> {
+    const result = IGlobalMemory.Update(memory);
     return result;
   }
 
-  static Initialize(
-  ): CRUDResult<Memory> {
+  static Initialize(): CRUDResult<Memory> {
     const result = IGlobalMemory.Initialize();
     return result;
   }

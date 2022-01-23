@@ -31,6 +31,4 @@ interface RoomInitializationData {
   remoteRooms?: StringMap<RemoteRoom>;
 }
 
-interface GlobalInitializationData {
-  
-}
+interface GlobalInitializationData {}

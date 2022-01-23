@@ -10,10 +10,15 @@ interface IExecuteCreepRole {}
 
 export default class implements IExecuteCreepRole {
   creep: Creep;
+
   creepCache: CreepCache;
+
   creepMemory: CreepMemory;
+
   jobCache: JobCache;
+
   jobMemory: JobMemory;
+
   constructor(
     creep: Creep,
     creepCache: CreepCache,
@@ -28,7 +33,7 @@ export default class implements IExecuteCreepRole {
     this.jobMemory = jobMemory;
   }
 
-  executeRole():JobResult {
+  executeRole(): JobResult {
     switch (this.jobCache.type) {
       case "Build":
         return new IBuildRole(
@@ -72,22 +77,24 @@ export default class implements IExecuteCreepRole {
           this.jobCache,
           this.jobMemory
         ).run();
+      default:
+        return "done";
     }
   }
 
-  run() {
+  run(): void {
     const result = this.executeRole();
     switch (result) {
-        case "done":
-            IJobs.UnassignCreepJob(this.creep,this.creepMemory);    
-        IJobData.DeleteMemory(this.creepMemory.jobId ?? "",true,true);
-            break;
-        case "empty":
-            case "full":
-                IJobs.UnassignCreepJob(this.creep,this.creepMemory);    
-                break;
-        default:
-            break;
+      case "done":
+        IJobs.UnassignCreepJob(this.creep, this.creepMemory);
+        IJobData.DeleteMemory(this.creepMemory.jobId ?? "", true, true);
+        break;
+      case "empty":
+      case "full":
+        IJobs.UnassignCreepJob(this.creep, this.creepMemory);
+        break;
+      default:
+        break;
     }
   }
 }

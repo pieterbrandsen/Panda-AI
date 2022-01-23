@@ -22,16 +22,21 @@ export default class implements ICreepExecuter {
       }
       const jobMemory = jobData.memory as JobMemory;
       const jobCache = jobData.cache as JobCache;
-      new ICreepRoleExecuter(creep, creepCache, creepMemory, jobCache, jobMemory).run();
-    }
-    else { 
+      new ICreepRoleExecuter(
+        creep,
+        creepCache,
+        creepMemory,
+        jobCache,
+        jobMemory
+      ).run();
+    } else {
       IJobs.FindJobForCreep(creep);
     }
   }
 
   static ExecuterAllCreeps(creeps: StringMap<CreepCache>): void {
     forOwn(creeps, (cache: CreepCache, id: string) => {
-      const creep:Creep|undefined = Game.creeps[id];
+      const creep: Creep | undefined = Game.creeps[id];
       if (creep) {
         this.ExecuteCreep(creep);
       } else {

@@ -85,8 +85,7 @@ export default class CreepSpawning implements ICreepSpawning {
     const parts: StringMapGeneric<BodyParts, CreepTypes> = this
       .emptyBodyPartsPerType;
 
-      
-      forEach(Object.keys(parts), (type) => {
+    forEach(Object.keys(parts), (type) => {
       parts[type] = mergeWith(
         parts,
         (this.creepsCache[type] ?? []).map((c) => c.body),

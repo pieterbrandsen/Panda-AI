@@ -68,6 +68,8 @@ export default class extends BaseMemory implements IGlobalMemory {
   static Initialize(): CRUDResult<Memory> {
     const data = this.Generate();
     const result = this.Update(data);
+
+    
     return { success: result.success, data: result.data };
   }
 }

@@ -62,13 +62,13 @@ const bodyIteratee: StringMapGeneric<CreepBodyIteratee, CreepTypes> = {
   miner: {
     owned: {
       default: {
-        body: [WORK, CARRY,MOVE, MOVE],
+        body: [WORK, CARRY, MOVE, MOVE],
         cost: 250,
         reqBodyPartPerLoop: 1,
         maxLoopCount: 1,
       },
       loop: {
-        body: [WORK, CARRY,MOVE],
+        body: [WORK, CARRY, MOVE],
         cost: 150,
         reqBodyPartPerLoop: 1,
         maxLoopCount: 4,
@@ -76,13 +76,13 @@ const bodyIteratee: StringMapGeneric<CreepBodyIteratee, CreepTypes> = {
     },
     remote: {
       default: {
-        body: [WORK, CARRY, MOVE,MOVE],
+        body: [WORK, CARRY, MOVE, MOVE],
         cost: 300,
         reqBodyPartPerLoop: 1,
         maxLoopCount: 1,
       },
       loop: {
-        body: [WORK, CARRY,MOVE],
+        body: [WORK, CARRY, MOVE],
         cost: 200,
         reqBodyPartPerLoop: 1,
         maxLoopCount: 4,

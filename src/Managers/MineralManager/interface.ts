@@ -18,9 +18,9 @@ export default class implements IMineralManager {
 
   cache: RoomCache;
 
-  constructor(roomName: string,roomMemory:RoomMemory,roomCache:RoomCache) {
+  constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
     this.room = Game.rooms[roomName];
-    this.memory = roomMemory
+    this.memory = roomMemory;
     this.cache = roomCache;
     this.managerMemory = this.memory.mineralManager;
 

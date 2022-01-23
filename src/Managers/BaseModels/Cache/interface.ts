@@ -18,8 +18,8 @@ export default class implements ICache {
         return Memory.StructuresData.version;
       case "Room":
         return Memory.RoomsData.version;
-        case "Job":
-          return Memory.JobsData.version;
+      case "Job":
+        return Memory.JobsData.version;
       default:
         return 999;
     }

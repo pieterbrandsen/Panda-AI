@@ -16,7 +16,7 @@ interface IRoomExecuter {}
 export default class implements IRoomExecuter {
   static ExecuteAllRooms(): boolean {
     const roomNamesWithVision = Object.keys(Game.rooms);
-    
+
     const roomsCache = IRoomCache.GetAll("", false);
 
     const roomNames = Object.keys(roomsCache);
@@ -43,13 +43,13 @@ export default class implements IRoomExecuter {
     IJobs.UpdateAllData(room);
 
     const { controller } = room;
-    new ISourceManager(room.name,roomMemory,roomCache).Run();
+    new ISourceManager(room.name, roomMemory, roomCache).Run();
 
     if (controller) {
-      new IControllerManager(room.name,roomMemory,roomCache).Run();
+      new IControllerManager(room.name, roomMemory, roomCache).Run();
       if (controller.my) {
-        new IMineralManager(room.name,roomMemory,roomCache).Run();
-        new ISpawnManager(room.name,roomMemory,roomCache).Run();
+        new IMineralManager(room.name, roomMemory, roomCache).Run();
+        new ISpawnManager(room.name, roomMemory, roomCache).Run();
       }
     }
 

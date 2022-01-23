@@ -1,7 +1,7 @@
 interface IRoomPosition {}
 
 export default class implements IRoomPosition {
-static FreezeRoomPosition(pos: RoomPosition): FreezedRoomPosition {
+  static FreezeRoomPosition(pos: RoomPosition): FreezedRoomPosition {
     return {
       x: pos.x,
       y: pos.y,

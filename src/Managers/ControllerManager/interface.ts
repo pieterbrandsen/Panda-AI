@@ -19,9 +19,9 @@ export default class implements IControllerManager {
 
   cache: RoomCache;
 
-  constructor(roomName: string,roomMemory:RoomMemory,roomCache:RoomCache) {
+  constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
     this.room = Game.rooms[roomName];
-    this.memory = roomMemory
+    this.memory = roomMemory;
     this.cache = roomCache;
     this.managerMemory = this.memory.controllerManager;
 
@@ -60,7 +60,8 @@ export default class implements IControllerManager {
   Run(): void {
     if (
       !this.isRemote &&
-      (this.managerMemory.controller && !this.managerMemory.controller.isOwned)
+      this.managerMemory.controller &&
+      !this.managerMemory.controller.isOwned
     )
       return;
 

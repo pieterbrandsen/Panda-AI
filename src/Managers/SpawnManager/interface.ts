@@ -16,9 +16,9 @@ export default class implements ISpawnManager {
 
   cache: RoomCache;
 
-  constructor(roomName: string,roomMemory:RoomMemory,roomCache:RoomCache) {
+  constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
     this.room = Game.rooms[roomName];
-    this.memory = roomMemory
+    this.memory = roomMemory;
     this.cache = roomCache;
     this.managerMemory = this.memory.spawnManager;
 
@@ -30,12 +30,8 @@ export default class implements ISpawnManager {
       this.room.name,
       false
     ).SpawnCreeps();
-    // const resultOwnedCreeps = new ICreepSpawning(
-    //   this.room.name,
-    //   false
-    // ).SpawnCreeps();
-    // if (resultOwnedCreeps) {
-    //   new ICreepSpawning(this.room.name, true).SpawnCreeps();
-    // }
+    if (resultOwnedCreeps) {
+      new ICreepSpawning(this.room.name, true).SpawnCreeps();
+    }
   }
 }
