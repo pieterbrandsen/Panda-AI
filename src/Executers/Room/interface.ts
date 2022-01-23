@@ -9,6 +9,7 @@ import ICreepCache from "../../Managers/BaseModels/Cache/creepInterface";
 import IStructuresCache from "../../Managers/BaseModels/Cache/structureInterface";
 import ICreepExecuter from "../Creep/interface";
 import IStructureExecuter from "../Structure/interface";
+import IJobs from "../../Managers/BaseModels/Jobs/interface";
 
 interface IRoomExecuter {}
 
@@ -39,19 +40,21 @@ export default class implements IRoomExecuter {
     const structuresCache = IStructuresCache.GetAll("", false, [room.name]);
     const creepsCache = ICreepCache.GetAll("", false, [room.name]);
 
+    IJobs.UpdateAllData(room);
+
     const { controller } = room;
     new ISourceManager(room.name,roomMemory,roomCache).Run();
 
-    // if (controller) {
-    //   new IControllerManager(room.name,roomMemory,roomCache).Run();
-    //   if (controller.my) {
-    //     new IMineralManager(room.name,roomMemory,roomCache).Run();
-    //     new ISpawnManager(room.name,roomMemory,roomCache).Run();
-    //   }
-    // }
+    if (controller) {
+      new IControllerManager(room.name,roomMemory,roomCache).Run();
+      if (controller.my) {
+        new IMineralManager(room.name,roomMemory,roomCache).Run();
+        new ISpawnManager(room.name,roomMemory,roomCache).Run();
+      }
+    }
 
-    // IStructureExecuter.ExecuterAllStructures(structuresCache);
-    // ICreepExecuter.ExecuterAllCreeps(creepsCache);
+    IStructureExecuter.ExecuterAllStructures(structuresCache);
+    ICreepExecuter.ExecuterAllCreeps(creepsCache);
 
     return true;
   }

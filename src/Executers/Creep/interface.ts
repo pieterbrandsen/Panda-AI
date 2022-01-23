@@ -1,19 +1,41 @@
 import { forOwn } from "lodash";
+import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
+import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
+import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import ICreepRoleExecuter from "../Roles/interface";
 
 interface ICreepExecuter {}
 
 export default class implements ICreepExecuter {
-  static ExecuteCreep(creep: Creep, cache: CreepCache): void {
-    console.log(creep, cache);
+  static ExecuteCreep(creep: Creep): void {
+    const creepData = ICreepData.GetMemory(ICreepData.GetCreepId(creep.name));
+    if (!creepData.success) {
+      return;
+    }
+    const creepMemory = creepData.memory as CreepMemory;
+    const creepCache = creepData.cache as CreepCache;
+
+    if (creepMemory.jobId) {
+      const jobData = IJobData.GetMemory(creepMemory.jobId);
+      if (!jobData.success) {
+        return;
+      }
+      const jobMemory = jobData.memory as JobMemory;
+      const jobCache = jobData.cache as JobCache;
+      new ICreepRoleExecuter(creep, creepCache, creepMemory, jobCache, jobMemory).run();
+    }
+    else { 
+      IJobs.FindJobForCreep(creep);
+    }
   }
 
   static ExecuterAllCreeps(creeps: StringMap<CreepCache>): void {
     forOwn(creeps, (cache: CreepCache, id: string) => {
-      const creep = Game.getObjectById<Creep | null>(id);
+      const creep:Creep|undefined = Game.creeps[id];
       if (creep) {
-        this.ExecuteCreep(creep, cache);
+        this.ExecuteCreep(creep);
       } else {
-        console.log(`Creep ${id} not found`);
+        // console.log(`Creep ${id} not found`);
       }
     });
   }
