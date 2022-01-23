@@ -15,12 +15,12 @@ export default class implements ICreepHelper {
       cache: undefined,
     };
     const memoryResult = ICreepMemory.Get(id);
-    if (result.success) {
+    if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
     const cacheResult = ICreepCache.Get(id);
-    if (result.success) {
+    if (cacheResult.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }

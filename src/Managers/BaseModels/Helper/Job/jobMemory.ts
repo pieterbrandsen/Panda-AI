@@ -15,12 +15,12 @@ export default class implements IJobHelper {
       cache: undefined,
     };
     const memoryResult = IJobMemory.Get(id);
-    if (result.success) {
+    if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
     const cacheResult = IJobCache.Get(id);
-    if (result.success) {
+    if (cacheResult.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }

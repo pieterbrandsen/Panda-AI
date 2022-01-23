@@ -27,7 +27,7 @@ export default class implements IMineralManager {
     this.executer = IRoomHelper.GetExecuter(this.room.name, "Controller");
   }
 
-  UpdateController(): void {
+  UpdateMineral(): void {
     const { managerMemory } = this;
 
     const mineralMemory = managerMemory.mineral;
@@ -84,9 +84,9 @@ export default class implements IMineralManager {
   }
 
   Run(): void {
-    if (this.room.controller ? this.room.controller.level >= 6 : true) return;
+    if (this.room.controller ? this.room.controller.level < 6 : true) return;
 
-    this.UpdateController();
+    this.UpdateMineral();
     if (this.updatedMemory) {
       IRoomMemory.Update(this.room.name, this.memory);
     }

@@ -1,6 +1,6 @@
 import { forEach } from "lodash";
 import IJobMemory from "../Memory/jobInterface";
-import ICreepMemory from "../Helper/Creep/creepMemory";
+import ICreepData from "../Helper/Creep/creepMemory";
 import IJobCache from "../Cache/jobInterface";
 import IJobHelper from "../Helper/Job/jobMemory";
 import IRoomInterface from "../Helper/Room/roomInterface";
@@ -9,6 +9,7 @@ import Predicates from "./predicates";
 import IStructureMemory from "../Memory/structureInterface";
 import IResourceStorage from "../ResourceStorage/interface";
 import IStructureData from "../Helper/Structure/structureMemory";
+import IRoomConstruction from "../Helper/Room/roomConstruction";
 
 // TODO: Update (all/single)
 // TODO: GenerateObject (update whenever something needs to be added, assign in this function the missing data that is optional?)
@@ -17,6 +18,12 @@ import IStructureData from "../Helper/Structure/structureMemory";
 interface IJobs {}
 
 export default class implements IJobs {
+  static UnassignCreepJob(creep: Creep, memory: CreepMemory): boolean {
+    delete memory.jobId;
+    return ICreepData.UpdateMemory(ICreepData.GetCreepId(creep.name), memory)
+      .success;
+  }
+
   static MoveJob(
     id: string,
     type: "Room" | "Manager",
@@ -48,9 +55,6 @@ export default class implements IJobs {
       roomNames,
       Predicates.IsJobTypes(jobTypes)
     );
-    if (!jobs.success) {
-      return undefined;
-    }
 
     let jobId: string | undefined;
     let lastAssigned = Infinity;
@@ -103,7 +107,7 @@ export default class implements IJobs {
     if (creep.store.getUsedCapacity() > 0) {
       switch (creepType) {
         case "miner":
-          new IResourceStorage(creep, "creep", executer).Manage(false, true);
+          new IResourceStorage(creep, "creep", executer).Manage(true, false);
           break;
         case "worker":
           return ["Build", "UpgradeController"];
@@ -117,18 +121,18 @@ export default class implements IJobs {
           return ["HarvestMineral", "HarvestSource"];
         case "worker":
         case "transferer":
+          new IResourceStorage(creep, "creep", executer).Manage(false, true);
           break;
         // skip default case
       }
     }
 
-    new IResourceStorage(creep, "creep", executer).Manage(true, false);
     return [];
   }
 
   static FindJobForCreep(creep: Creep): boolean {
-    const creepId = ICreepMemory.GetCreepId(creep.name);
-    const memoryResult = ICreepMemory.GetMemory(creepId);
+    const creepId = ICreepData.GetCreepId(creep.name);
+    const memoryResult = ICreepData.GetMemory(creepId);
     if (!memoryResult.success) {
       return false;
     }
@@ -158,7 +162,7 @@ export default class implements IJobs {
       job.lastAssigned = Game.time;
       IJobMemory.Update(newJob.id, job);
 
-      ICreepMemory.UpdateMemory(creepId, creepMemory, creepCache);
+      ICreepData.UpdateMemory(creepId, creepMemory, creepCache);
       return true;
     }
     return false;
@@ -192,7 +196,7 @@ export default class implements IJobs {
             jobMemory.targetId
           );
           if (!csSite || (jobMemory.amountToTransfer ?? 0) <= 0) {
-            const csSiteAtLocation = IRoomInterface.GetCsSiteAtLocation(
+            const csSiteAtLocation = IRoomConstruction.GetCsSiteAtLocation(
               room,
               jobMemory.pos
             );

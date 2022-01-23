@@ -59,7 +59,7 @@ export default class implements IControllerManager {
 
   Run(): void {
     if (
-      !this.isRemote ||
+      !this.isRemote &&
       (this.managerMemory.controller && !this.managerMemory.controller.isOwned)
     )
       return;

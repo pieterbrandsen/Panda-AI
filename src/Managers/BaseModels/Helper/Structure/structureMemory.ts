@@ -13,12 +13,12 @@ export default class implements IStructureHelper {
       cache: undefined,
     };
     const memoryResult = IStructureMemory.Get(id);
-    if (result.success) {
+    if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
     const cacheResult = IStructureCache.Get(id);
-    if (result.success) {
+    if (cacheResult.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }

@@ -30,8 +30,12 @@ export default class implements ISpawnManager {
       this.room.name,
       false
     ).SpawnCreeps();
-    if (resultOwnedCreeps) {
-      new ICreepSpawning(this.room.name, true).SpawnCreeps();
-    }
+    // const resultOwnedCreeps = new ICreepSpawning(
+    //   this.room.name,
+    //   false
+    // ).SpawnCreeps();
+    // if (resultOwnedCreeps) {
+    //   new ICreepSpawning(this.room.name, true).SpawnCreeps();
+    // }
   }
 }

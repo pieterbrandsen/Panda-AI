@@ -39,7 +39,7 @@ export default class implements ISourceManager {
           targetId: sourceId,
           type: "HarvestSource",
         });
-        console.log(jobResult.success,jobResult.cache,jobResult.memory);
+
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
         const jobId = IJobMemory.GetJobId(
           jobResult.cache.type,
