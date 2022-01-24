@@ -19,3 +19,8 @@ interface BestStructureLoop {
   cache: StructureCache;
   levels: StorageLevels;
 }
+
+interface LevelCheckResult {
+  level: StorageLevels;
+  result:boolean;
+}

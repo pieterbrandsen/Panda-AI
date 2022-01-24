@@ -16,12 +16,8 @@ interface IResourceStorage {
   GetRequiredStorageLevels(
     object: StructuresWithStorage | Creep
   ): StorageLevels;
-  IsStructureEmptyEnough(
-    structure?: StructuresWithStorage
-  ): { emptyEnough: boolean; levels: StorageLevels };
-  IsStructureFullEnough(
-    structure?: StructuresWithStorage
-  ): { fullEnough: boolean; levels: StorageLevels };
+  IsStructureEmptyEnough(structure?: StructuresWithStorage): LevelCheckResult;
+  IsStructureFullEnough(structure?: StructuresWithStorage): LevelCheckResult;
   GetClosestBestStructure(
     structure: BestStructureLoop,
     bestStructure: BestStructureLoop,
@@ -85,17 +81,17 @@ export default class implements IResourceStorage {
           : 0);
 
     const fillToCapacity: StorageLevels = {
-      max: -1,
+      max: capacity,
       high: -1,
       low: capacity,
-      min: capacity,
+      min: 0,
       current: used,
     };
     const emptyToZero: StorageLevels = {
-      max: 0,
+      max: capacity,
       high: 0,
       low: -1,
-      min: -1,
+      min: 0,
       current: used,
     };
 
@@ -139,6 +135,13 @@ export default class implements IResourceStorage {
           return fillToCapacity;
       }
     } else {
+      // return {
+      //   max: 0,
+      //   high: capacity * 0.1,
+      //   min: capacity,
+      //   low: capacity * 0.9,
+      //   current: used,
+      // };
       return {
         max: capacity,
         high: capacity * 0.9,
@@ -158,20 +161,43 @@ export default class implements IResourceStorage {
 
   IsStructureEmptyEnough(
     object?: StructuresWithStorage | Creep
-  ): { emptyEnough: boolean; levels: StorageLevels } {
+  ): LevelCheckResult {
     const levels = !object
       ? this.requiredStorageLevel
       : this.GetRequiredStorageLevels(object);
-    return { emptyEnough: levels.current <= levels.low, levels };
+    return { result: levels.current <= levels.low, level: levels };
   }
 
   IsStructureFullEnough(
     object?: StructuresWithStorage | Creep
-  ): { fullEnough: boolean; levels: StorageLevels } {
+  ): LevelCheckResult {
     const levels = !object
       ? this.requiredStorageLevel
       : this.GetRequiredStorageLevels(object);
-    return { fullEnough: levels.current >= levels.high, levels };
+    return { result: levels.current >= levels.high, level: levels };
+  }
+
+  CanStructureBeFilled(
+    object?: StructuresWithStorage | Creep
+  ): LevelCheckResult {
+    const levels = !object
+      ? this.requiredStorageLevel
+      : this.GetRequiredStorageLevels(object);
+    return {
+      result: levels.current < levels.high || levels.high === -1,
+      level: levels,
+    };
+  }
+  CanStructureBeEmptied(
+    object?: StructuresWithStorage | Creep
+  ): LevelCheckResult {
+    const levels = !object
+      ? this.requiredStorageLevel
+      : this.GetRequiredStorageLevels(object);
+    return {
+      result: levels.current >= levels.low || levels.low === -1,
+      level: levels,
+    };
   }
 
   GetClosestBestStructure(
@@ -219,12 +245,12 @@ export default class implements IResourceStorage {
       (cache: StructureCache, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
         if (structure) {
-          const isFullEnough = this.IsStructureFullEnough(structure);
-          if (isFullEnough.fullEnough) {
+          const levelCheck = this.CanStructureBeEmptied(structure);
+          if (levelCheck.result) {
             const structureLoop: BestStructureLoop = {
               cache,
               id,
-              levels: isFullEnough.levels,
+              levels: levelCheck.level,
             };
             if (!bestStructure) bestStructure = structureLoop;
             bestStructure = this.GetClosestBestStructure(
@@ -246,12 +272,12 @@ export default class implements IResourceStorage {
       (cache: StructureCache, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
         if (structure) {
-          const isEmptyEnough = this.IsStructureEmptyEnough(structure);
-          if (isEmptyEnough.emptyEnough) {
+          const levelCheck = this.CanStructureBeFilled(structure);
+          if (levelCheck.result) {
             const structureLoop: BestStructureLoop = {
               cache,
               id,
-              levels: isEmptyEnough.levels,
+              levels: levelCheck.level,
             };
             if (!bestStructure) bestStructure = structureLoop;
             bestStructure = this.GetClosestBestStructure(
@@ -274,9 +300,9 @@ export default class implements IResourceStorage {
     // const structureCache = structureCacheResult.data as StructureCache;
     if (!this.memory || !this.cache) return false;
 
-    const isFullEnough = this.IsStructureFullEnough();
-    const isEmptyEnough = this.IsStructureEmptyEnough();
-    if (fillFrom && isFullEnough.fullEnough) {
+    const levelFullCheck = this.IsStructureFullEnough();
+    const levelEmptyCheck = this.IsStructureEmptyEnough();
+    if (fillFrom && levelFullCheck.result) {
       const targetStructureInformation = this.FindStructureToEmptyTo();
       if (targetStructureInformation) {
         const targetDataResult = IStructureData.GetMemory(
@@ -285,17 +311,9 @@ export default class implements IResourceStorage {
         if (targetDataResult.success) {
           const targetMemory = targetDataResult.memory as StructureMemory;
           const amountToTransfer = Math.min(
-            (isFullEnough.levels.current -
-              targetStructureInformation.levels.current) /
-              2,
             targetStructureInformation.levels.max -
-              targetStructureInformation.levels.current
-          );
-          console.log(
-            isFullEnough.levels.current,
-            targetStructureInformation.levels.max,
-            targetStructureInformation.levels.max -
-              targetStructureInformation.levels.current
+              targetStructureInformation.levels.current,
+              levelFullCheck.level.current
           );
           const isTypeSpawning = ([
             "spawn",
@@ -319,16 +337,18 @@ export default class implements IResourceStorage {
             targetStructureInformation.id,
             targetMemory
           );
+          this.memory.energyOutgoing[
+            jobId
+          ] = amountToTransfer;
           if (this.type === "structure") {
-            (this.memory as StructureMemory).energyOutgoing[
-              jobId
-            ] = amountToTransfer;
             IStructureData.UpdateMemory(
               this.object.id,
               this.memory as StructureMemory
             );
           } else {
-            ICreepData.UpdateMemory(this.object.id, this.memory as CreepMemory);
+            const creepMemory = this.memory as CreepMemory;
+            creepMemory.jobId = jobId;
+            ICreepData.UpdateMemory((this.object as Creep).name, creepMemory);
           }
           return true;
         }
@@ -337,7 +357,7 @@ export default class implements IResourceStorage {
       }
     }
 
-    if (emptyTo && isEmptyEnough.emptyEnough) {
+    if (emptyTo && levelEmptyCheck.result) {
       const targetStructureInformation = this.FindStructureToFillFrom();
       if (targetStructureInformation) {
         const targetDataResult = IStructureData.GetMemory(
@@ -345,11 +365,16 @@ export default class implements IResourceStorage {
         );
         if (targetDataResult.success) {
           const targetMemory = targetDataResult.memory as StructureMemory;
+          // const amountToTransfer = Math.min(
+          //   (targetStructureInformation.levels.current -
+          //     levelEmptyCheck.level.min) /
+          //     2,
+          //   levelEmptyCheck.level.max - levelEmptyCheck.level.current
+          // );
           const amountToTransfer = Math.min(
-            (targetStructureInformation.levels.current -
-              isEmptyEnough.levels.min) /
-              2,
-            isEmptyEnough.levels.max - isEmptyEnough.levels.current
+            levelEmptyCheck.level.max -
+            levelEmptyCheck.level.current,
+              targetStructureInformation.levels.current / 2
           );
           const jobType = "TransferStructure";
           const jobResult = IJobMemory.Initialize({
