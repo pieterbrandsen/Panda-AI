@@ -1,3 +1,4 @@
+import { forEach } from "lodash";
 import IJobMemory from "../../Memory/jobInterface";
 import IJobCache from "../../Cache/jobInterface";
 
@@ -80,6 +81,14 @@ export default class implements IJobHelper {
     return result;
   }
 
+  static DeleteAllData(roomName: string): void {
+    const jobIds = Object.keys(IJobCache.GetAll(false, "", [roomName]));
+
+    forEach(jobIds, (id) => {
+      this.DeleteMemory(id, true, true);
+    });
+  }
+
   static UpdateMemory(
     id: string,
     memory?: JobMemory,
@@ -122,9 +131,11 @@ export default class implements IJobHelper {
       id,
       data.targetId,
       data.pos,
+      data.objectType,
       data.amountToTransfer,
       data.fromTargetId,
-      data.structureType
+      data.structureType,
+      data.maxCreepsCount
     );
     if (memoryResult.success) {
       result.success = true;

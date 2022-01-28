@@ -6,7 +6,11 @@ type JobTypes =
   | "UpgradeController"
   | "HarvestMineral"
   | "ReserveController"
-  | "Build";
+  | "Build"
+  | "Repair";
+
+type JobObjectExecuter = "Creep" | "Structure";
+
 interface JobMemory extends BaseMemory {
   pos: FreezedRoomPosition;
   lastAssigned: number;
@@ -16,4 +20,7 @@ interface JobMemory extends BaseMemory {
   amountToTransfer?: number;
 
   structureType?: StructureConstant;
+  objectType: JobObjectExecuter;
+
+  maxCreepsCount?: number;
 }
