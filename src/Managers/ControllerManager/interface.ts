@@ -43,6 +43,8 @@ export default class implements IControllerManager {
           pos: controllerMemory.pos,
           targetId: controllerMemory.id,
           type: jobType,
+          amountToTransfer: 10 * 1000,
+          objectType: "Creep",
         });
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
         const jobId = IJobMemory.GetJobId(

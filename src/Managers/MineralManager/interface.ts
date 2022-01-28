@@ -69,6 +69,7 @@ export default class implements IMineralManager {
           targetId: mineralMemory.id,
           type: "HarvestMineral",
           amountToTransfer: mineral ? mineral.mineralAmount : 0,
+          objectType: "Creep",
         });
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
         const jobId = IJobMemory.GetJobId(

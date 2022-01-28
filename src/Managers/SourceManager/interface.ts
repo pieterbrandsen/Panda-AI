@@ -2,6 +2,7 @@ import { forEach } from "lodash";
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
 import IJobMemory from "../BaseModels/Helper/Job/jobMemory";
+import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
 
 interface ISourceManager {}
 
@@ -33,11 +34,17 @@ export default class implements ISourceManager {
     forEach(sourceIds, (sourceId) => {
       const sourceMemory = managerMemory.sources[sourceId];
       if (!sourceMemory.jobId) {
+        const maxCreepsAround = IRoomPosition.GetNonWallPositionsAround(
+          sourceMemory.pos,
+          this.room
+        );
         const jobResult = IJobMemory.Initialize({
           executer: this.executer,
           pos: sourceMemory.pos,
           targetId: sourceId,
           type: "HarvestSource",
+          objectType: "Creep",
+          maxCreepsCount: maxCreepsAround,
         });
 
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
