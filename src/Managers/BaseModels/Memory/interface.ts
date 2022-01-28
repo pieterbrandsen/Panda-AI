@@ -52,7 +52,7 @@ export default abstract class implements IMemory {
   ): boolean {
     const minimumVersion = this.MinimumVersion(type);
     let isValid = true;
-    if (data.version < minimumVersion) {
+    if (data.version !== minimumVersion) {
       isValid = false;
     }
 

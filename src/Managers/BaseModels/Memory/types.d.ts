@@ -17,9 +17,11 @@ interface BaseMemory {
 interface CreepMemory extends BaseMemory {
   jobId?: string;
   isRemoteCreep: boolean;
+  energyIncoming: StringMap<number>;
   energyOutgoing: StringMap<number>;
 }
 interface StructureMemory extends BaseMemory {
+  jobId?: string;
   isSourceStructure?: boolean;
   energyIncoming: StringMap<number>;
   energyOutgoing: StringMap<number>;

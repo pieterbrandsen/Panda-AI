@@ -3,6 +3,8 @@ interface JobInitializationData {
   pos: FreezedRoomPosition;
   executer: string;
   targetId: string;
+  objectType: JobObjectExecuter;
+  maxCreepsCount?: number;
 
   // ResourceStorage
   fromTargetId?: string;

@@ -24,6 +24,9 @@ export default class implements IRoomSetup {
         case "extension":
           executer = IRoomHelper.GetExecuter(room.name, "Spawn");
           break;
+        case "controller":
+          executer = IRoomHelper.GetExecuter(room.name, "Controller");
+          break;
         default:
           break;
       }

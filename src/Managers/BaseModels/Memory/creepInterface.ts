@@ -21,6 +21,7 @@ export default class extends BaseMemory implements ICreepMemory {
     return {
       version: super.MinimumVersion(this.type),
       energyOutgoing: {},
+      energyIncoming: {},
       isRemoteCreep,
     };
   }
@@ -46,6 +47,7 @@ export default class extends BaseMemory implements ICreepMemory {
 
   static Delete(id: string): CRUDResult<CreepMemory> {
     delete Memory.CreepsData.data[id];
+    delete Memory.creeps[id];
     return { success: true, data: undefined };
   }
 

@@ -7,7 +7,11 @@ export default class extends BaseMemory implements IGlobalMemory {
   private static type: MemoryTypes = "Global";
 
   static ValidateSingle(): boolean {
-    return Memory.version !== undefined;
+    let isValid = true;
+    if (Memory.version === undefined) {
+      isValid = false;
+    }
+    return isValid;
   }
 
   /**
@@ -58,18 +62,22 @@ export default class extends BaseMemory implements IGlobalMemory {
     return { success: true, data };
   }
 
-  static Delete(): CRUDResult<Memory> {
-    forEach(Object.keys(Memory), (key: string) => {
+  static Delete(key?: string): CRUDResult<Memory> {
+    if (key) {
       delete Memory[key];
+      return { success: true, data: undefined };
+    }
+    forEach(Object.keys(Memory), (k: string) => {
+      delete Memory[k];
     });
     return { success: true, data: undefined };
   }
 
   static Initialize(): CRUDResult<Memory> {
+    this.Delete();
     const data = this.Generate();
     const result = this.Update(data);
 
-    
     return { success: result.success, data: result.data };
   }
 }

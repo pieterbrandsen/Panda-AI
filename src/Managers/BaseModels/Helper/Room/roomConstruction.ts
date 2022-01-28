@@ -18,6 +18,7 @@ export default class implements IRoomStructure {
         type: "Build",
         amountToTransfer: CONSTRUCTION_COST[type],
         structureType: type,
+        objectType: "Creep",
       });
       if (job.success && job.cache && job.memory) {
         const jobId = IJobMemory.GetJobId(job.cache.type, job.memory.pos);

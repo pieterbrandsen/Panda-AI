@@ -22,5 +22,5 @@ interface BestStructureLoop {
 
 interface LevelCheckResult {
   level: StorageLevels;
-  result:boolean;
+  result: boolean;
 }
