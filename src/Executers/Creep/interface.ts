@@ -40,7 +40,7 @@ export default class implements ICreepExecuter {
       if (creep) {
         this.ExecuteCreep(creep);
       } else {
-        // console.log(`Creep ${id} not found`);
+        ICreepData.DeleteMemory(id, true, true);
       }
     });
   }

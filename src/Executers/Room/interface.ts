@@ -10,35 +10,44 @@ import IStructuresCache from "../../Managers/BaseModels/Cache/structureInterface
 import ICreepExecuter from "../Creep/interface";
 import IStructureExecuter from "../Structure/interface";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 
 interface IRoomExecuter {}
 
 export default class implements IRoomExecuter {
   static ExecuteAllRooms(): boolean {
-    const roomNamesWithVision = Object.keys(Game.rooms);
-
     const roomsCache = IRoomCache.GetAll("", false);
+    const roomNamesWithVision = Object.keys(Game.rooms);
+    forEach(roomNamesWithVision, (roomName) => {
+      const room = Game.rooms[roomName];
+      if (!roomsCache[roomName]) {
+        IRoomData.Initialize({ room });
+      }
+    });
 
     const roomNames = Object.keys(roomsCache);
     forEach(union(roomNames, roomNamesWithVision), (roomName) => {
-      const room = Game.rooms[roomName];
-      if (!roomsCache[roomName]) {
-        IRoomData.Initialize({ room, remoteRooms: {} });
+      this.ExecuteRoom(roomName);
+      if (!roomNamesWithVision.includes(roomName)) {
+        IJobData.DeleteAllData(roomName);
+        IRoomData.DeleteMemory(roomName, true, true);
       }
-
-      this.ExecuteRoom(room);
     });
     return true;
   }
 
-  static ExecuteRoom(room: Room | undefined): boolean {
+  static ExecuteRoom(roomName: string): boolean {
+    const structuresCache = IStructuresCache.GetAll("", false, [roomName]);
+    const creepsCache = ICreepCache.GetAll("", false, [roomName]);
+    IStructureExecuter.ExecuterAllStructures(structuresCache);
+    ICreepExecuter.ExecuterAllCreeps(creepsCache);
+
+    const room = Game.rooms[roomName];
     if (!room) return false;
     const roomData = IRoomData.GetMemory(room.name);
     if (!roomData.success) return false;
     const roomMemory = roomData.memory as RoomMemory;
     const roomCache = roomData.cache as RoomCache;
-    const structuresCache = IStructuresCache.GetAll("", false, [room.name]);
-    const creepsCache = ICreepCache.GetAll("", false, [room.name]);
 
     IJobs.UpdateAllData(room);
 
@@ -52,9 +61,6 @@ export default class implements IRoomExecuter {
         new ISpawnManager(room.name, roomMemory, roomCache).Run();
       }
     }
-
-    IStructureExecuter.ExecuterAllStructures(structuresCache);
-    ICreepExecuter.ExecuterAllCreeps(creepsCache);
 
     return true;
   }

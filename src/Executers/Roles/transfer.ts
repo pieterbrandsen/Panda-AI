@@ -1,3 +1,6 @@
+import IStructureData from "../../Managers/BaseModels/Helper/Structure/structureMemory";
+import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
+
 interface ICreepTransferRole {}
 
 export default class implements ICreepTransferRole {
@@ -26,17 +29,23 @@ export default class implements ICreepTransferRole {
   }
 
   run(): JobResult {
-    if (this.creep.store.getFreeCapacity() === 0) {
-      return "full";
-    }
-    if (this.creep.store.getUsedCapacity() === 0) {
-      return "empty";
-    }
-    const target: Structure | null = Game.getObjectById(
+    const resource: ResourceConstant = RESOURCE_ENERGY;
+    const target: StructuresWithStorage | null = Game.getObjectById(
       this.jobMemory.targetId
     );
     if (target) {
-      const result = this.creep.transfer(target, RESOURCE_ENERGY);
+      if (target.store.getFreeCapacity(resource) === 0) {
+        return "full";
+      }
+      if (target.store.getUsedCapacity(resource) === 0) {
+        return "empty";
+      }
+
+      const amountToTransfer = Math.min(
+        target.store.getFreeCapacity(resource),
+        this.creep.store.energy
+      );
+      const result = this.creep.transfer(target, resource, amountToTransfer);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
@@ -46,6 +55,23 @@ export default class implements ICreepTransferRole {
         case ERR_NOT_ENOUGH_RESOURCES:
           return "empty";
         case OK:
+          {
+            const targetMemoryResult = IStructureData.GetMemory(
+              this.jobMemory.targetId
+            );
+            if (targetMemoryResult.success) {
+              const targetMemory = targetMemoryResult.memory as StructureMemory;
+              targetMemory.energyIncoming[
+                this.jobMemory.fromTargetId as string
+              ] -= amountToTransfer;
+              this.creepMemory.energyOutgoing[
+                this.creepMemory.jobId as string
+              ] -= amountToTransfer;
+
+              ICreepData.UpdateMemory(this.creep.name, this.creepMemory);
+              IStructureData.UpdateMemory(target.id, targetMemory);
+            }
+          }
           break;
         // skip default case
       }
