@@ -1,32 +1,13 @@
-import HeapInitializer from "./heap/initialization";
-import HeapValidator from "./heap/validation";
-import GarbageCollection from "./memory/garbageCollection";
-import MemoryInitializer from "./memory/initialization";
-import MemoryValidator from "./memory/validation";
-import ExecuteRooms from "./rooms/executeRooms";
-import { VersionedMemoryTypeName } from "./utils/constants/memory";
-import { ErrorMapper } from "./utils/external/errorMapper";
+import { ErrorMapper } from "./tempErrorMapper";
+import IGlobalMemory from "./Managers/BaseModels/Memory/globalInterface";
+import IGlobalData from "./Managers/BaseModels/Helper/Global/globalMemory";
+import IRoomsExecuter from "./Executers/Room/interface";
 
 // eslint-disable-next-line
 export const loop = ErrorMapper.wrapLoop((): void => {
-  if (
-    !MemoryValidator.IsMemoryValid(Memory.version, VersionedMemoryTypeName.Root)
-  ) {
-    MemoryInitializer.SetupRootMemory();
-    if (
-      !MemoryValidator.IsMemoryValid(
-        Memory.version,
-        VersionedMemoryTypeName.Root
-      )
-    )
-      return;
+  if (!IGlobalMemory.ValidateSingle()) {
+    IGlobalData.Initialize();
+    return;
   }
-
-  if (!HeapValidator.IsHeapValid()) {
-    HeapInitializer.SetupHeap();
-    if (!HeapValidator.IsHeapValid()) return;
-  }
-
-  ExecuteRooms.ExecuteAll();
-  GarbageCollection.Check();
+  IRoomsExecuter.ExecuteAllRooms();
 });
