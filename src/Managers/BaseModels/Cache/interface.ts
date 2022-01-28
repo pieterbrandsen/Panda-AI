@@ -60,12 +60,18 @@ export default class implements ICache {
 
   protected static GetAllData<T extends CacheObjects>(
     data: StringMap<T>,
+    type: CacheTypes,
     executer?: string,
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<T>,
     predicate2?: Predicate<T>
   ): StringMap<T> {
+    const validatedData = this.Validate(data,type);
+    forEach(validatedData.nonValidObjects, (key) => {
+      delete data[key];
+    });
+
     if (roomsToCheck.length > 0) {
       data = pickBy(data, Predicates.IsInRoomNameArray(roomsToCheck));
     }

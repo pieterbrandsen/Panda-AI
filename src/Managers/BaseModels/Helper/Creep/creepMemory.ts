@@ -70,7 +70,7 @@ export default class implements ICreepHelper {
         result.memory = deleteResult.data;
       }
     }
-    if (isCache) {
+    if (isCache && result.success) {
       const deleteResult = ICreepCache.Delete(id);
       if (deleteResult.success) {
         result.success = true;
@@ -98,7 +98,7 @@ export default class implements ICreepHelper {
         result.memory = updateResult.data;
       }
     }
-    if (cache) {
+    if (cache && result.success) {
       const updateResult = ICreepCache.Update(id, cache);
       if (updateResult.success) {
         result.success = true;
@@ -130,7 +130,7 @@ export default class implements ICreepHelper {
       data.pos,
       data.type
     );
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }

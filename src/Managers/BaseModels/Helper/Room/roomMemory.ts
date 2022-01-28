@@ -46,7 +46,7 @@ export default class implements IRoomHelper {
     }
 
     const cacheResult = IRoomCache.Create(id, cache);
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.cache = cacheResult.data;
       result.success = true;
     }
@@ -71,7 +71,7 @@ export default class implements IRoomHelper {
         result.memory = deleteResult.data;
       }
     }
-    if (isCache) {
+    if (isCache && result.success) {
       const deleteResult = IRoomCache.Delete(id);
       if (deleteResult.success) {
         result.success = true;
@@ -99,7 +99,7 @@ export default class implements IRoomHelper {
         result.memory = updateResult.data;
       }
     }
-    if (cache) {
+    if (cache && result.success) {
       const updateResult = IRoomCache.Update(id, cache);
       if (updateResult.success) {
         result.success = true;
@@ -129,7 +129,7 @@ export default class implements IRoomHelper {
       result.memory = memoryResult.data;
     }
     const cacheResult = IRoomCache.Initialize(id);
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }

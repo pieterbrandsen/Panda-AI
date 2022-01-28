@@ -28,7 +28,8 @@ export default class extends BaseMemory implements ICreepMemory {
 
   static Get(id: string): CRUDResult<CreepMemory> {
     const data = clone(Memory.CreepsData.data[id]);
-    return { success: !!data, data };
+    if (data === undefined) return { success: false, data: undefined };
+    return { success: this.ValidateSingle(data), data };
   }
 
   static Create(id: string, data: CreepMemory): CRUDResult<CreepMemory> {
@@ -53,7 +54,7 @@ export default class extends BaseMemory implements ICreepMemory {
 
   static GetAll(predicate?: Predicate<CreepMemory>): StringMap<CreepMemory> {
     let { data } = Memory.CreepsData;
-    data = super.GetAllData(data, predicate);
+    data = super.GetAllData(data, this.type,  predicate);
     return data;
   }
 

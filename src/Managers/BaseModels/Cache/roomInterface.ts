@@ -26,7 +26,8 @@ export default class extends BaseCache implements IRoomCache {
 
   static Get(id: string): CRUDResult<RoomCache> {
     const data = clone(Memory.RoomsData.cache[id]);
-    return { success: !!data, data };
+    if (data === undefined) return { success: false, data: undefined };
+    return { success: this.ValidateSingle(data), data };
   }
 
   static Create(id: string, data: RoomCache): CRUDResult<RoomCache> {
@@ -57,6 +58,7 @@ export default class extends BaseCache implements IRoomCache {
     let data = Memory.RoomsData.cache;
     data = super.GetAllData(
       data,
+      this.type,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,

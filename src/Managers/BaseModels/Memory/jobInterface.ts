@@ -39,10 +39,10 @@ export default class extends BaseMemory implements IJobMemory {
 
   static Get(id: string): CRUDResult<JobMemory> {
     const data = clone(Memory.JobsData.data[id]);
-    if (data) {
+    if (data === undefined) return { success: false, data: undefined };
+
       data.pos = RoomPosition.UnFreezeRoomPosition(data.pos);
-    }
-    return { success: !!data, data };
+    return { success: this.ValidateSingle(data), data };
   }
 
   static Create(id: string, data: JobMemory): CRUDResult<JobMemory> {
@@ -66,7 +66,7 @@ export default class extends BaseMemory implements IJobMemory {
 
   static GetAll(predicate?: Predicate<JobMemory>): StringMap<JobMemory> {
     let { data } = Memory.JobsData;
-    data = super.GetAllData(data, predicate);
+    data = super.GetAllData(data, this.type,  predicate);
     return data;
   }
 

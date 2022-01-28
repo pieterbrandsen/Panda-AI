@@ -27,7 +27,8 @@ export default class extends BaseMemory implements IStructureMemory {
 
   static Get(id: string): CRUDResult<StructureMemory> {
     const data = clone(Memory.StructuresData.data[id]);
-    return { success: !!data, data };
+    if (data === undefined) return { success: false, data: undefined };
+    return { success: this.ValidateSingle(data), data };
   }
 
   static Create(
@@ -59,7 +60,7 @@ export default class extends BaseMemory implements IStructureMemory {
     predicate?: Predicate<StructureMemory>
   ): StringMap<StructureMemory> {
     let { data } = Memory.StructuresData;
-    data = super.GetAllData(data, predicate);
+    data = super.GetAllData(data, this.type,  predicate);
     return data;
   }
 

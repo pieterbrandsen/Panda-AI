@@ -34,7 +34,8 @@ export default class extends BaseCache implements ICreepCache {
 
   static Get(id: string): CRUDResult<CreepCache> {
     const data = clone(Memory.CreepsData.cache[id]);
-    return { success: !!data, data };
+    if (data === undefined) return { success: false, data: undefined };
+    return { success: this.ValidateSingle(data), data };
   }
 
   static Create(id: string, data: CreepCache): CRUDResult<CreepCache> {
@@ -65,6 +66,7 @@ export default class extends BaseCache implements ICreepCache {
     let data = Memory.CreepsData.cache;
     data = super.GetAllData(
       data,
+      this.type,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,

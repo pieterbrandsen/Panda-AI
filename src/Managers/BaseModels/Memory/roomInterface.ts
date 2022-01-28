@@ -34,7 +34,8 @@ export default class extends BaseMemory implements IRoomMemory {
 
   static Get(id: string): CRUDResult<RoomMemory> {
     const data = clone(Memory.RoomsData.data[id]);
-    return { success: !!data, data };
+    if (data === undefined) return { success: false, data: undefined };
+    return { success: this.ValidateSingle(data), data };
   }
 
   static Create(id: string, data: RoomMemory): CRUDResult<RoomMemory> {
@@ -58,7 +59,7 @@ export default class extends BaseMemory implements IRoomMemory {
 
   static GetAll(predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
     let { data } = Memory.RoomsData;
-    data = super.GetAllData(data, predicate);
+    data = super.GetAllData(data, this.type,  predicate);
     return data;
   }
 

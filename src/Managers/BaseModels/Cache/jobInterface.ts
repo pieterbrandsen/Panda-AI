@@ -27,7 +27,8 @@ export default class extends BaseMemory implements IJobCache {
 
   static Get(id: string): CRUDResult<JobCache> {
     const data = clone(Memory.JobsData.cache[id]);
-    return { success: !!data, data };
+    if (data === undefined) return { success: false, data: undefined };
+    return { success: this.ValidateSingle(data), data };
   }
 
   static Create(id: string, data: JobCache): CRUDResult<JobCache> {
@@ -59,6 +60,7 @@ export default class extends BaseMemory implements IJobCache {
     let data = Memory.JobsData.cache;
     data = super.GetAllData(
       data,
+      this.type,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,

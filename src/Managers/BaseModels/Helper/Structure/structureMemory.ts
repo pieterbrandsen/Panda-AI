@@ -18,7 +18,7 @@ export default class implements IStructureHelper {
       result.memory = memoryResult.data;
     }
     const cacheResult = IStructureCache.Get(id);
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }
@@ -43,7 +43,7 @@ export default class implements IStructureHelper {
     }
 
     const cacheResult = IStructureCache.Create(id, cache);
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.cache = cacheResult.data;
       result.success = true;
     }
@@ -68,7 +68,7 @@ export default class implements IStructureHelper {
         result.memory = deleteResult.data;
       }
     }
-    if (isCache) {
+    if (isCache && result.success) {
       const deleteResult = IStructureCache.Delete(id);
       if (deleteResult.success) {
         result.success = true;
@@ -96,7 +96,7 @@ export default class implements IStructureHelper {
         result.memory = updateResult.data;
       }
     }
-    if (cache) {
+    if (cache && result.success) {
       const updateResult = IStructureCache.Update(id, cache);
       if (updateResult.success) {
         result.success = true;
@@ -126,7 +126,7 @@ export default class implements IStructureHelper {
       data.structure,
       data.executer
     );
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }

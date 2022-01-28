@@ -21,7 +21,7 @@ export default class implements IJobHelper {
       result.memory = memoryResult.data;
     }
     const cacheResult = IJobCache.Get(id);
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }
@@ -46,7 +46,7 @@ export default class implements IJobHelper {
     }
 
     const cacheResult = IJobCache.Create(id, cache);
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.cache = cacheResult.data;
       result.success = true;
     }
@@ -71,7 +71,7 @@ export default class implements IJobHelper {
         result.memory = deleteResult.data;
       }
     }
-    if (isCache) {
+    if (isCache && result.success) {
       const deleteResult = IJobCache.Delete(id);
       if (deleteResult.success) {
         result.success = true;
@@ -107,7 +107,7 @@ export default class implements IJobHelper {
         result.memory = updateResult.data;
       }
     }
-    if (cache) {
+    if (cache && result.success) {
       const updateResult = IJobCache.Update(id, cache);
       if (updateResult.success) {
         result.success = true;
@@ -142,7 +142,7 @@ export default class implements IJobHelper {
       result.memory = memoryResult.data;
     }
     const cacheResult = IJobCache.Initialize(id, data.executer, data.type);
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }

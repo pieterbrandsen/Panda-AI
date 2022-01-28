@@ -29,7 +29,8 @@ export default class extends BaseMemory implements IStructureCache {
 
   static Get(id: string): CRUDResult<StructureCache> {
     const data = clone(Memory.StructuresData.cache[id]);
-    return { success: !!data, data };
+    if (data === undefined) return { success: false, data: undefined };
+    return { success: this.ValidateSingle(data), data };
   }
 
   static Create(id: string, data: StructureCache): CRUDResult<StructureCache> {
@@ -60,6 +61,7 @@ export default class extends BaseMemory implements IStructureCache {
     let data = Memory.StructuresData.cache;
     data = super.GetAllData(
       data,
+      this.type,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,
