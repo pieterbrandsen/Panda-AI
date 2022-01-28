@@ -59,7 +59,7 @@ export default class extends BaseMemory implements IRoomMemory {
 
   static GetAll(predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
     let { data } = Memory.RoomsData;
-    data = super.GetAllData(data, this.type,  predicate);
+    data = super.GetAllData(data, this.type, predicate);
     return data;
   }
 

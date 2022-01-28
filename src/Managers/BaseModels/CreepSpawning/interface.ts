@@ -172,17 +172,14 @@ export default class CreepSpawning implements ICreepSpawning {
       const aliveCreepCount = this.aliveCreepCount[creepType];
       const missingCreepCount = this.missingCreepCount[creepType];
 
-      if (aliveBodyPartCount < 2 && creepType === "miner") {
+      if (aliveCreepCount < 2 && creepType === "miner") {
         scores[creepType] = 999;
-      }
-      else {
-        if (missingBodyPartCount <= 0 || missingCreepCount <= 0) {
-          scores[key] = 0;
-        } else if (missingBodyPartCount === 0 || aliveBodyPartCount === 0) {
-          scores[creepType] = missingBodyPartCount > 0 ? missingBodyPartCount : 0;
-        } else {
-          scores[creepType] = missingBodyPartCount / aliveBodyPartCount;
-        }
+      } else if (missingBodyPartCount <= 0 || missingCreepCount <= 0) {
+        scores[key] = 0;
+      } else if (missingBodyPartCount === 0 || aliveBodyPartCount === 0) {
+        scores[creepType] = missingBodyPartCount > 0 ? missingBodyPartCount : 0;
+      } else {
+        scores[creepType] = missingBodyPartCount / aliveBodyPartCount;
       }
     });
 

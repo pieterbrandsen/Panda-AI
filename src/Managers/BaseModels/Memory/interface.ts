@@ -52,7 +52,7 @@ export default abstract class implements IMemory {
   ): boolean {
     const minimumVersion = this.MinimumVersion(type);
     let isValid = true;
-      if (data.version !== minimumVersion) {
+    if (data.version !== minimumVersion) {
       isValid = false;
     }
 
@@ -64,7 +64,7 @@ export default abstract class implements IMemory {
     type: MemoryTypes,
     predicate?: Predicate<T>
   ): StringMap<T> {
-    const validatedData = this.Validate(data,type);
+    const validatedData = this.Validate(data, type);
     forEach(validatedData.nonValidObjects, (key) => {
       delete data[key];
     });

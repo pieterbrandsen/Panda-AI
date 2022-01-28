@@ -20,7 +20,7 @@ export default class implements IRoomPosition {
   static GetNonWallPositionsAround(
     pos: FreezedRoomPosition,
     room: Room,
-    maxDistance: number = 1
+    maxDistance = 1
   ): number {
     const nonWallPositions = room
       .lookForAtArea(

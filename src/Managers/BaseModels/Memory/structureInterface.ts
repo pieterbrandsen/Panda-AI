@@ -60,7 +60,7 @@ export default class extends BaseMemory implements IStructureMemory {
     predicate?: Predicate<StructureMemory>
   ): StringMap<StructureMemory> {
     let { data } = Memory.StructuresData;
-    data = super.GetAllData(data, this.type,  predicate);
+    data = super.GetAllData(data, this.type, predicate);
     return data;
   }
 

@@ -41,7 +41,7 @@ export default class extends BaseMemory implements IJobMemory {
     const data = clone(Memory.JobsData.data[id]);
     if (data === undefined) return { success: false, data: undefined };
 
-      data.pos = RoomPosition.UnFreezeRoomPosition(data.pos);
+    data.pos = RoomPosition.UnFreezeRoomPosition(data.pos);
     return { success: this.ValidateSingle(data), data };
   }
 
@@ -66,7 +66,7 @@ export default class extends BaseMemory implements IJobMemory {
 
   static GetAll(predicate?: Predicate<JobMemory>): StringMap<JobMemory> {
     let { data } = Memory.JobsData;
-    data = super.GetAllData(data, this.type,  predicate);
+    data = super.GetAllData(data, this.type, predicate);
     return data;
   }
 

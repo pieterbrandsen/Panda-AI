@@ -67,7 +67,7 @@ export default class implements ICache {
     predicate?: Predicate<T>,
     predicate2?: Predicate<T>
   ): StringMap<T> {
-    const validatedData = this.Validate(data,type);
+    const validatedData = this.Validate(data, type);
     forEach(validatedData.nonValidObjects, (key) => {
       delete data[key];
     });
