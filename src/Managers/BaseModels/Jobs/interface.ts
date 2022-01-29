@@ -130,7 +130,7 @@ export default class implements IJobs {
           new IResourceStorage(creep, "Creep", executer).Manage(false, true);
           break;
         case "worker":
-          return ["Build", "UpgradeController"];
+          return ["Build", "UpgradeController", "Repair"];
         case "transferer":
           return ["TransferSpawn", "TransferStructure"];
         // skip default case
@@ -149,6 +149,8 @@ export default class implements IJobs {
         case "transferer":
           new IResourceStorage(creep, "Creep", executer).Manage(true, false);
           break;
+        case "claimer":
+          return ["ReserveController"];
         // skip default case
       }
     }
@@ -195,9 +197,7 @@ export default class implements IJobs {
   }
 
   static UpdateAllData(room: Room): void {
-    const jobIds = Object.keys(
-      IJobCache.GetAll(false, "", [room.name]).data ?? {}
-    );
+    const jobIds = Object.keys(IJobCache.GetAll(false, "", [room.name]));
     forEach(jobIds, (id) => {
       this.UpdateData(room, id);
     });
@@ -206,9 +206,6 @@ export default class implements IJobs {
   static UpdateData(room: Room, id: string): boolean {
     const job = IJobData.GetMemory(id);
     if (!job.success) {
-      return false;
-    }
-    if (job.memory && job.cache) {
       return false;
     }
     const jobMemory = job.memory as JobMemory;
@@ -269,6 +266,7 @@ export default class implements IJobs {
       // break;
       case "TransferSpawn":
       case "TransferStructure":
+      case "WithdrawStructure":
         {
           const structure = Game.getObjectById<Structure | null>(
             jobMemory.targetId

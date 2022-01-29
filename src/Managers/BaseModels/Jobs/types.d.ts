@@ -3,6 +3,7 @@ type JobTypes =
   | "HarvestSource"
   | "TransferSpawn"
   | "TransferStructure"
+  | "WithdrawStructure"
   | "UpgradeController"
   | "HarvestMineral"
   | "ReserveController"

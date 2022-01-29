@@ -1,3 +1,5 @@
+import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
+
 interface ICreepBuilderRole {}
 
 export default class implements ICreepBuilderRole {
@@ -39,6 +41,12 @@ export default class implements ICreepBuilderRole {
           this.creep.moveTo(target);
           break;
         case OK:
+          (this.jobMemory.amountToTransfer as number) -=
+            this.creepCache.body.work * 1;
+          IJobData.UpdateMemory(
+            this.creepMemory.jobId as string,
+            this.jobMemory
+          );
           break;
         // skip default case
       }

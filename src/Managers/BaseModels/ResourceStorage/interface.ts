@@ -29,7 +29,14 @@ interface IResourceStorage {
 }
 
 export default class implements IResourceStorage {
-  energyStructureTypes: StructureConstant[] = [
+  energyWithdrawStructureTypes: StructureConstant[] = [
+    "container",
+    "link",
+    "storage",
+    "terminal",
+  ];
+
+  energyTransferStructureTypes: StructureConstant[] = [
     "spawn",
     "extension",
     "tower",
@@ -249,7 +256,7 @@ export default class implements IResourceStorage {
         "",
         false,
         [this.object.room.name],
-        Predicates.IsStructureTypes(this.energyStructureTypes, true)
+        Predicates.IsStructureTypes(this.energyWithdrawStructureTypes, true)
       ),
       (cache: StructureCache, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
@@ -281,7 +288,7 @@ export default class implements IResourceStorage {
         "",
         false,
         [this.object.room.name],
-        Predicates.IsStructureTypes(this.energyStructureTypes, true)
+        Predicates.IsStructureTypes(this.energyTransferStructureTypes, true)
       ),
       (cache: StructureCache, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
@@ -317,16 +324,32 @@ export default class implements IResourceStorage {
     );
     if (targetDataResult.success) {
       const targetMemory = targetDataResult.memory as StructureMemory;
-      const amountToTransfer = Math.min(
-        targetStructureInformation.levels.max -
-          targetStructureInformation.levels.current,
-        thisLevel.level.current
-      );
+      const amountRequired = isSpending
+        ? targetStructureInformation.levels.max -
+          targetStructureInformation.levels.current
+        : targetStructureInformation.levels.current -
+          targetStructureInformation.levels.min;
+      const amountTransferring = isSpending
+        ? Math.min(
+            targetStructureInformation.levels.max -
+              targetStructureInformation.levels.current,
+            thisLevel.level.current
+          )
+        : Math.min(
+            targetStructureInformation.levels.current -
+              targetStructureInformation.levels.min,
+            thisLevel.level.max - thisLevel.level.current
+          );
       const isTypeSpawning = ([
         "spawn",
         "extension",
       ] as StructureConstant[]).includes(targetStructureInformation.cache.type);
-      const type = isTypeSpawning ? "TransferSpawn" : "TransferStructure";
+      let type: JobTypes = isTypeSpawning
+        ? "TransferSpawn"
+        : "TransferStructure";
+      if (!isSpending) {
+        type = "WithdrawStructure";
+      }
       const jobId = IJobData.GetJobId(type, this.cache.pos);
       const jobData = IJobData.GetMemory(jobId);
       if (!jobData.success) {
@@ -335,7 +358,7 @@ export default class implements IResourceStorage {
           pos: this.cache.pos,
           targetId: targetStructureInformation.id,
           type,
-          amountToTransfer,
+          amountToTransfer: amountRequired,
           fromTargetId: this.object.id,
           objectType: this.type,
         });
@@ -346,11 +369,11 @@ export default class implements IResourceStorage {
       }
 
       if (isSpending) {
-        targetMemory.energyIncoming[this.object.id] = amountToTransfer;
-        this.memory.energyOutgoing[jobId] = amountToTransfer;
+        targetMemory.energyIncoming[this.object.id] = amountTransferring;
+        this.memory.energyOutgoing[jobId] = amountTransferring;
       } else {
-        targetMemory.energyOutgoing[this.object.id] = amountToTransfer;
-        this.memory.energyIncoming[jobId] = amountToTransfer;
+        targetMemory.energyOutgoing[this.object.id] = amountTransferring;
+        this.memory.energyIncoming[jobId] = amountTransferring;
       }
 
       IStructureData.UpdateMemory(targetStructureInformation.id, targetMemory);

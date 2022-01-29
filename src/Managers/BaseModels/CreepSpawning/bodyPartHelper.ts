@@ -149,6 +149,7 @@ export default class ICreepBodyPartHelper {
             }
             break;
           case "TransferStructure":
+          case "WithdrawStructure":
             bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
             per1Lifetime = 125000;
@@ -178,9 +179,9 @@ export default class ICreepBodyPartHelper {
             per1Lifetime = 2000;
             multiplier = 1;
             break;
-
           // skip default case
         }
+
         const bodyPartsToBeAdded = Math.ceil(
           amount / (per1Lifetime * multiplier)
         );
@@ -203,6 +204,7 @@ export default class ICreepBodyPartHelper {
         return WORK;
       case "TransferSpawn":
       case "TransferStructure":
+      case "WithdrawStructure":
         return CARRY;
       case "ReserveController":
         return CLAIM;

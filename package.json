@@ -22,6 +22,7 @@
     "test-only": "jest --watch --coverage",
     "watch-main": "rollup -cw --environment DEST:main",
     "watch-pserver": "rollup -cw --environment DEST:pserver",
+    "watch-pserver2": "rollup -cw --environment DEST:pserver2",
     "watch-sim": "rollup -cw --environment DEST:sim",
     "upload-coverage": "npm run test-cov-runInBand && codecov"
   },

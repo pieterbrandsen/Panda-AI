@@ -2,9 +2,9 @@ import IStructureData from "../../Managers/BaseModels/Helper/Structure/structure
 import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 
-interface ICreepTransferRole {}
+interface ICreepWithdrawRole {}
 
-export default class implements ICreepTransferRole {
+export default class implements ICreepWithdrawRole {
   creep: Creep;
 
   creepCache: CreepCache;
@@ -32,26 +32,26 @@ export default class implements ICreepTransferRole {
   run(): JobResult {
     const resource: ResourceConstant = RESOURCE_ENERGY;
     const target: StructuresWithStorage | null = Game.getObjectById(
-      this.jobMemory.targetId
+      this.jobMemory.targetId ?? ""
     );
     if (target) {
-      if (target.store.getFreeCapacity(resource) === 0) {
+      if (target.store.getUsedCapacity(resource) === 0) {
         return "done";
       }
 
-      const amountToTransfer = Math.min(
-        target.store.getFreeCapacity(resource),
-        this.creep.store.energy
+      const amountToWithdraw = Math.min(
+        target.store.getUsedCapacity(resource),
+        this.creep.store.getFreeCapacity(resource)
       );
-      const result = this.creep.transfer(target, resource, amountToTransfer);
+      const result = this.creep.transfer(target, resource, amountToWithdraw);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
           break;
         case ERR_FULL:
-          return "done";
+          return "full";
         case ERR_NOT_ENOUGH_RESOURCES:
-          return "empty";
+          return "done";
         case OK:
           {
             const targetMemoryResult = IStructureData.GetMemory(
@@ -59,13 +59,13 @@ export default class implements ICreepTransferRole {
             );
             if (targetMemoryResult.success) {
               const targetMemory = targetMemoryResult.memory as StructureMemory;
-              targetMemory.energyIncoming[
+              targetMemory.energyOutgoing[
                 this.jobMemory.fromTargetId as string
-              ] -= amountToTransfer;
-              this.creepMemory.energyOutgoing[
+              ] -= amountToWithdraw;
+              this.creepMemory.energyIncoming[
                 this.creepMemory.jobId as string
-              ] -= amountToTransfer;
-              (this.jobMemory.amountToTransfer as number) -= amountToTransfer;
+              ] -= amountToWithdraw;
+              (this.jobMemory.amountToTransfer as number) -= amountToWithdraw;
 
               IJobData.UpdateMemory(
                 this.creepMemory.jobId as string,

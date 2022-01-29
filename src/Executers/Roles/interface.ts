@@ -1,7 +1,9 @@
 import IBuildRole from "./build";
+import IRepairRole from "./repair";
 import IHarvestRole from "./harvest";
 import IReserveControllerRole from "./reserveController";
 import ITransferRole from "./transfer";
+import IWithdrawRole from "./withdraw";
 import IUpgradeControllerRole from "./upgradeController";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
@@ -43,6 +45,14 @@ export default class implements IExecuteCreepRole {
           this.jobCache,
           this.jobMemory
         ).run();
+      case "Repair":
+        return new IRepairRole(
+          this.creep,
+          this.creepCache,
+          this.creepMemory,
+          this.jobCache,
+          this.jobMemory
+        ).run();
       case "HarvestMineral":
       case "HarvestSource":
         return new IHarvestRole(
@@ -63,6 +73,14 @@ export default class implements IExecuteCreepRole {
       case "TransferSpawn":
       case "TransferStructure":
         return new ITransferRole(
+          this.creep,
+          this.creepCache,
+          this.creepMemory,
+          this.jobCache,
+          this.jobMemory
+        ).run();
+      case "WithdrawStructure":
+        return new IWithdrawRole(
           this.creep,
           this.creepCache,
           this.creepMemory,

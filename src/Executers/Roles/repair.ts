@@ -1,8 +1,8 @@
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 
-interface ICreepUpgradeControllerRole {}
+interface ICreepRepairRole {}
 
-export default class implements ICreepUpgradeControllerRole {
+export default class implements ICreepRepairRole {
   creep: Creep;
 
   creepCache: CreepCache;
@@ -31,18 +31,18 @@ export default class implements ICreepUpgradeControllerRole {
     if (this.creep.store.getUsedCapacity() === 0) {
       return "empty";
     }
-    const target: StructureController | null = Game.getObjectById(
+    const target: Structure | null = Game.getObjectById(
       this.jobMemory.targetId
     );
     if (target) {
-      const result = this.creep.upgradeController(target);
+      const result = this.creep.repair(target);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
           break;
         case OK:
           (this.jobMemory.amountToTransfer as number) -=
-            this.creepCache.body.work * 2;
+            this.creepCache.body.work * 1;
           IJobData.UpdateMemory(
             this.creepMemory.jobId as string,
             this.jobMemory
