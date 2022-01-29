@@ -10,6 +10,7 @@
     "push-main": "rollup -c --environment DEST:main",
     "push-s+": "rollup -c --environment DEST:s+",
     "push-pserver": "rollup -c --environment DEST:pserver",
+    "push-pserver2": "rollup -c --environment DEST:pserver2",
     "push-sim": "rollup -c --environment DEST:sim",
     "test": "jest",
     "test-server": "npm run build && node server/index.js 300",
