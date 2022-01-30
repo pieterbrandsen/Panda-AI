@@ -182,9 +182,19 @@ export default class ICreepBodyPartHelper {
           // skip default case
         }
 
-        const bodyPartsToBeAdded = Math.ceil(
+        let bodyPartsToBeAdded = Math.ceil(
           amount / (per1Lifetime * multiplier)
         );
+
+        switch (cache.type) {
+          case "WithdrawStructure":
+            if (bodyPartsToBeAdded > 15) bodyPartsToBeAdded = 15;  
+            break;
+          default:
+            if (bodyPartsToBeAdded > 40) bodyPartsToBeAdded = 40;  
+          break;
+        }
+
         parts[ICreepBodyPartHelper.GetCreepType(cache.type)][
           bodyPart
         ] += bodyPartsToBeAdded;
