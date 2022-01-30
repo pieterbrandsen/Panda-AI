@@ -45,4 +45,10 @@ export default class {
       return structureTypes.includes(cache.type) === shouldBe;
     };
   };
+
+  static IsInRangeOf(pos: FreezedRoomPosition, range: number) {
+    return (cache: StructureCache): boolean => {
+      return Math.hypot(pos.x - cache.pos.x, pos.y - cache.pos.y) <= range;
+    };
+  }
 }

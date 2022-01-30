@@ -56,7 +56,8 @@ export default class extends BaseMemory implements IStructureCache {
     executer: string,
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
-    predicate?: Predicate<StructureCache>
+    predicate?: Predicate<StructureCache>,
+    predicate2?: Predicate<StructureCache>
   ): StringMap<StructureCache> {
     let data = Memory.StructuresData.cache;
     data = super.GetAllData(
@@ -65,7 +66,8 @@ export default class extends BaseMemory implements IStructureCache {
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,
-      predicate
+      predicate,
+      predicate2
     );
     return data;
   }

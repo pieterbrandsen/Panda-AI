@@ -126,9 +126,6 @@ export default class implements IJobs {
   ): JobTypes[] {
     if (creep.store.getUsedCapacity() > 0) {
       switch (creepType) {
-        case "miner":
-          new IResourceStorage(creep, "Creep", executer).Manage(false, true);
-          break;
         case "worker":
           return ["Build", "UpgradeController", "Repair"];
         case "transferer":

@@ -1,4 +1,5 @@
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
+import IResourceStorage from "../../Managers/BaseModels/ResourceStorage/interface";
 
 interface ICreepUpgradeControllerRole {}
 
@@ -29,8 +30,21 @@ export default class implements ICreepUpgradeControllerRole {
 
   run(): JobResult {
     if (this.creep.store.getUsedCapacity() === 0) {
-      return "empty";
+      const closeStructure = new IResourceStorage(
+        this.creep,
+        "Creep",
+        this.creepCache.executer
+      ).Manage(true, false, 5);
+      if (!closeStructure) {
+        new IResourceStorage(
+          this.creep,
+          "Creep",
+          this.creepCache.executer
+        ).Manage(true, false);
+      }
+      return "continue";
     }
+
     const target: StructureController | null = Game.getObjectById(
       this.jobMemory.targetId
     );

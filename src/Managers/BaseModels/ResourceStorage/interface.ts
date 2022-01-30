@@ -23,8 +23,8 @@ interface IResourceStorage {
     bestStructure: BestStructureLoop,
     isFilling: boolean
   ): BestStructureLoop;
-  FindStructureToFillFrom(): BestStructureLoop | null;
-  FindStructureToEmptyTo(): BestStructureLoop | null;
+  FindStructureToFillFrom(inRoomRange: number): BestStructureLoop | null;
+  FindStructureToEmptyTo(inRoomRange: number): BestStructureLoop | null;
   Manage(): boolean;
 }
 
@@ -249,14 +249,15 @@ export default class implements IResourceStorage {
     return bestStructure;
   }
 
-  FindStructureToFillFrom(): BestStructureLoop | null {
+  FindStructureToFillFrom(inRoomRange: number): BestStructureLoop | null {
     let bestStructure: BestStructureLoop | null = null;
     forOwn(
       IStructureCache.GetAll(
         "",
         false,
         [this.object.room.name],
-        Predicates.IsStructureTypes(this.energyWithdrawStructureTypes, true)
+        Predicates.IsStructureTypes(this.energyWithdrawStructureTypes, true),
+        Predicates.IsInRangeOf(this.object.pos, inRoomRange)
       ),
       (cache: StructureCache, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
@@ -281,14 +282,15 @@ export default class implements IResourceStorage {
     return bestStructure;
   }
 
-  FindStructureToEmptyTo(): BestStructureLoop | null {
+  FindStructureToEmptyTo(inRoomRange: number): BestStructureLoop | null {
     let bestStructure: BestStructureLoop | null = null;
     forOwn(
       IStructureCache.GetAll(
         "",
         false,
         [this.object.room.name],
-        Predicates.IsStructureTypes(this.energyTransferStructureTypes, true)
+        Predicates.IsStructureTypes(this.energyTransferStructureTypes, true),
+        Predicates.IsInRangeOf(this.object.pos, inRoomRange)
       ),
       (cache: StructureCache, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
@@ -391,7 +393,7 @@ export default class implements IResourceStorage {
     }
   }
 
-  Manage(fillFrom = true, emptyTo = true): boolean {
+  Manage(fillFrom = true, emptyTo = true, inRoomRange = 50): boolean {
     // const structureMemoryResult = IStructureMemory.Get(this.object.id);
     // const structureCacheResult = IStructureCache.Get(this.object.id);
     // if (!structureMemoryResult.success) return;
@@ -402,7 +404,9 @@ export default class implements IResourceStorage {
     const levelFullCheck = this.IsStructureFullEnough();
     const levelEmptyCheck = this.IsStructureEmptyEnough();
     if (fillFrom) {
-      const targetStructureInformation = this.FindStructureToFillFrom();
+      const targetStructureInformation = this.FindStructureToFillFrom(
+        inRoomRange
+      );
       if (targetStructureInformation) {
         this.ManageJob(targetStructureInformation, levelEmptyCheck, false);
         return true;
@@ -410,7 +414,9 @@ export default class implements IResourceStorage {
     }
 
     if (emptyTo) {
-      const targetStructureInformation = this.FindStructureToEmptyTo();
+      const targetStructureInformation = this.FindStructureToEmptyTo(
+        inRoomRange
+      );
       if (targetStructureInformation) {
         this.ManageJob(targetStructureInformation, levelFullCheck, true);
         return true;
