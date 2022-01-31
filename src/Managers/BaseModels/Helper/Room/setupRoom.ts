@@ -2,12 +2,15 @@ import { forEach } from "lodash";
 import IRoomHelper from "./roomInterface";
 import IRoomData from "./roomMemory";
 import IStructureData from "../Structure/structureMemory";
+import ICreepData from "../Creep/creepMemory";
+import IBodyHelper from "../../CreepSpawning/bodyPartHelper"
 
 interface IRoomSetup {}
 
 export default class implements IRoomSetup {
   static SetupStructures(room: Room): boolean {
     const structures = room.find(FIND_STRUCTURES);
+    const creeps = room.find(FIND_MY_CREEPS);
     const roomData = IRoomData.GetMemory(room.name);
     if (!roomData.success) return false;
     const roomMemory = roomData.memory as RoomMemory;
@@ -31,6 +34,15 @@ export default class implements IRoomSetup {
           break;
       }
       IStructureData.Initialize({ executer, structure });
+    });
+
+    forEach(creeps, (creep) => {
+      let type = creep.name.split("-")[0] as CreepTypes;
+      let roomName = creep.name.split("-")[1];
+      const body = creep.body.map(b=>b.type) as BodyPartConstant[];
+      const executer = IRoomHelper.GetExecuter(roomName, "Controller");
+      const isRemoteCreep = IRoomHelper.GetRoomName(executer) !== creep.room.name;
+      ICreepData.Initialize({body:IBodyHelper.ConvertBodyToStringMap(body),isRemoteCreep,executer,name:creep.name,pos:creep.pos,type});
     });
 
     IRoomData.UpdateMemory(IRoomData.GetId(room.name), roomMemory);
