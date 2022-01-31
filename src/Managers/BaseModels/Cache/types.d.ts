@@ -22,6 +22,11 @@ interface JobCache extends BaseCache {
   type: JobTypes;
 }
 
-type CacheObjects = DroppedResourceCache | CreepCache | StructureCache | RoomCache | JobCache;
+type CacheObjects =
+  | DroppedResourceCache
+  | CreepCache
+  | StructureCache
+  | RoomCache
+  | JobCache;
 type CacheTypes = "DroppedResource" | "Creep" | "Structure" | "Room" | "Job";
 type CacheStructurePredicateNames = "IsStructureType";

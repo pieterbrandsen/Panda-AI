@@ -150,11 +150,11 @@ export default class ICreepBodyPartHelper {
             break;
           case "TransferStructure":
           case "WithdrawStructure":
-              bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
-              amount = memory.amountToTransfer ?? 0;
-              per1Lifetime = 125000;
-              multiplier = 0.1;
-              break;
+            bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+            amount = memory.amountToTransfer ?? 0;
+            per1Lifetime = 125000;
+            multiplier = 0.1;
+            break;
           case "WithdrawResource":
             bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;

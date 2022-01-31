@@ -18,7 +18,7 @@ export default abstract class implements IMemory {
         return Memory.RoomsData.version;
       case "Job":
         return Memory.JobsData.version;
-        case "DroppedResource":
+      case "DroppedResource":
         return Memory.DroppedResourceData.version;
       default:
         return 999;

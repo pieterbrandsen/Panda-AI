@@ -1,2 +1,1 @@
-interface DroppedResourceManager {
-}
+interface DroppedResourceManager {}

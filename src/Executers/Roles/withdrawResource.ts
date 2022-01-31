@@ -1,4 +1,3 @@
-import IStructureData from "../../Managers/BaseModels/Helper/Structure/structureMemory";
 import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 
@@ -32,8 +31,8 @@ export default class implements ICreepWithdrawResourceRole {
   run(): JobResult {
     const target: Resource | null = Game.getObjectById(
       this.jobMemory.targetId ?? ""
-      );
-      if (target) {
+    );
+    if (target) {
       const resource: ResourceConstant = target.resourceType;
       if (target.amount === 0) {
         return "done";
@@ -51,18 +50,16 @@ export default class implements ICreepWithdrawResourceRole {
         case ERR_FULL:
           return "full";
         case OK:
-          {
-              this.creepMemory.energyIncoming[
-                this.creepMemory.jobId as string
-              ] -= amountToWithdraw;
-              (this.jobMemory.amountToTransfer as number) -= amountToWithdraw;
+          this.creepMemory.energyIncoming[
+            this.creepMemory.jobId as string
+          ] -= amountToWithdraw;
+          (this.jobMemory.amountToTransfer as number) -= amountToWithdraw;
 
-              IJobData.UpdateMemory(
-                this.creepMemory.jobId as string,
-                this.jobMemory
-              );
-              ICreepData.UpdateMemory(this.creep.name, this.creepMemory);
-          }
+          IJobData.UpdateMemory(
+            this.creepMemory.jobId as string,
+            this.jobMemory
+          );
+          ICreepData.UpdateMemory(this.creep.name, this.creepMemory);
           break;
         // skip default case
       }

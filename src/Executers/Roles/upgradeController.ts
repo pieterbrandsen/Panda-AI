@@ -51,8 +51,8 @@ export default class implements ICreepUpgradeControllerRole {
           this.creep.moveTo(target);
           break;
         case OK:
-          (this.jobMemory.amountToTransfer as number) -=
-            this.creepCache.body.work;
+          (this.jobMemory
+            .amountToTransfer as number) -= this.creepCache.body.work;
           IJobData.UpdateMemory(
             this.creepMemory.jobId as string,
             this.jobMemory

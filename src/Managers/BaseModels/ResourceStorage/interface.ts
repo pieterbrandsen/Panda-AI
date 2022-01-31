@@ -4,7 +4,6 @@ import IStructureData from "../Helper/Structure/structureMemory";
 import IStructureCache from "../Cache/structureInterface";
 import IRoomPosition from "../Helper/Room/roomPosition";
 import CachePredicates from "../Cache/predicates";
-import MemoryPredicates from "../Memory/predicates";
 import IJobData from "../Helper/Job/jobMemory";
 import IDroppedResourceCache from "../Cache/droppedResourceInterface";
 import IDroppedResourceData from "../Helper/DroppedResource/droppedResourceMemory";
@@ -261,7 +260,7 @@ export default class implements IResourceStorage {
     const distance = currentPos.getRangeTo(newPos);
     const bestDistance = currentPos.getRangeTo(bestPos);
 
-    const amount = resource.amount;
+    const { amount } = resource;
     const bestAmount = bestResource.amount;
 
     // TODO: Get level based on % filled
@@ -349,6 +348,7 @@ export default class implements IResourceStorage {
     );
     return bestStructure;
   }
+
   FindDroppedResourceToFillFrom(): BestDroppedResourceLoop | null {
     let bestDroppedResource: BestDroppedResourceLoop | null = null;
     forOwn(
@@ -379,9 +379,9 @@ export default class implements IResourceStorage {
     targetResourceInformation?: BestDroppedResourceLoop
   ): void {
     if (!this.memory || !this.cache) return;
-    const targetDataResult = targetStructureInformation ? IStructureData.GetMemory(
-      targetStructureInformation?.id ?? ""
-    ) : IDroppedResourceData.GetMemory(targetResourceInformation?.id ?? "");
+    const targetDataResult = targetStructureInformation
+      ? IStructureData.GetMemory(targetStructureInformation?.id ?? "")
+      : IDroppedResourceData.GetMemory(targetResourceInformation?.id ?? "");
     if (targetDataResult.success) {
       const targetMemory = targetDataResult.memory as StructureMemory;
       let amountRequired = 0;
@@ -472,7 +472,12 @@ export default class implements IResourceStorage {
     const targetDroppedResourceInformation = this.FindDroppedResourceToFillFrom();
     if (targetDroppedResourceInformation) {
       const levelEmptyCheck = this.IsObjectEmptyEnough();
-      this.ManageJob(levelEmptyCheck, false,undefined,targetDroppedResourceInformation);
+      this.ManageJob(
+        levelEmptyCheck,
+        false,
+        undefined,
+        targetDroppedResourceInformation
+      );
       return true;
     }
     return false;
@@ -493,7 +498,7 @@ export default class implements IResourceStorage {
         inRoomRange
       );
       if (targetStructureInformation) {
-        this.ManageJob(levelEmptyCheck, false,targetStructureInformation);
+        this.ManageJob(levelEmptyCheck, false, targetStructureInformation);
         return true;
       }
     }
@@ -503,7 +508,7 @@ export default class implements IResourceStorage {
         inRoomRange
       );
       if (targetStructureInformation) {
-        this.ManageJob(levelFullCheck, true,targetStructureInformation);
+        this.ManageJob(levelFullCheck, true, targetStructureInformation);
         return true;
       }
     }

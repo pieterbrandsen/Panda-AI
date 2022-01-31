@@ -31,7 +31,10 @@ export default class extends BaseMemory implements IDroppedResourcesMemory {
     return { success: this.ValidateSingle(data), data };
   }
 
-  static Create(id: string, data: DroppedResourceMemory): CRUDResult<DroppedResourceMemory> {
+  static Create(
+    id: string,
+    data: DroppedResourceMemory
+  ): CRUDResult<DroppedResourceMemory> {
     const dataAtId = this.Get(id);
     if (dataAtId.success) {
       return { success: false, data: dataAtId.data };
@@ -40,7 +43,10 @@ export default class extends BaseMemory implements IDroppedResourcesMemory {
     return { success: result.success, data: clone(result.data) };
   }
 
-  static Update(id: string, data: DroppedResourceMemory): CRUDResult<DroppedResourceMemory> {
+  static Update(
+    id: string,
+    data: DroppedResourceMemory
+  ): CRUDResult<DroppedResourceMemory> {
     Memory.DroppedResourceData.data[id] = data;
     return { success: true, data };
   }
@@ -50,15 +56,15 @@ export default class extends BaseMemory implements IDroppedResourcesMemory {
     return { success: true, data: undefined };
   }
 
-  static GetAll(predicate?: Predicate<DroppedResourceMemory>): StringMap<DroppedResourceMemory> {
+  static GetAll(
+    predicate?: Predicate<DroppedResourceMemory>
+  ): StringMap<DroppedResourceMemory> {
     let { data } = Memory.DroppedResourceData;
     data = super.GetAllData(data, this.type, predicate);
     return data;
   }
 
-  static Initialize(
-    id: string,
-  ): CRUDResult<DroppedResourceMemory> {
+  static Initialize(id: string): CRUDResult<DroppedResourceMemory> {
     const data = this.Generate();
     const result = this.Create(id, data);
     return { success: result.success, data: result.data };

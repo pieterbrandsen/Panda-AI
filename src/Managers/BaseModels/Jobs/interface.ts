@@ -10,7 +10,6 @@ import Predicates from "./predicates";
 import MemoryPredicates from "../Memory/predicates";
 import IStructureMemory from "../Memory/structureInterface";
 import IResourceStorage from "../ResourceStorage/interface";
-import IDroppedResourceData from "../Helper/DroppedResource/droppedResourceMemory";
 import IStructureData from "../Helper/Structure/structureMemory";
 import IRoomConstruction from "../Helper/Room/roomConstruction";
 
@@ -131,7 +130,7 @@ export default class implements IJobs {
         case "worker":
           return ["Build", "UpgradeController", "Repair"];
         case "transferer":
-          new IResourceStorage(creep, "Creep", executer).Manage(false, true)
+          new IResourceStorage(creep, "Creep", executer).Manage(false, true);
         // skip default case
       }
     } else {
@@ -139,15 +138,18 @@ export default class implements IJobs {
         case "miner":
           return ["HarvestMineral", "HarvestSource"];
         case "worker":
-        case "transferer": {
-          const resourceStorage = new IResourceStorage(creep, "Creep", executer);
-          if (
-            !resourceStorage.Manage(true, false)
-          ) {
-            resourceStorage.ManageDroppedResource();
+        case "transferer":
+          {
+            const resourceStorage = new IResourceStorage(
+              creep,
+              "Creep",
+              executer
+            );
+            if (!resourceStorage.Manage(true, false)) {
+              resourceStorage.ManageDroppedResource();
+            }
           }
-        }
-        break;
+          break;
         case "claimer":
           return ["ReserveController"];
         // skip default case
@@ -236,7 +238,7 @@ export default class implements IJobs {
                   structure: structureAtLocation,
                 });
               }
-            this.Delete(id);
+              this.Delete(id);
             }
           } else {
             jobMemory.amountToTransfer = csSite.progressTotal - csSite.progress;
@@ -265,9 +267,9 @@ export default class implements IJobs {
       // break;
       case "TransferSpawn":
       case "TransferStructure":
-        case "WithdrawStructure":
-          case "WithdrawResource":
-            {
+      case "WithdrawStructure":
+      case "WithdrawResource":
+        {
           const target = Game.getObjectById<Structure | null>(
             jobMemory.targetId
           );
@@ -280,13 +282,19 @@ export default class implements IJobs {
             (jobMemory.amountToTransfer ?? 0) <= 0
           ) {
             this.Delete(id);
-            const targetStructureMemory = IStructureMemory.Get(jobMemory.targetId);
+            const targetStructureMemory = IStructureMemory.Get(
+              jobMemory.targetId
+            );
             const fromTargetStructureMemory = IStructureMemory.Get(
               jobMemory.fromTargetId ?? ""
             );
             if (fromTargetStructureMemory.data) {
-              delete fromTargetStructureMemory.data.energyIncoming[jobMemory.targetId];
-              delete fromTargetStructureMemory.data.energyOutgoing[jobMemory.targetId];
+              delete fromTargetStructureMemory.data.energyIncoming[
+                jobMemory.targetId
+              ];
+              delete fromTargetStructureMemory.data.energyOutgoing[
+                jobMemory.targetId
+              ];
             }
             if (targetStructureMemory.data && jobMemory.fromTargetId) {
               delete targetStructureMemory.data.energyIncoming[
@@ -319,12 +327,12 @@ export default class implements IJobs {
     return false;
   }
 
-  public static Delete(id:string) {
-    const creeps = ICreepMemory.GetAll(MemoryPredicates.HasJobId(id))
-    forOwn(creeps, (memory:CreepMemory,creepId:string) => {
-      this.UnassignCreepJob(creepId,memory);
-    })
+  public static Delete(id: string): boolean {
+    const creeps = ICreepMemory.GetAll(MemoryPredicates.HasJobId(id));
+    forOwn(creeps, (memory: CreepMemory, creepId: string) => {
+      this.UnassignCreepJob(creepId, memory);
+    });
 
-    IJobData.DeleteMemory(id, true, true);
+    return IJobData.DeleteMemory(id, true, true).success;
   }
 }

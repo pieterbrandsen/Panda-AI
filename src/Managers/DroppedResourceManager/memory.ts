@@ -1,9 +1,6 @@
-import { forEach } from "lodash";
-import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
+interface IDroppedResourceManagerMemory {}
 
-interface ISpawnMemory {}
-
-export default class implements ISpawnMemory {
+export default class implements IDroppedResourceManagerMemory {
   static SetupMemory(): DroppedResourceManager {
     return {};
   }

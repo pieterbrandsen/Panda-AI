@@ -37,7 +37,7 @@ export default class implements IControllerManager {
       const jobType: JobTypes = !this.isRemote
         ? "UpgradeController"
         : "ReserveController";
-        if (controllerMemory.isOwned) {
+      if (controllerMemory.isOwned) {
         IJobData.Initialize({
           executer: this.executer,
           pos: controllerMemory.pos,

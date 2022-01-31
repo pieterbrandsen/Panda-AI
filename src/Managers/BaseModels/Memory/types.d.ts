@@ -49,10 +49,18 @@ interface Memory extends BaseMemory {
   StructuresData: MainMemoryData<StructureMemory, StructureCache>;
   RoomsData: MainMemoryData<RoomMemory, RoomCache>;
   JobsData: MainMemoryData<JobMemory, JobCache>;
-  DroppedResourceData: MainMemoryData<DroppedResourceMemory, DroppedResourceCache>;
+  DroppedResourceData: MainMemoryData<
+    DroppedResourceMemory,
+    DroppedResourceCache
+  >;
 }
 
-type MemoryObjects = DroppedResourceMemory | CreepMemory | StructureMemory | RoomMemory | JobMemory;
+type MemoryObjects =
+  | DroppedResourceMemory
+  | CreepMemory
+  | StructureMemory
+  | RoomMemory
+  | JobMemory;
 interface DoubleCRUDResult<M extends MemoryObjects, C extends CacheObjects> {
   success: boolean;
   memory: M | undefined;
@@ -64,4 +72,10 @@ interface FreezedRoomPosition {
   roomName: string;
 }
 
-type MemoryTypes = "Creep" | "DroppedResource"| "Structure" | "Room" | "Global" | "Job";
+type MemoryTypes =
+  | "Creep"
+  | "DroppedResource"
+  | "Structure"
+  | "Room"
+  | "Global"
+  | "Job";

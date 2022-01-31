@@ -42,7 +42,7 @@ export default class implements IRoomExecuter {
     const creepsCache = ICreepCache.GetAll("", false, [roomName]);
     IStructureExecuter.ExecuterAllStructures(structuresCache);
     ICreepExecuter.ExecuterAllCreeps(creepsCache);
-    
+
     const room = Game.rooms[roomName];
     if (!room) return false;
     const roomData = IRoomData.GetMemory(room.name);
@@ -58,7 +58,7 @@ export default class implements IRoomExecuter {
 
     if (controller) {
       new IControllerManager(room.name, roomMemory, roomCache).Run();
-    if (controller.my) {
+      if (controller.my) {
         new IMineralManager(room.name, roomMemory, roomCache).Run();
         new ISpawnManager(room.name, roomMemory, roomCache).Run();
       }

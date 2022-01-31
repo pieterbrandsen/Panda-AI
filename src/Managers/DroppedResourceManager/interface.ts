@@ -1,9 +1,7 @@
-import { forEach, forOwn } from "lodash";
+import { forEach } from "lodash";
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
 import IJobData from "../BaseModels/Helper/Job/jobMemory";
-import ICreepData from "../BaseModels/Helper/Creep/creepMemory";
-import IJobs from "../BaseModels/Jobs/interface";
 import IDroppedResourceData from "../BaseModels/Helper/DroppedResource/droppedResourceMemory";
 import IDroppedResourceCache from "../BaseModels/Cache/droppedResourceInterface";
 
@@ -32,30 +30,36 @@ export default class implements ISourceManager {
   }
 
   UpdateDroppedResources(): void {
-    const droppedResourceMemoryIds = Object.keys(IDroppedResourceCache.GetAll("",false,[this.room.name]));
+    const droppedResourceMemoryIds = Object.keys(
+      IDroppedResourceCache.GetAll("", false, [this.room.name])
+    );
     forEach(droppedResourceMemoryIds, (id) => {
-      const resource = Game.getObjectById<Resource|null>(id);
+      const resource = Game.getObjectById<Resource | null>(id);
       if (!resource) {
-        IDroppedResourceData.DeleteMemory(id,true,true);
+        IDroppedResourceData.DeleteMemory(id, true, true);
       }
     });
 
     const droppedResources = this.room.find(FIND_DROPPED_RESOURCES);
     forEach(droppedResources, (droppedResource) => {
-      let droppedResourceData = IDroppedResourceData.GetMemory(droppedResource.id);
+      let droppedResourceData = IDroppedResourceData.GetMemory(
+        droppedResource.id
+      );
       if (!droppedResourceData.success) {
         droppedResourceData = IDroppedResourceData.Initialize({
-          executer:this.executer,resource:droppedResource, });
-          if (!droppedResourceData.success) {
-            return;
-          }
+          executer: this.executer,
+          resource: droppedResource,
+        });
+        if (!droppedResourceData.success) {
+          return;
         }
-        const droppedResourceMemory = droppedResourceData.memory as DroppedResourceMemory;
- 
-        const jobId = droppedResourceMemory.jobId ?? "";
+      }
+      const droppedResourceMemory = droppedResourceData.memory as DroppedResourceMemory;
+
+      const jobId = droppedResourceMemory.jobId ?? "";
       const jobData = IJobData.GetMemory(jobId);
       if (!jobData.success) {
-      IJobData.Initialize({
+        IJobData.Initialize({
           executer: this.executer,
           objectType: "Resource",
           pos: droppedResource.pos,
@@ -64,7 +68,10 @@ export default class implements ISourceManager {
           amountToTransfer: droppedResource.amount,
         });
         droppedResourceMemory.jobId = jobId;
-        IDroppedResourceData.UpdateMemory(droppedResource.id, droppedResourceMemory);
+        IDroppedResourceData.UpdateMemory(
+          droppedResource.id,
+          droppedResourceMemory
+        );
       } else {
         const job = jobData.memory as JobMemory;
         job.amountToTransfer = droppedResource.amount;

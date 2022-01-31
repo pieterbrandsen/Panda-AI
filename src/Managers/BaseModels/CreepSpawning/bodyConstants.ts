@@ -90,18 +90,18 @@ const bodyIteratee: StringMapGeneric<CreepBodyIteratee, CreepTypes> = {
     },
     starter: {
       default: {
-        body: [WORK, WORK,MOVE,MOVE],
+        body: [WORK, WORK, MOVE, MOVE],
         cost: 300,
         reqBodyPartPerLoop: 2,
         maxLoopCount: 1,
       },
       loop: {
-        body: [WORK,MOVE],
+        body: [WORK, MOVE],
         cost: 150,
         reqBodyPartPerLoop: 1,
         maxLoopCount: 5,
       },
-    }
+    },
   },
   claimer: {
     owned: {

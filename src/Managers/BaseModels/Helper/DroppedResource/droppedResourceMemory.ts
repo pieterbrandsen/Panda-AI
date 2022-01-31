@@ -9,8 +9,13 @@ export default class implements IDroppedResourceHelper {
     return id;
   }
 
-  static GetMemory(id: string): DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> {
-    const result: DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> = {
+  static GetMemory(
+    id: string
+  ): DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> {
+    const result: DoubleCRUDResult<
+      DroppedResourceMemory,
+      DroppedResourceCache
+    > = {
       success: false,
       memory: undefined,
       cache: undefined,
@@ -33,7 +38,10 @@ export default class implements IDroppedResourceHelper {
     memory: DroppedResourceMemory,
     cache: DroppedResourceCache
   ): DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> {
-    const result: DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> = {
+    const result: DoubleCRUDResult<
+      DroppedResourceMemory,
+      DroppedResourceCache
+    > = {
       success: false,
       memory: undefined,
       cache: undefined,
@@ -59,7 +67,10 @@ export default class implements IDroppedResourceHelper {
     isMemory: boolean,
     isCache: boolean
   ): DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> {
-    const result: DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> = {
+    const result: DoubleCRUDResult<
+      DroppedResourceMemory,
+      DroppedResourceCache
+    > = {
       success: false,
       memory: undefined,
       cache: undefined,
@@ -92,7 +103,10 @@ export default class implements IDroppedResourceHelper {
     memory?: DroppedResourceMemory,
     cache?: DroppedResourceCache
   ): DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> {
-    const result: DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> = {
+    const result: DoubleCRUDResult<
+      DroppedResourceMemory,
+      DroppedResourceCache
+    > = {
       success: false,
       memory: undefined,
       cache: undefined,
@@ -120,7 +134,10 @@ export default class implements IDroppedResourceHelper {
     data: DroppedResourceInitializationData
   ): DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> {
     const id = this.GetDroppedResourceId(data.resource.id);
-    const result: DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> = {
+    const result: DoubleCRUDResult<
+      DroppedResourceMemory,
+      DroppedResourceCache
+    > = {
       success: false,
       memory: undefined,
       cache: undefined,

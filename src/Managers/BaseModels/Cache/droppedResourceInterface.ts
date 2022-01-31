@@ -36,7 +36,10 @@ export default class extends BaseCache implements IDroppedResourceCache {
     return { success: this.ValidateSingle(data), data };
   }
 
-  static Create(id: string, data: DroppedResourceCache): CRUDResult<DroppedResourceCache> {
+  static Create(
+    id: string,
+    data: DroppedResourceCache
+  ): CRUDResult<DroppedResourceCache> {
     const dataAtId = this.Get(id);
     if (dataAtId.success) {
       return { success: false, data: dataAtId.data };
@@ -45,7 +48,10 @@ export default class extends BaseCache implements IDroppedResourceCache {
     return { success: result.success, data: clone(result.data) };
   }
 
-  static Update(id: string, data: DroppedResourceCache): CRUDResult<DroppedResourceCache> {
+  static Update(
+    id: string,
+    data: DroppedResourceCache
+  ): CRUDResult<DroppedResourceCache> {
     Memory.DroppedResourceData.cache[id] = data;
     return { success: true, data };
   }
