@@ -107,6 +107,13 @@ export default class CreepSpawning implements ICreepSpawning {
   }
 
   GetBodyLoop(type: CreepTypes): BodyCostRoomTypes | undefined {
+    if (type === "miner") {
+      const controller = this.spawnRoom.controller;
+      if (controller && !(controller.level > 6)) {
+        return bodyIteratee[type].starter;
+      }
+    }
+
     return !this.isRemoteCreep
       ? bodyIteratee[type].owned
       : bodyIteratee[type].remote;
@@ -172,6 +179,8 @@ export default class CreepSpawning implements ICreepSpawning {
       const aliveCreepCount = this.aliveCreepCount[creepType];
       const missingCreepCount = this.missingCreepCount[creepType];
 
+      console.log(key,aliveCreepCount, missingCreepCount, aliveBodyPartCount, missingBodyPartCount)
+
       if (aliveCreepCount < 2 && creepType === "miner") {
         scores[creepType] = 999;
       } else if (missingBodyPartCount <= 0 || missingCreepCount <= 0) {
@@ -182,6 +191,8 @@ export default class CreepSpawning implements ICreepSpawning {
         scores[creepType] = missingBodyPartCount / aliveBodyPartCount;
       }
     });
+
+    console.log("-----------------------------------")
     
     const bestScore = reduce(scores, (max, score) =>
       max > score ? max : score

@@ -41,13 +41,13 @@ const bodyIteratee: StringMapGeneric<CreepBodyIteratee, CreepTypes> = {
         body: [WORK, MOVE, CARRY],
         cost: 200,
         reqBodyPartPerLoop: 1,
-        maxLoopCount: 10,
+        maxLoopCount: 5,
       },
     },
     remote: {
       default: {
-        body: [WORK, MOVE, CARRY, MOVE, CARRY],
-        cost: 300,
+        body: [WORK, MOVE, CARRY],
+        cost: 200,
         reqBodyPartPerLoop: 1,
         maxLoopCount: 1,
       },
@@ -55,7 +55,7 @@ const bodyIteratee: StringMapGeneric<CreepBodyIteratee, CreepTypes> = {
         body: [WORK, MOVE, CARRY],
         cost: 200,
         reqBodyPartPerLoop: 1,
-        maxLoopCount: 15,
+        maxLoopCount: 7,
       },
     },
   },
@@ -88,6 +88,20 @@ const bodyIteratee: StringMapGeneric<CreepBodyIteratee, CreepTypes> = {
         maxLoopCount: 4,
       },
     },
+    starter: {
+      default: {
+        body: [WORK, WORK,MOVE,MOVE],
+        cost: 300,
+        reqBodyPartPerLoop: 2,
+        maxLoopCount: 1,
+      },
+      loop: {
+        body: [WORK,MOVE],
+        cost: 150,
+        reqBodyPartPerLoop: 1,
+        maxLoopCount: 5,
+      },
+    }
   },
   claimer: {
     owned: {
