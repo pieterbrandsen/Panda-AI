@@ -1,6 +1,6 @@
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
-import IJobMemory from "../BaseModels/Helper/Job/jobMemory";
+import IJobData from "../BaseModels/Helper/Job/jobMemory";
 
 interface IControllerManager {}
 
@@ -37,8 +37,8 @@ export default class implements IControllerManager {
       const jobType: JobTypes = !this.isRemote
         ? "UpgradeController"
         : "ReserveController";
-      if (!controllerMemory.jobId && controllerMemory.isOwned) {
-        const jobResult = IJobMemory.Initialize({
+        if (controllerMemory.isOwned) {
+        IJobData.Initialize({
           executer: this.executer,
           pos: controllerMemory.pos,
           targetId: controllerMemory.id,
@@ -46,15 +46,6 @@ export default class implements IControllerManager {
           amountToTransfer: 10 * 1000,
           objectType: "Creep",
         });
-        if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
-        const jobId = IJobMemory.GetJobId(
-          jobResult.cache.type,
-          jobResult.memory.pos
-        );
-        if (jobId) {
-          controllerMemory.jobId = jobId;
-          this.updatedMemory = true;
-        }
       }
     }
   }

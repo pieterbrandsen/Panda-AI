@@ -144,15 +144,21 @@ export default class ICreepBodyPartHelper {
               per1Lifetime = 187500;
               multiplier = 0.001;
             } else {
-              per1Lifetime = 93750;
-              multiplier = 0.0003;
+              per1Lifetime = 125000;
+              multiplier = 0.1;
             }
             break;
           case "TransferStructure":
           case "WithdrawStructure":
+              bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+              amount = memory.amountToTransfer ?? 0;
+              per1Lifetime = 125000;
+              multiplier = 0.1;
+              break;
+          case "WithdrawResource":
             bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
-            per1Lifetime = 125000;
+            per1Lifetime = 1000;
             multiplier = 0.1;
             break;
           case "Repair":
@@ -187,12 +193,12 @@ export default class ICreepBodyPartHelper {
         );
 
         switch (cache.type) {
-          case "WithdrawStructure":
-            if (bodyPartsToBeAdded > 15) bodyPartsToBeAdded = 15;  
+          case "UpgradeController":
+            if (bodyPartsToBeAdded > 15) bodyPartsToBeAdded = 15;
             break;
           default:
-            if (bodyPartsToBeAdded > 40) bodyPartsToBeAdded = 40;  
-          break;
+            if (bodyPartsToBeAdded > 40) bodyPartsToBeAdded = 40;
+            break;
         }
 
         parts[ICreepBodyPartHelper.GetCreepType(cache.type)][
@@ -214,6 +220,7 @@ export default class ICreepBodyPartHelper {
         return WORK;
       case "TransferSpawn":
       case "TransferStructure":
+      case "WithdrawResource":
       case "WithdrawStructure":
         return CARRY;
       case "ReserveController":
@@ -261,8 +268,9 @@ export default class ICreepBodyPartHelper {
         return "worker";
       case "HarvestSource":
         return "miner";
+      case "WithdrawStructure":
+      case "WithdrawResource":
       case "TransferSpawn":
-        return "transferer";
       case "TransferStructure":
         return "transferer";
       case "ReserveController":

@@ -19,6 +19,11 @@ interface StructureInitializationData {
   executer: string;
 }
 
+interface DroppedResourceInitializationData {
+  resource: Resource;
+  executer: string;
+}
+
 interface CreepInitializationData {
   name: string;
   isRemoteCreep: boolean;

@@ -13,11 +13,15 @@ interface StructureCache extends BaseCache {
   type: StructureConstant;
   pos: FreezedRoomPosition;
 }
+interface DroppedResourceCache extends BaseCache {
+  type: ResourceConstant;
+  pos: FreezedRoomPosition;
+}
 interface RoomCache extends BaseCache {}
 interface JobCache extends BaseCache {
   type: JobTypes;
 }
 
-type CacheObjects = CreepCache | StructureCache | RoomCache | JobCache;
-type CacheTypes = "Creep" | "Structure" | "Room" | "Job";
+type CacheObjects = DroppedResourceCache | CreepCache | StructureCache | RoomCache | JobCache;
+type CacheTypes = "DroppedResource" | "Creep" | "Structure" | "Room" | "Job";
 type CacheStructurePredicateNames = "IsStructureType";

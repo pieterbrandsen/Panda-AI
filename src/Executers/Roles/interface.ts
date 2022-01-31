@@ -3,10 +3,12 @@ import IRepairRole from "./repair";
 import IHarvestRole from "./harvest";
 import IReserveControllerRole from "./reserveController";
 import ITransferRole from "./transfer";
-import IWithdrawRole from "./withdraw";
+import IWithdrawStructureRole from "./withdrawStructure";
+import IWithdrawResourceRole from "./withdrawResource";
 import IUpgradeControllerRole from "./upgradeController";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
 
 interface IExecuteCreepRole {}
 
@@ -80,7 +82,15 @@ export default class implements IExecuteCreepRole {
           this.jobMemory
         ).run();
       case "WithdrawStructure":
-        return new IWithdrawRole(
+        return new IWithdrawStructureRole(
+          this.creep,
+          this.creepCache,
+          this.creepMemory,
+          this.jobCache,
+          this.jobMemory
+        ).run();
+      case "WithdrawResource":
+        return new IWithdrawResourceRole(
           this.creep,
           this.creepCache,
           this.creepMemory,
@@ -102,14 +112,15 @@ export default class implements IExecuteCreepRole {
 
   run(): void {
     const result = this.executeRole();
+    const creepId = ICreepData.GetCreepId(this.creep.name);
     switch (result) {
       case "done":
-        IJobs.UnassignCreepJob(this.creep, this.creepMemory);
+        IJobs.UnassignCreepJob(creepId, this.creepMemory);
         IJobData.DeleteMemory(this.creepMemory.jobId ?? "", true, true);
         break;
       case "empty":
       case "full":
-        IJobs.UnassignCreepJob(this.creep, this.creepMemory);
+        IJobs.UnassignCreepJob(creepId, this.creepMemory);
         break;
       default:
         break;

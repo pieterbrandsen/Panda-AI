@@ -4,13 +4,14 @@ type JobTypes =
   | "TransferSpawn"
   | "TransferStructure"
   | "WithdrawStructure"
+  | "WithdrawResource"
   | "UpgradeController"
   | "HarvestMineral"
   | "ReserveController"
   | "Build"
   | "Repair";
 
-type JobObjectExecuter = "Creep" | "Structure";
+type JobObjectExecuter = "Creep" | "Structure" | "Resource";
 
 interface JobMemory extends BaseMemory {
   pos: FreezedRoomPosition;

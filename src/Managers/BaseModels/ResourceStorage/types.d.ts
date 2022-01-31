@@ -20,6 +20,12 @@ interface BestStructureLoop {
   levels: StorageLevels;
 }
 
+interface BestDroppedResourceLoop {
+  id: string;
+  cache: DroppedResourceCache;
+  amount: number;
+}
+
 interface LevelCheckResult {
   level: StorageLevels;
   result: boolean;

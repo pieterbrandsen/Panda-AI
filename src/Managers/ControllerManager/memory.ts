@@ -8,7 +8,6 @@ export default class implements ISpawnMemory {
     return {
       controller: controller
         ? {
-            jobId: undefined,
             id: controller.id,
             pos: IRoomPosition.FreezeRoomPosition(controller.pos),
             isOwned: controller.my,

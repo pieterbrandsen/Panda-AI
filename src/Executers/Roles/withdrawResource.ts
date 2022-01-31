@@ -2,9 +2,9 @@ import IStructureData from "../../Managers/BaseModels/Helper/Structure/structure
 import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 
-interface ICreepWithdrawRole {}
+interface ICreepWithdrawResourceRole {}
 
-export default class implements ICreepWithdrawRole {
+export default class implements ICreepWithdrawResourceRole {
   creep: Creep;
 
   creepCache: CreepCache;
@@ -30,38 +30,28 @@ export default class implements ICreepWithdrawRole {
   }
 
   run(): JobResult {
-    const resource: ResourceConstant = RESOURCE_ENERGY;
-    const target: StructuresWithStorage | null = Game.getObjectById(
+    const target: Resource | null = Game.getObjectById(
       this.jobMemory.targetId ?? ""
-    );
-    if (target) {
-      if (target.store.getUsedCapacity(resource) === 0) {
+      );
+      if (target) {
+      const resource: ResourceConstant = target.resourceType;
+      if (target.amount === 0) {
         return "done";
       }
 
       const amountToWithdraw = Math.min(
-        target.store.getUsedCapacity(resource),
+        target.amount,
         this.creep.store.getFreeCapacity(resource)
       );
-      const result = this.creep.transfer(target, resource, amountToWithdraw);
+      const result = this.creep.pickup(target);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
           break;
         case ERR_FULL:
           return "full";
-        case ERR_NOT_ENOUGH_RESOURCES:
-          return "done";
         case OK:
           {
-            const targetMemoryResult = IStructureData.GetMemory(
-              this.jobMemory.targetId
-            );
-            if (targetMemoryResult.success) {
-              const targetMemory = targetMemoryResult.memory as StructureMemory;
-              targetMemory.energyOutgoing[
-                this.jobMemory.fromTargetId as string
-              ] -= amountToWithdraw;
               this.creepMemory.energyIncoming[
                 this.creepMemory.jobId as string
               ] -= amountToWithdraw;
@@ -72,8 +62,6 @@ export default class implements ICreepWithdrawRole {
                 this.jobMemory
               );
               ICreepData.UpdateMemory(this.creep.name, this.creepMemory);
-              IStructureData.UpdateMemory(target.id, targetMemory);
-            }
           }
           break;
         // skip default case

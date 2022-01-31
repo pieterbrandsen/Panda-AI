@@ -182,7 +182,7 @@ export default class CreepSpawning implements ICreepSpawning {
         scores[creepType] = missingBodyPartCount / aliveBodyPartCount;
       }
     });
-
+    
     const bestScore = reduce(scores, (max, score) =>
       max > score ? max : score
     );

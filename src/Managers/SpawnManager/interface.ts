@@ -27,7 +27,6 @@ export default class implements ISpawnManager {
 
   Run(): void {
     const resultOwnedCreeps = new ICreepSpawning(this.room.name).SpawnCreeps();
-
     if (resultOwnedCreeps && this.memory.remoteRooms) {
       new ICreepSpawning(
         this.room.name,

@@ -3,8 +3,11 @@ import ICreepData from "../Helper/Creep/creepMemory";
 import IStructureData from "../Helper/Structure/structureMemory";
 import IStructureCache from "../Cache/structureInterface";
 import IRoomPosition from "../Helper/Room/roomPosition";
-import Predicates from "../Cache/predicates";
+import CachePredicates from "../Cache/predicates";
+import MemoryPredicates from "../Memory/predicates";
 import IJobData from "../Helper/Job/jobMemory";
+import IDroppedResourceCache from "../Cache/droppedResourceInterface";
+import IDroppedResourceData from "../Helper/DroppedResource/droppedResourceMemory";
 
 interface IResourceStorage {
   object: StructuresWithStorage | Creep;
@@ -16,8 +19,8 @@ interface IResourceStorage {
   GetRequiredStorageLevels(
     object: StructuresWithStorage | Creep
   ): StorageLevels;
-  IsStructureEmptyEnough(structure?: StructuresWithStorage): LevelCheckResult;
-  IsStructureFullEnough(structure?: StructuresWithStorage): LevelCheckResult;
+  IsObjectEmptyEnough(structure?: StructuresWithStorage): LevelCheckResult;
+  IsObjectFullEnough(structure?: StructuresWithStorage): LevelCheckResult;
   GetClosestBestStructure(
     structure: BestStructureLoop,
     bestStructure: BestStructureLoop,
@@ -177,7 +180,7 @@ export default class implements IResourceStorage {
     }
   }
 
-  IsStructureEmptyEnough(
+  IsObjectEmptyEnough(
     object?: StructuresWithStorage | Creep
   ): LevelCheckResult {
     const levels = !object
@@ -186,9 +189,7 @@ export default class implements IResourceStorage {
     return { result: levels.current <= levels.low, level: levels };
   }
 
-  IsStructureFullEnough(
-    object?: StructuresWithStorage | Creep
-  ): LevelCheckResult {
+  IsObjectFullEnough(object?: StructuresWithStorage | Creep): LevelCheckResult {
     const levels = !object
       ? this.requiredStorageLevel
       : this.GetRequiredStorageLevels(object);
@@ -249,6 +250,34 @@ export default class implements IResourceStorage {
     return bestStructure;
   }
 
+  GetClosestBestDroppedResource(
+    resource: BestDroppedResourceLoop,
+    bestResource: BestDroppedResourceLoop
+  ): BestDroppedResourceLoop {
+    const currentPos = this.object.pos;
+    const newPos = IRoomPosition.UnFreezeRoomPosition(resource.cache.pos);
+    const bestPos = IRoomPosition.UnFreezeRoomPosition(bestResource.cache.pos);
+
+    const distance = currentPos.getRangeTo(newPos);
+    const bestDistance = currentPos.getRangeTo(bestPos);
+
+    const amount = resource.amount;
+    const bestAmount = bestResource.amount;
+
+    // TODO: Get level based on % filled
+    const newScore =
+      (distance / bestDistance) * 60 +
+      (bestAmount / bestAmount / (amount / amount)) * 40;
+    const bestScore =
+      (bestDistance / distance) * 60 +
+      (amount / amount / (bestAmount / bestAmount)) * 40;
+
+    if (newScore > bestScore) {
+      return resource;
+    }
+    return bestResource;
+  }
+
   FindStructureToFillFrom(inRoomRange: number): BestStructureLoop | null {
     let bestStructure: BestStructureLoop | null = null;
     forOwn(
@@ -256,8 +285,11 @@ export default class implements IResourceStorage {
         "",
         false,
         [this.object.room.name],
-        Predicates.IsStructureTypes(this.energyWithdrawStructureTypes, true),
-        Predicates.IsInRangeOf(this.object.pos, inRoomRange)
+        CachePredicates.IsStructureTypes(
+          this.energyWithdrawStructureTypes,
+          true
+        ),
+        CachePredicates.IsInRangeOf(this.object.pos, inRoomRange)
       ),
       (cache: StructureCache, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
@@ -289,8 +321,11 @@ export default class implements IResourceStorage {
         "",
         false,
         [this.object.room.name],
-        Predicates.IsStructureTypes(this.energyTransferStructureTypes, true),
-        Predicates.IsInRangeOf(this.object.pos, inRoomRange)
+        CachePredicates.IsStructureTypes(
+          this.energyTransferStructureTypes,
+          true
+        ),
+        CachePredicates.IsInRangeOf(this.object.pos, inRoomRange)
       ),
       (cache: StructureCache, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
@@ -314,42 +349,81 @@ export default class implements IResourceStorage {
     );
     return bestStructure;
   }
+  FindDroppedResourceToFillFrom(): BestDroppedResourceLoop | null {
+    let bestDroppedResource: BestDroppedResourceLoop | null = null;
+    forOwn(
+      IDroppedResourceCache.GetAll("", false, [this.object.room.name]),
+      (cache: DroppedResourceCache, id: string) => {
+        const resource = Game.getObjectById<Resource | null>(id);
+        if (resource) {
+          const droppedResourceLoop: BestDroppedResourceLoop = {
+            cache,
+            id,
+            amount: resource.amount,
+          };
+          if (!bestDroppedResource) bestDroppedResource = droppedResourceLoop;
+          bestDroppedResource = this.GetClosestBestDroppedResource(
+            droppedResourceLoop,
+            bestDroppedResource
+          );
+        }
+      }
+    );
+    return bestDroppedResource;
+  }
 
   ManageJob(
-    targetStructureInformation: BestStructureLoop,
     thisLevel: LevelCheckResult,
-    isSpending: boolean
+    isSpending: boolean,
+    targetStructureInformation?: BestStructureLoop,
+    targetResourceInformation?: BestDroppedResourceLoop
   ): void {
     if (!this.memory || !this.cache) return;
-    const targetDataResult = IStructureData.GetMemory(
-      targetStructureInformation.id
-    );
+    const targetDataResult = targetStructureInformation ? IStructureData.GetMemory(
+      targetStructureInformation?.id ?? ""
+    ) : IDroppedResourceData.GetMemory(targetResourceInformation?.id ?? "");
     if (targetDataResult.success) {
       const targetMemory = targetDataResult.memory as StructureMemory;
-      const amountRequired = isSpending
-        ? targetStructureInformation.levels.max -
-          targetStructureInformation.levels.current
-        : targetStructureInformation.levels.current -
-          targetStructureInformation.levels.min;
-      const amountTransferring = isSpending
-        ? Math.min(
-            targetStructureInformation.levels.max -
-              targetStructureInformation.levels.current,
-            thisLevel.level.current
+      let amountRequired = 0;
+      let amountTransferring = 0;
+      let id = "";
+
+      if (targetStructureInformation) {
+        id = targetStructureInformation.id;
+        amountRequired = isSpending
+          ? targetStructureInformation.levels.max -
+            targetStructureInformation.levels.current
+          : targetStructureInformation.levels.current -
+            targetStructureInformation.levels.min;
+
+        amountTransferring = isSpending
+          ? Math.min(
+              targetStructureInformation.levels.max -
+                targetStructureInformation.levels.current,
+              thisLevel.level.current
+            )
+          : Math.min(
+              targetStructureInformation.levels.current -
+                targetStructureInformation.levels.min,
+              thisLevel.level.max - thisLevel.level.current
+            );
+      } else if (targetResourceInformation) {
+        id = targetResourceInformation.id;
+        amountRequired = targetResourceInformation.amount;
+        amountTransferring = thisLevel.level.max - thisLevel.level.current;
+      }
+
+      const isTypeSpawning = targetStructureInformation
+        ? (["spawn", "extension"] as StructureConstant[]).includes(
+            targetStructureInformation.cache.type
           )
-        : Math.min(
-            targetStructureInformation.levels.current -
-              targetStructureInformation.levels.min,
-            thisLevel.level.max - thisLevel.level.current
-          );
-      const isTypeSpawning = ([
-        "spawn",
-        "extension",
-      ] as StructureConstant[]).includes(targetStructureInformation.cache.type);
+        : false;
       let type: JobTypes = isTypeSpawning
         ? "TransferSpawn"
         : "TransferStructure";
-      if (!isSpending) {
+      if (targetResourceInformation) {
+        type = "WithdrawResource";
+      } else if (!isSpending) {
         type = "WithdrawStructure";
       }
       const jobId = IJobData.GetJobId(type, this.cache.pos);
@@ -358,7 +432,7 @@ export default class implements IResourceStorage {
         const jobResult = IJobData.Initialize({
           executer: this.executer,
           pos: this.cache.pos,
-          targetId: targetStructureInformation.id,
+          targetId: id,
           type,
           amountToTransfer: amountRequired,
           fromTargetId: this.object.id,
@@ -378,7 +452,7 @@ export default class implements IResourceStorage {
         this.memory.energyIncoming[jobId] = amountTransferring;
       }
 
-      IStructureData.UpdateMemory(targetStructureInformation.id, targetMemory);
+      IStructureData.UpdateMemory(id, targetMemory);
       if (this.type === "Structure") {
         IStructureData.UpdateMemory(
           this.object.id,
@@ -393,6 +467,17 @@ export default class implements IResourceStorage {
     }
   }
 
+  ManageDroppedResource(): boolean {
+    if (!this.memory || !this.cache) return false;
+    const targetDroppedResourceInformation = this.FindDroppedResourceToFillFrom();
+    if (targetDroppedResourceInformation) {
+      const levelEmptyCheck = this.IsObjectEmptyEnough();
+      this.ManageJob(levelEmptyCheck, false,undefined,targetDroppedResourceInformation);
+      return true;
+    }
+    return false;
+  }
+
   Manage(fillFrom = true, emptyTo = true, inRoomRange = 50): boolean {
     // const structureMemoryResult = IStructureMemory.Get(this.object.id);
     // const structureCacheResult = IStructureCache.Get(this.object.id);
@@ -401,14 +486,14 @@ export default class implements IResourceStorage {
     // const structureCache = structureCacheResult.data as StructureCache;
     if (!this.memory || !this.cache) return false;
 
-    const levelFullCheck = this.IsStructureFullEnough();
-    const levelEmptyCheck = this.IsStructureEmptyEnough();
+    const levelFullCheck = this.IsObjectFullEnough();
+    const levelEmptyCheck = this.IsObjectEmptyEnough();
     if (fillFrom) {
       const targetStructureInformation = this.FindStructureToFillFrom(
         inRoomRange
       );
       if (targetStructureInformation) {
-        this.ManageJob(targetStructureInformation, levelEmptyCheck, false);
+        this.ManageJob(levelEmptyCheck, false,targetStructureInformation);
         return true;
       }
     }
@@ -418,7 +503,7 @@ export default class implements IResourceStorage {
         inRoomRange
       );
       if (targetStructureInformation) {
-        this.ManageJob(targetStructureInformation, levelFullCheck, true);
+        this.ManageJob(levelFullCheck, true,targetStructureInformation);
         return true;
       }
     }

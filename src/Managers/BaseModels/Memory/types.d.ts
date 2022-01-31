@@ -14,6 +14,11 @@ interface BaseMemory {
   version: number;
 }
 
+interface DroppedResourceMemory extends BaseMemory {
+  jobId?: string;
+  energyIncoming: StringMap<number>;
+  energyOutgoing: StringMap<number>;
+}
 interface CreepMemory extends BaseMemory {
   jobId?: string;
   isRemoteCreep: boolean;
@@ -37,15 +42,17 @@ interface RoomMemory extends BaseMemory {
   controllerManager: ControllerManager;
   mineralManager: MineralManager;
   spawnManager: SpawnManager;
+  droppedResourceManager: DroppedResourceManager;
 }
 interface Memory extends BaseMemory {
   CreepsData: MainMemoryData<CreepMemory, CreepCache>;
   StructuresData: MainMemoryData<StructureMemory, StructureCache>;
   RoomsData: MainMemoryData<RoomMemory, RoomCache>;
   JobsData: MainMemoryData<JobMemory, JobCache>;
+  DroppedResourceData: MainMemoryData<DroppedResourceMemory, DroppedResourceCache>;
 }
 
-type MemoryObjects = CreepMemory | StructureMemory | RoomMemory | JobMemory;
+type MemoryObjects = DroppedResourceMemory | CreepMemory | StructureMemory | RoomMemory | JobMemory;
 interface DoubleCRUDResult<M extends MemoryObjects, C extends CacheObjects> {
   success: boolean;
   memory: M | undefined;
@@ -57,4 +64,4 @@ interface FreezedRoomPosition {
   roomName: string;
 }
 
-type MemoryTypes = "Creep" | "Structure" | "Room" | "Global" | "Job";
+type MemoryTypes = "Creep" | "DroppedResource"| "Structure" | "Room" | "Global" | "Job";

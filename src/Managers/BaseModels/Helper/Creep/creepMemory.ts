@@ -1,5 +1,6 @@
 import ICreepMemory from "../../Memory/creepInterface";
 import ICreepCache from "../../Cache/creepInterface";
+import IJobs from "../../Jobs/interface";
 
 interface ICreepHelper {}
 
@@ -63,7 +64,15 @@ export default class implements ICreepHelper {
       memory: undefined,
       cache: undefined,
     };
-    if (isMemory) {
+
+    const memoryData = ICreepMemory.Get(id);
+    if (memoryData.success) {
+      if (IJobs.UnassignCreepJob(id, memoryData.data as CreepMemory)) {
+        result.success = true;
+      }
+    }
+
+    if (isMemory && result.success) {
       const deleteResult = ICreepMemory.Delete(id);
       if (deleteResult.success) {
         result.success = true;

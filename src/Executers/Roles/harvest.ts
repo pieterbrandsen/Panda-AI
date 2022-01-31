@@ -34,11 +34,15 @@ export default class implements ICreepHarvestRole {
       this.creep.store.getFreeCapacity() === 0
     ) {
       if (this.jobCache.type === "HarvestSource") {
-        new IResourceStorage(
-          this.creep,
-          "Creep",
-          this.creepCache.executer
-        ).Manage(false, true, 3);
+        if (
+          !new IResourceStorage(
+            this.creep,
+            "Creep",
+            this.creepCache.executer
+          ).Manage(false, true, 3)
+        ) {
+          this.creep.drop(RESOURCE_ENERGY);
+        }
         return "continue";
       }
       return "full";

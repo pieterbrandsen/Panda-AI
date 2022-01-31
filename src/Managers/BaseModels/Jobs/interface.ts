@@ -1,13 +1,16 @@
-import { forEach } from "lodash";
+import { forEach, forOwn } from "lodash";
 import IJobMemory from "../Memory/jobInterface";
 import ICreepData from "../Helper/Creep/creepMemory";
+import ICreepMemory from "../Memory/creepInterface";
 import IJobCache from "../Cache/jobInterface";
 import IJobData from "../Helper/Job/jobMemory";
 import IRoomInterface from "../Helper/Room/roomInterface";
 import IRoomMemory from "../Memory/roomInterface";
 import Predicates from "./predicates";
+import MemoryPredicates from "../Memory/predicates";
 import IStructureMemory from "../Memory/structureInterface";
 import IResourceStorage from "../ResourceStorage/interface";
+import IDroppedResourceData from "../Helper/DroppedResource/droppedResourceMemory";
 import IStructureData from "../Helper/Structure/structureMemory";
 import IRoomConstruction from "../Helper/Room/roomConstruction";
 
@@ -18,7 +21,7 @@ import IRoomConstruction from "../Helper/Room/roomConstruction";
 interface IJobs {}
 
 export default class implements IJobs {
-  static UnassignCreepJob(creep: Creep, memory: CreepMemory): boolean {
+  static UnassignCreepJob(creepId: string, memory: CreepMemory): boolean {
     if (memory.jobId) {
       const jobData = IJobMemory.Get(memory.jobId);
       if (jobData.success) {
@@ -27,11 +30,11 @@ export default class implements IJobs {
         if (targetData.success) {
           const targetMemory = targetData.memory as StructureMemory;
           const updatedMemory = false;
-          if (targetMemory.energyIncoming[creep.id]) {
-            delete targetMemory.energyIncoming[creep.id];
+          if (targetMemory.energyIncoming[job.fromTargetId ?? ""]) {
+            delete targetMemory.energyIncoming[job.fromTargetId ?? ""];
           }
-          if (targetMemory.energyOutgoing[creep.id]) {
-            delete targetMemory.energyOutgoing[creep.id];
+          if (targetMemory.energyOutgoing[job.fromTargetId ?? ""]) {
+            delete targetMemory.energyOutgoing[job.fromTargetId ?? ""];
           }
           if (updatedMemory)
             IStructureData.UpdateMemory(job.targetId, targetMemory);
@@ -40,8 +43,7 @@ export default class implements IJobs {
     }
     delete memory.jobId;
 
-    return ICreepData.UpdateMemory(ICreepData.GetCreepId(creep.name), memory)
-      .success;
+    return ICreepData.UpdateMemory(creepId, memory).success;
   }
 
   static MoveJob(
@@ -129,7 +131,7 @@ export default class implements IJobs {
         case "worker":
           return ["Build", "UpgradeController", "Repair"];
         case "transferer":
-          return ["TransferSpawn", "TransferStructure"];
+          new IResourceStorage(creep, "Creep", executer).Manage(false, true)
         // skip default case
       }
     } else {
@@ -137,15 +139,15 @@ export default class implements IJobs {
         case "miner":
           return ["HarvestMineral", "HarvestSource"];
         case "worker":
+        case "transferer": {
+          const resourceStorage = new IResourceStorage(creep, "Creep", executer);
           if (
-            !new IResourceStorage(creep, "Creep", executer).Manage(true, false)
+            !resourceStorage.Manage(true, false)
           ) {
-            return ["HarvestSource"];
+            resourceStorage.ManageDroppedResource();
           }
-          break;
-        case "transferer":
-          new IResourceStorage(creep, "Creep", executer).Manage(true, false);
-          break;
+        }
+        break;
         case "claimer":
           return ["ReserveController"];
         // skip default case
@@ -234,7 +236,7 @@ export default class implements IJobs {
                   structure: structureAtLocation,
                 });
               }
-              IJobData.DeleteMemory(id, true, true);
+            this.Delete(id);
             }
           } else {
             jobMemory.amountToTransfer = csSite.progressTotal - csSite.progress;
@@ -248,7 +250,7 @@ export default class implements IJobs {
             jobMemory.targetId
           );
           if (!mineral || (jobMemory.amountToTransfer ?? 0) <= 0) {
-            IJobData.DeleteMemory(id, true, true);
+            this.Delete(id);
           } else {
             jobMemory.amountToTransfer = mineral.mineralAmount;
             updatedMemory = true;
@@ -263,27 +265,28 @@ export default class implements IJobs {
       // break;
       case "TransferSpawn":
       case "TransferStructure":
-      case "WithdrawStructure":
-        {
-          const structure = Game.getObjectById<Structure | null>(
+        case "WithdrawStructure":
+          case "WithdrawResource":
+            {
+          const target = Game.getObjectById<Structure | null>(
             jobMemory.targetId
           );
-          const targetObj = Game.getObjectById<Structure | Creep | null>(
+          const fromTarget = Game.getObjectById<Structure | Creep | null>(
             jobMemory.fromTargetId as ""
           );
           if (
-            !structure ||
-            !targetObj ||
+            !target ||
+            !fromTarget ||
             (jobMemory.amountToTransfer ?? 0) <= 0
           ) {
-            IJobData.DeleteMemory(id, true, true);
-            const structureMemory = IStructureMemory.Get(jobMemory.targetId);
-            const targetStructureMemory = IStructureMemory.Get(
+            this.Delete(id);
+            const targetStructureMemory = IStructureMemory.Get(jobMemory.targetId);
+            const fromTargetStructureMemory = IStructureMemory.Get(
               jobMemory.fromTargetId ?? ""
             );
-            if (structureMemory.data) {
-              delete structureMemory.data.energyIncoming[jobMemory.targetId];
-              delete structureMemory.data.energyOutgoing[jobMemory.targetId];
+            if (fromTargetStructureMemory.data) {
+              delete fromTargetStructureMemory.data.energyIncoming[jobMemory.targetId];
+              delete fromTargetStructureMemory.data.energyOutgoing[jobMemory.targetId];
             }
             if (targetStructureMemory.data && jobMemory.fromTargetId) {
               delete targetStructureMemory.data.energyIncoming[
@@ -302,7 +305,7 @@ export default class implements IJobs {
             jobMemory.targetId
           );
           if (!controller || (jobMemory.amountToTransfer ?? 0) <= 0) {
-            IJobData.DeleteMemory(id, true, true);
+            this.Delete(id);
           }
         }
         break;
@@ -314,5 +317,14 @@ export default class implements IJobs {
       return true;
     }
     return false;
+  }
+
+  public static Delete(id:string) {
+    const creeps = ICreepMemory.GetAll(MemoryPredicates.HasJobId(id))
+    forOwn(creeps, (memory:CreepMemory,creepId:string) => {
+      this.UnassignCreepJob(creepId,memory);
+    })
+
+    IJobData.DeleteMemory(id, true, true);
   }
 }

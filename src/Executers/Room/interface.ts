@@ -4,6 +4,7 @@ import IRoomCache from "../../Managers/BaseModels/Cache/roomInterface";
 import IControllerManager from "../../Managers/ControllerManager/interface";
 import IMineralManager from "../../Managers/MineralManager/interface";
 import ISourceManager from "../../Managers/SourceManager/interface";
+import IDroppedResourceManager from "../../Managers/DroppedResourceManager/interface";
 import ISpawnManager from "../../Managers/SpawnManager/interface";
 import ICreepCache from "../../Managers/BaseModels/Cache/creepInterface";
 import IStructuresCache from "../../Managers/BaseModels/Cache/structureInterface";
@@ -41,7 +42,7 @@ export default class implements IRoomExecuter {
     const creepsCache = ICreepCache.GetAll("", false, [roomName]);
     IStructureExecuter.ExecuterAllStructures(structuresCache);
     ICreepExecuter.ExecuterAllCreeps(creepsCache);
-
+    
     const room = Game.rooms[roomName];
     if (!room) return false;
     const roomData = IRoomData.GetMemory(room.name);
@@ -53,10 +54,11 @@ export default class implements IRoomExecuter {
 
     const { controller } = room;
     new ISourceManager(room.name, roomMemory, roomCache).Run();
+    new IDroppedResourceManager(room.name, roomMemory, roomCache).Run();
 
     if (controller) {
       new IControllerManager(room.name, roomMemory, roomCache).Run();
-      if (controller.my) {
+    if (controller.my) {
         new IMineralManager(room.name, roomMemory, roomCache).Run();
         new ISpawnManager(room.name, roomMemory, roomCache).Run();
       }

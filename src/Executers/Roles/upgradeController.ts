@@ -36,11 +36,7 @@ export default class implements ICreepUpgradeControllerRole {
         this.creepCache.executer
       ).Manage(true, false, 5);
       if (!closeStructure) {
-        new IResourceStorage(
-          this.creep,
-          "Creep",
-          this.creepCache.executer
-        ).Manage(true, false);
+        return "empty";
       }
       return "continue";
     }
@@ -56,7 +52,7 @@ export default class implements ICreepUpgradeControllerRole {
           break;
         case OK:
           (this.jobMemory.amountToTransfer as number) -=
-            this.creepCache.body.work * 2;
+            this.creepCache.body.work;
           IJobData.UpdateMemory(
             this.creepMemory.jobId as string,
             this.jobMemory

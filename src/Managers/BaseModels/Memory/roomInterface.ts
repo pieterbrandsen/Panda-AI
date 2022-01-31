@@ -4,6 +4,7 @@ import IControllerMemory from "../../ControllerManager/memory";
 import IMineralMemory from "../../MineralManager/memory";
 import ISourceMemory from "../../SourceManager/memory";
 import ISpawnMemory from "../../SpawnManager/memory";
+import IDroppedResourceManager from "../../DroppedResourceManager/memory";
 
 interface IRoomMemory {}
 
@@ -29,6 +30,7 @@ export default class extends BaseMemory implements IRoomMemory {
       mineralManager: IMineralMemory.SetupMemory(room),
       sourceManager: ISourceMemory.SetupMemory(room),
       spawnManager: ISpawnMemory.SetupMemory(),
+      droppedResourceManager: IDroppedResourceManager.SetupMemory(),
     };
   }
 

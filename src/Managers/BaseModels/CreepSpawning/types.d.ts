@@ -20,4 +20,5 @@ type BodyParts = StringMapGeneric<number, BodyPartConstant>;
 interface CreepBodyIteratee {
   remote?: BodyCostRoomTypes;
   owned?: BodyCostRoomTypes;
+  starter?: BodyCostRoomTypes;
 }

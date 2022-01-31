@@ -86,7 +86,9 @@ export default class ICreepCountHelper {
             }
             break;
           case "TransferStructure":
-            amount = memory.maxCreepsCount ?? 5;
+          case "WithdrawStructure":
+              case "WithdrawResource":
+                amount = memory.maxCreepsCount ?? 1;
             break;
           case "Repair":
             amount = memory.maxCreepsCount ?? 4;
