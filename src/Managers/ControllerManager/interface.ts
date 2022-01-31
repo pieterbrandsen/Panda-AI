@@ -43,7 +43,7 @@ export default class implements IControllerManager {
           pos: controllerMemory.pos,
           targetId: controllerMemory.id,
           type: jobType,
-          amountToTransfer: 100 * 1000,
+          amountToTransfer: 20 * 1000,
           objectType: "Creep",
         });
       }

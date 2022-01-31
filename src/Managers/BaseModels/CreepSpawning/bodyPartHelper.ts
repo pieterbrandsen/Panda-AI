@@ -194,7 +194,12 @@ export default class ICreepBodyPartHelper {
 
         switch (cache.type) {
           case "UpgradeController":
-            if (bodyPartsToBeAdded > 15) bodyPartsToBeAdded = 15;
+            if (
+              this.spawnRoom.controller &&
+              this.spawnRoom.controller.level === 8 &&
+              bodyPartsToBeAdded > 15
+            )
+              bodyPartsToBeAdded = 15;
             break;
           default:
             if (bodyPartsToBeAdded > 40) bodyPartsToBeAdded = 40;

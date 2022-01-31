@@ -314,9 +314,11 @@ export default class implements IJobs {
           );
           if (!controller || (jobMemory.amountToTransfer ?? 0) <= 0) {
             this.Delete(id);
-          }
-          else if (jobMemory.amountToTransfer && jobMemory.amountToTransfer < 1000)  {
-            jobMemory.amountToTransfer = 100 * 1000;
+          } else if (
+            jobMemory.amountToTransfer &&
+            jobMemory.amountToTransfer < 1000
+          ) {
+            jobMemory.amountToTransfer = 20 * 1000;
             updatedMemory = true;
           }
         }
