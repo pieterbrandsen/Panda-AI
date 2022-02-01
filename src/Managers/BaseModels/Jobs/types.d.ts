@@ -25,4 +25,5 @@ interface JobMemory extends BaseMemory {
   objectType: JobObjectExecuter;
 
   maxCreepsCount?: number;
+  assignedCreeps: string[];
 }

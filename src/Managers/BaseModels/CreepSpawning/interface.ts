@@ -179,13 +179,13 @@ export default class CreepSpawning implements ICreepSpawning {
       const aliveCreepCount = this.aliveCreepCount[creepType];
       const missingCreepCount = this.missingCreepCount[creepType];
 
-      console.log(
-        key,
-        aliveCreepCount,
-        missingCreepCount,
-        aliveBodyPartCount,
-        missingBodyPartCount
-      );
+      // console.log(
+      //   key,
+      //   aliveCreepCount,
+      //   missingCreepCount,
+      //   aliveBodyPartCount,
+      //   missingBodyPartCount
+      // );
 
       if (aliveCreepCount < 2 && creepType === "miner") {
         scores[creepType] = 999;
@@ -198,7 +198,7 @@ export default class CreepSpawning implements ICreepSpawning {
       }
     });
 
-    console.log("-----------------------------------");
+    // console.log("-----------------------------------");
 
     const bestScore = reduce(scores, (max, score) =>
       max > score ? max : score

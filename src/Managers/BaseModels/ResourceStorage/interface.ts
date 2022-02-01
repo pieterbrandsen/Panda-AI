@@ -7,6 +7,7 @@ import CachePredicates from "../Cache/predicates";
 import IJobData from "../Helper/Job/jobMemory";
 import IDroppedResourceCache from "../Cache/droppedResourceInterface";
 import IDroppedResourceData from "../Helper/DroppedResource/droppedResourceMemory";
+import IJobs from "../Jobs/interface";
 
 interface IResourceStorage {
   object: StructuresWithStorage | Creep;
@@ -20,11 +21,6 @@ interface IResourceStorage {
   ): StorageLevels;
   IsObjectEmptyEnough(structure?: StructuresWithStorage): LevelCheckResult;
   IsObjectFullEnough(structure?: StructuresWithStorage): LevelCheckResult;
-  GetClosestBestStructure(
-    structure: BestStructureLoop,
-    bestStructure: BestStructureLoop,
-    isFilling: boolean
-  ): BestStructureLoop;
   FindStructureToFillFrom(inRoomRange: number): BestStructureLoop | null;
   FindStructureToEmptyTo(inRoomRange: number): BestStructureLoop | null;
   Manage(): boolean;
@@ -219,66 +215,48 @@ export default class implements IResourceStorage {
     };
   }
 
-  GetClosestBestStructure(
-    structure: BestStructureLoop,
-    bestStructure: BestStructureLoop,
-    isFilling: boolean
-  ): BestStructureLoop {
+  GetStructureScore(structure:BestStructureLoop,isFilling:boolean):number {
     const currentPos = this.object.pos;
-    const newPos = IRoomPosition.UnFreezeRoomPosition(structure.cache.pos);
-    const bestPos = IRoomPosition.UnFreezeRoomPosition(bestStructure.cache.pos);
-
-    const distance = currentPos.getRangeTo(newPos);
-    const bestDistance = currentPos.getRangeTo(bestPos);
-
-    const level = structure.levels;
-    const bestLevel = bestStructure.levels;
-    if (isFilling ? level.max === -1 : level.min === -1) return bestStructure;
-
-    // TODO: Get level based on % filled
-    const newScore =
-      (distance / bestDistance) * 60 +
-      (bestLevel.current / bestLevel.max / (level.current / level.max)) * 40;
-    const bestScore =
-      (bestDistance / distance) * 60 +
-      (level.current / level.max / (bestLevel.current / bestLevel.max)) * 40;
-
-    if (isFilling ? newScore < bestScore : newScore > bestScore) {
-      return structure;
-    }
-    return bestStructure;
+    const pos = IRoomPosition.UnFreezeRoomPosition(structure.cache.pos);
+    const distance = currentPos.getRangeTo(pos);
+    const amount = isFilling ? structure.levels.current - structure.levels.min : structure.levels.max - structure.levels.current;
+    return (0.4* amount) / (0.6*distance);
+  }
+  GetDroppedResourceScore(resource:BestDroppedResourceLoop):number {
+    if (resource.amount < 100) return 0;
+    const currentPos = this.object.pos;
+    const pos = IRoomPosition.UnFreezeRoomPosition(resource.cache.pos);
+    const distance = currentPos.getRangeTo(pos);
+    const amount = resource.amount;
+    return (0.3* amount) / (0.7*distance);
   }
 
-  GetClosestBestDroppedResource(
-    resource: BestDroppedResourceLoop,
-    bestResource: BestDroppedResourceLoop
-  ): BestDroppedResourceLoop {
-    const currentPos = this.object.pos;
-    const newPos = IRoomPosition.UnFreezeRoomPosition(resource.cache.pos);
-    const bestPos = IRoomPosition.UnFreezeRoomPosition(bestResource.cache.pos);
-
-    const distance = currentPos.getRangeTo(newPos);
-    const bestDistance = currentPos.getRangeTo(bestPos);
-
-    const { amount } = resource;
-    const bestAmount = bestResource.amount;
-
-    // TODO: Get level based on % filled
-    const newScore =
-      (distance / bestDistance) * 60 +
-      (bestAmount / bestAmount / (amount / amount)) * 40;
-    const bestScore =
-      (bestDistance / distance) * 60 +
-      (amount / amount / (bestAmount / bestAmount)) * 40;
-
-    if (newScore > bestScore) {
-      return resource;
+  IsBestStructure(
+    structure: BestStructureLoop,
+    isFilling: boolean,
+    bestScore: number
+  ): number | void {
+    const score = this.GetStructureScore(structure,isFilling);
+    
+    if (score > bestScore) {
+      return score;
     }
-    return bestResource;
+  }
+
+  IsBestDroppedResource(
+    resource: BestDroppedResourceLoop,
+    bestScore: number,
+  ): number | void {
+    const score = this.GetDroppedResourceScore(resource);
+
+    if (score > bestScore) {
+      return score;
+    }
   }
 
   FindStructureToFillFrom(inRoomRange: number): BestStructureLoop | null {
     let bestStructure: BestStructureLoop | null = null;
+    let bestScore = 0;
     forOwn(
       IStructureCache.GetAll(
         "",
@@ -301,11 +279,15 @@ export default class implements IResourceStorage {
               levels: levelCheck.level,
             };
             if (!bestStructure) bestStructure = structureLoop;
-            bestStructure = this.GetClosestBestStructure(
+            const score = this.IsBestStructure(
               structureLoop,
-              bestStructure,
-              false
+              false,
+              bestScore
             );
+            if (score) {
+              bestStructure = structureLoop;
+              bestScore = score;
+            }
           }
         }
       }
@@ -315,6 +297,7 @@ export default class implements IResourceStorage {
 
   FindStructureToEmptyTo(inRoomRange: number): BestStructureLoop | null {
     let bestStructure: BestStructureLoop | null = null;
+    let bestScore = 0;
     forOwn(
       IStructureCache.GetAll(
         "",
@@ -337,11 +320,15 @@ export default class implements IResourceStorage {
               levels: levelCheck.level,
             };
             if (!bestStructure) bestStructure = structureLoop;
-            bestStructure = this.GetClosestBestStructure(
+            const score = this.IsBestStructure(
               structureLoop,
-              bestStructure,
-              true
+              true,
+              bestScore
             );
+            if (score) {
+              bestStructure = structureLoop;
+              bestScore = score;
+            }
           }
         }
       }
@@ -351,6 +338,7 @@ export default class implements IResourceStorage {
 
   FindDroppedResourceToFillFrom(): BestDroppedResourceLoop | null {
     let bestDroppedResource: BestDroppedResourceLoop | null = null;
+    let bestScore = 0;
     forOwn(
       IDroppedResourceCache.GetAll("", false, [this.object.room.name]),
       (cache: DroppedResourceCache, id: string) => {
@@ -362,10 +350,14 @@ export default class implements IResourceStorage {
             amount: resource.amount,
           };
           if (!bestDroppedResource) bestDroppedResource = droppedResourceLoop;
-          bestDroppedResource = this.GetClosestBestDroppedResource(
+          const score = this.IsBestDroppedResource(
             droppedResourceLoop,
-            bestDroppedResource
+            bestScore
           );
+          if (score) {
+            bestDroppedResource = droppedResourceLoop;
+            bestScore = score;
+          }
         }
       }
     );
@@ -429,9 +421,9 @@ export default class implements IResourceStorage {
         type = "WithdrawStructure";
       }
       const jobId = IJobData.GetJobId(type, this.cache.pos);
-      const jobData = IJobData.GetMemory(jobId);
+      let jobData = IJobData.GetMemory(jobId);
       if (!jobData.success) {
-        const jobResult = IJobData.Initialize({
+        jobData = IJobData.Initialize({
           executer: this.executer,
           pos: this.cache.pos,
           targetId: id,
@@ -441,7 +433,7 @@ export default class implements IResourceStorage {
           objectType: this.type,
         });
 
-        if (!jobResult.success) {
+        if (!jobData.success) {
           return;
         }
       }
@@ -465,8 +457,8 @@ export default class implements IResourceStorage {
       } else {
         const creepName = (this.object as Creep).name;
         const creepMemory = this.memory as CreepMemory;
-        creepMemory.jobId = jobId;
-        ICreepData.UpdateMemory(creepName, creepMemory);
+        const creepCache = this.cache as CreepCache;
+        IJobs.AssignCreepJob(creepName,creepMemory,creepCache,jobId,jobData.cache as JobCache)
       }
     }
   }

@@ -25,6 +25,13 @@ export default class implements IJobs {
       const jobData = IJobMemory.Get(memory.jobId);
       if (jobData.success) {
         const job = jobData.data as JobMemory;
+        const index = job.assignedCreeps.indexOf(creepId);
+        if (index !== -1) {
+          job.assignedCreeps.splice(index, 1);
+        }
+        if (job.fromTargetId) delete job.fromTargetId; 
+        IJobMemory.Update(memory.jobId, job);
+        
         const targetData = IStructureData.GetMemory(job.targetId);
         if (targetData.success) {
           const targetMemory = targetData.memory as StructureMemory;
@@ -43,6 +50,20 @@ export default class implements IJobs {
     delete memory.jobId;
 
     return ICreepData.UpdateMemory(creepId, memory).success;
+  }
+
+  static AssignCreepJob(creepId:string,creepMemory:CreepMemory,creepCache:CreepCache,jobId:string,jobCache:JobCache):boolean {
+    creepMemory.jobId = jobId;
+    creepCache.executer = jobCache.executer;
+    const jobMemory = IJobMemory.Get(jobId);
+    if (!jobMemory.success) {
+      return false;
+    }
+    const job = jobMemory.data as JobMemory;
+    job.assignedCreeps.push(creepId);
+    job.lastAssigned = Game.time;
+    if (!IJobMemory.Update(jobId, job).success) return false;
+    return ICreepData.UpdateMemory(creepId, creepMemory, creepCache).success;
   }
 
   static MoveJob(
@@ -69,7 +90,7 @@ export default class implements IJobs {
     executer: string,
     jobTypes: JobTypes[],
     roomNames: string[]
-  ): { id: string; job: JobCache } | undefined {
+  ): { id: string; cache: JobCache } | undefined {
     let jobs = IJobCache.GetAll(
       true,
       executer,
@@ -84,7 +105,7 @@ export default class implements IJobs {
       const jobMemoryResult = IJobMemory.Get(id);
       if (jobMemoryResult.success) {
         const jobMemory = jobMemoryResult.data as JobMemory;
-        if (jobMemory.lastAssigned < lastAssigned) {
+        if (jobMemory.lastAssigned < lastAssigned && jobMemory.assignedCreeps.length < (jobMemory.maxCreepsCount ?? 99)) {
           jobId = id;
           lastAssigned = jobMemory.lastAssigned;
         }
@@ -92,7 +113,7 @@ export default class implements IJobs {
     });
 
     if (jobId !== undefined) {
-      return { id: jobId, job: jobs[jobId] };
+      return { id: jobId, cache: jobs[jobId] };
     }
 
     lastAssigned = Infinity;
@@ -107,7 +128,7 @@ export default class implements IJobs {
       const jobMemoryResult = IJobMemory.Get(id);
       if (jobMemoryResult.success) {
         const jobMemory = jobMemoryResult.data as JobMemory;
-        if (jobMemory.lastAssigned < lastAssigned) {
+        if (jobMemory.lastAssigned < lastAssigned && jobMemory.assignedCreeps.length < (jobMemory.maxCreepsCount ?? 99)) {
           jobId = id;
           lastAssigned = jobMemory.lastAssigned;
         }
@@ -115,7 +136,7 @@ export default class implements IJobs {
     });
 
     if (jobId !== undefined) {
-      return { id: jobId, job: jobs[jobId] };
+      return { id: jobId, cache: jobs[jobId] };
     }
     return undefined;
   }
@@ -181,18 +202,7 @@ export default class implements IJobs {
     );
     const newJob = this.FindNewJob(creepCache.executer, jobTypes, roomNames);
     if (newJob !== undefined) {
-      creepMemory.jobId = newJob.id;
-      creepCache.executer = newJob.job.executer;
-      const jobMemory = IJobMemory.Get(newJob.id);
-      if (!jobMemory.success) {
-        return false;
-      }
-      const job = jobMemory.data as JobMemory;
-      job.lastAssigned = Game.time;
-      IJobMemory.Update(newJob.id, job);
-
-      ICreepData.UpdateMemory(creepId, creepMemory, creepCache);
-      return true;
+      return this.AssignCreepJob(creepId,creepMemory,creepCache,newJob.id,newJob.cache);
     }
     return false;
   }
