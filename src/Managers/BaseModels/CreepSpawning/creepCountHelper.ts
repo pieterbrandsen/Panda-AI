@@ -110,6 +110,14 @@ export default class ICreepCountHelper {
       }
     });
 
+    forEach(Object.keys(creepCounts), (type) => {
+      switch (type as CreepTypes) {
+        default:
+          if (creepCounts[type] > 15) creepCounts[type][WORK] = 15;
+          break;
+      }
+    });
+
     return creepCounts;
   }
 

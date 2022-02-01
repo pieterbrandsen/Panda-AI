@@ -27,7 +27,16 @@ export default class implements ISpawnManager {
 
   Run(): void {
     const resultOwnedCreeps = new ICreepSpawning(this.room.name).SpawnCreeps();
-    if (resultOwnedCreeps && this.memory.remoteRooms) {
+    const capacityEnergy = this.room.energyCapacityAvailable;
+    const { energyAvailable } = this.room;
+    const energyAvailablePercentage = energyAvailable / capacityEnergy;
+
+    if (
+      resultOwnedCreeps &&
+      this.memory.remoteRooms &&
+      energyAvailablePercentage > 0.5 &&
+      energyAvailable > 1000
+    ) {
       new ICreepSpawning(
         this.room.name,
         Object.keys(this.memory.remoteRooms)

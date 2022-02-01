@@ -383,7 +383,9 @@ export default class implements IResourceStorage {
       ? IStructureData.GetMemory(targetStructureInformation?.id ?? "")
       : IDroppedResourceData.GetMemory(targetResourceInformation?.id ?? "");
     if (targetDataResult.success) {
-      const targetMemory = targetDataResult.memory as StructureMemory;
+      const targetMemory = targetDataResult.memory as
+        | StructureMemory
+        | DroppedResourceMemory;
       let amountRequired = 0;
       let amountTransferring = 0;
       let id = "";
@@ -452,7 +454,9 @@ export default class implements IResourceStorage {
         this.memory.energyIncoming[jobId] = amountTransferring;
       }
 
-      IStructureData.UpdateMemory(id, targetMemory);
+      if (targetStructureInformation)
+        IStructureData.UpdateMemory(id, targetMemory);
+      else IDroppedResourceData.UpdateMemory(id, targetMemory);
       if (this.type === "Structure") {
         IStructureData.UpdateMemory(
           this.object.id,

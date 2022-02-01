@@ -159,7 +159,7 @@ export default class ICreepBodyPartHelper {
             bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
             per1Lifetime = 1000;
-            multiplier = 0.1;
+            multiplier = 0.2;
             break;
           case "Repair":
             bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
@@ -209,6 +209,19 @@ export default class ICreepBodyPartHelper {
         parts[ICreepBodyPartHelper.GetCreepType(cache.type)][
           bodyPart
         ] += bodyPartsToBeAdded;
+      }
+    });
+
+    forEach(Object.keys(parts), (type) => {
+      switch (type as CreepTypes) {
+        case "worker":
+          if (parts[type][WORK] > 50) parts[type][WORK] = 50;
+          break;
+        case "transferer":
+          if (parts[type][CARRY] > 100) parts[type][CARRY] = 100;
+          break;
+        default:
+          break;
       }
     });
 
