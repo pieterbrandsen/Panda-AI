@@ -63,7 +63,7 @@ export default class implements ICreepTransferRole {
                 this.jobMemory.fromTargetId as string
               ] -= amountToTransfer;
               this.creepMemory.energyOutgoing[
-                this.creepMemory.jobId as string
+                this.jobMemory.targetId as string
               ] -= amountToTransfer;
               (this.jobMemory.amountToTransfer as number) -= amountToTransfer;
 

@@ -448,10 +448,10 @@ export default class implements IResourceStorage {
 
       if (isSpending) {
         targetMemory.energyIncoming[this.object.id] = amountTransferring;
-        this.memory.energyOutgoing[jobId] = amountTransferring;
+        this.memory.energyOutgoing[id] = amountTransferring;
       } else {
         targetMemory.energyOutgoing[this.object.id] = amountTransferring;
-        this.memory.energyIncoming[jobId] = amountTransferring;
+        this.memory.energyIncoming[id] = amountTransferring;
       }
 
       if (targetStructureInformation)

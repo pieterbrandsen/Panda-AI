@@ -63,7 +63,7 @@ export default class implements ICreepWithdrawStructureRole {
                 this.jobMemory.fromTargetId as string
               ] -= amountToWithdraw;
               this.creepMemory.energyIncoming[
-                this.creepMemory.jobId as string
+                this.jobMemory.targetId as string
               ] -= amountToWithdraw;
               (this.jobMemory.amountToTransfer as number) -= amountToWithdraw;
 

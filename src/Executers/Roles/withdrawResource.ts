@@ -51,7 +51,7 @@ export default class implements ICreepWithdrawResourceRole {
           return "full";
         case OK:
           this.creepMemory.energyIncoming[
-            this.creepMemory.jobId as string
+            this.jobMemory.targetId as string
           ] -= amountToWithdraw;
           (this.jobMemory.amountToTransfer as number) -= amountToWithdraw;
 
