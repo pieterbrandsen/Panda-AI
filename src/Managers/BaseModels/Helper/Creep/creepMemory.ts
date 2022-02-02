@@ -67,7 +67,7 @@ export default class implements ICreepHelper {
 
     const memoryData = ICreepMemory.Get(id);
     if (memoryData.success) {
-      if (IJobs.UnassignCreepJob(id, memoryData.data as CreepMemory)) {
+      if (IJobs.UnassignCreepJob(id, memoryData.data as CreepMemory,false)) {
         result.success = true;
       }
     }
