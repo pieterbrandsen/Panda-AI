@@ -98,7 +98,9 @@ export default class implements IJobs {
     creepCache.executer = jobCache.executer;
     job.fromTargetId = creepId;
     job.lastAssigned = Game.time;
-    if (!IJobMemory.Update(jobId, job).success) return false;
+    if (!IJobMemory.Update(jobId, job).success) {
+      return false;
+    }
     return ICreepData.UpdateMemory(creepId, creepMemory, creepCache).success;
   }
 
@@ -245,7 +247,7 @@ export default class implements IJobs {
       if (permJobData.success) {
         const permJobCache = permJobData.cache as JobCache;
         if (jobTypes.includes(permJobCache.type)) {
-          this.AssignCreepJob(
+          return this.AssignCreepJob(
             creep.id,
             creepMemory,
             creepCache,
@@ -297,6 +299,7 @@ export default class implements IJobs {
             );
             if (csSiteAtLocation) {
               jobMemory.targetId = csSiteAtLocation.id;
+              updatedMemory = true;
             } else {
               const structureAtLocation = IRoomInterface.GetStructuresAtLocation(
                 room,
