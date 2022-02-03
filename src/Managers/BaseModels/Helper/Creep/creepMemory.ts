@@ -61,9 +61,12 @@ export default class implements ICreepHelper {
       cache: undefined,
     };
 
+    
     const memoryData = ICreepMemory.Get(id);
     if (memoryData.success) {
-      if (IJobs.UnassignCreepJob(id, memoryData.data as CreepMemory, false)) {
+      const memory = memoryData.data as CreepMemory;
+      delete Memory.creeps[memory.name];
+      if (IJobs.UnassignCreepJob(id, memory, false)) {
         result.success = true;
       }
     }
@@ -122,7 +125,6 @@ export default class implements ICreepHelper {
       memory: undefined,
       cache: undefined,
     };
-    delete Memory.creeps[data.name];
 
     const memoryResult = ICreepMemory.Initialize(
       data.id,

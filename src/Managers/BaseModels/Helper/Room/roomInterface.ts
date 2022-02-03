@@ -14,7 +14,7 @@ export default class implements IRoomHelper {
     return executer.split("-")[1];
   }
 
-  static GetStructuresAtLocation(
+  static GetStructureAtLocation(
     room: Room,
     pos: FreezedRoomPosition,
     structureType: StructureConstant

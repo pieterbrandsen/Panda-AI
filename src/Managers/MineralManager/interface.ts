@@ -2,6 +2,7 @@ import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
 import IJobMemory from "../BaseModels/Helper/Job/jobMemory";
 import IRoomConstruction from "../BaseModels/Helper/Room/roomConstruction";
+import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
 
 interface IMineralManager {}
 
@@ -43,6 +44,13 @@ export default class implements IMineralManager {
           managerMemory.extractorBuildJobId = createdSite;
           this.updatedMemory = true;
         }
+        else {
+          const structure = IRoomHelper.GetStructureAtLocation(this.room,mineralMemory.pos,STRUCTURE_EXTRACTOR);
+          if (structure) {
+            managerMemory.extractorId = structure.id;
+            this.updatedMemory = true; 
+          }
+        }
         return;
       }
       if (managerMemory.extractorBuildJobId) {
@@ -63,6 +71,10 @@ export default class implements IMineralManager {
 
       if (!mineralMemory.jobId) {
         const mineral = Game.getObjectById<Mineral>(mineralMemory.id);
+        const maxCreepsAround = IRoomPosition.GetNonWallPositionsAround(
+          mineralMemory.pos,
+          this.room
+        );
         const jobResult = IJobMemory.Initialize({
           executer: this.executer,
           pos: mineralMemory.pos,
@@ -70,6 +82,7 @@ export default class implements IMineralManager {
           type: "HarvestMineral",
           amountToTransfer: mineral ? mineral.mineralAmount : 0,
           objectType: "Creep",
+          maxCreepsCount:maxCreepsAround
         });
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
         const jobId = IJobMemory.GetJobId(

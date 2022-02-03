@@ -15,7 +15,7 @@ export default class implements ICreepExecuter {
     const creepMemory = creepData.memory as CreepMemory;
     const creepCache = creepData.cache as CreepCache;
 
-    creep.say(creepMemory.permJobId ?? "none");
+    creep.say(creepMemory.jobId ?? "none");
     if (creepMemory.jobId) {
       const jobData = IJobData.GetMemory(creepMemory.jobId);
       if (!jobData.success) {

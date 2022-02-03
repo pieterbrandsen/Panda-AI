@@ -130,9 +130,14 @@ export default class ICreepBodyPartHelper {
             break;
           case "HarvestMineral":
             bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
-            amount = memory.amountToTransfer ?? 0;
-            per1Lifetime = 1000;
-            multiplier = 4;
+            if (
+              this.spawnRoom.controller &&
+              this.spawnRoom.controller.level > 6
+            ) {
+              amount = memory.amountToTransfer ?? 0;
+              per1Lifetime = 1000;
+              multiplier = 4;
+            }
             break;
           case "TransferSpawn":
             bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
@@ -285,6 +290,7 @@ export default class ICreepBodyPartHelper {
       case "UpgradeController":
         return "worker";
       case "HarvestSource":
+        case "HarvestMineral":
         return "miner";
       case "WithdrawStructure":
       case "WithdrawResource":

@@ -133,6 +133,34 @@ export default class implements IJobs {
     return IJobCache.Update(id, job);
   }
 
+  static GetJobScore(memory: JobMemory): number {
+    if (memory.assignedCreeps.length >= (memory.maxCreepsCount ?? 100)) return 0;
+    let score = 0;
+    score += Game.time / memory.lastAssigned;
+    if (memory.maxCreepsCount) {
+      score += memory.assignedCreeps.length / memory.maxCreepsCount;
+    }
+    return score;
+  }
+
+  static FindBestJob(jobIds: string[]): string | undefined {
+    let bestJobId: string | undefined = undefined;
+    let bestScore = 0;
+    forEach(jobIds, (jobId: string) => {
+      const jobMemoryResult = IJobMemory.Get(jobId);
+      if (jobMemoryResult.success) {
+        const jobMemory = jobMemoryResult.data as JobMemory;
+        const score = this.GetJobScore(jobMemory);
+        if (score > 0 && score > bestScore) {
+          bestScore = score;
+          bestJobId = jobId;
+        }
+      }
+    });
+
+    return bestJobId;
+  }
+
   static FindNewJob(
     executer: string,
     jobTypes: JobTypes[],
@@ -144,23 +172,7 @@ export default class implements IJobs {
       roomNames,
       Predicates.IsJobTypes(jobTypes)
     );
-    let jobId: string | undefined;
-    let lastAssigned = Infinity;
-    let jobIds = Object.keys(jobs);
-    forEach(jobIds, (id) => {
-      const jobMemoryResult = IJobMemory.Get(id);
-      if (jobMemoryResult.success) {
-        const jobMemory = jobMemoryResult.data as JobMemory;
-        if (
-          jobMemory.lastAssigned < lastAssigned &&
-          jobMemory.assignedCreeps.length < (jobMemory.maxCreepsCount ?? 100)
-        ) {
-          jobId = id;
-          lastAssigned = jobMemory.lastAssigned;
-        }
-      }
-    });
-
+    let jobId = this.FindBestJob(Object.keys(jobs));
     if (jobId !== undefined) {
       return { id: jobId, cache: jobs[jobId] };
     }
@@ -171,21 +183,7 @@ export default class implements IJobs {
       roomNames,
       Predicates.IsJobTypes(jobTypes)
     );
-    jobIds = Object.keys(jobs);
-    forEach(jobIds, (id) => {
-      const jobMemoryResult = IJobMemory.Get(id);
-      if (jobMemoryResult.success) {
-        const jobMemory = jobMemoryResult.data as JobMemory;
-        if (
-          jobMemory.lastAssigned < lastAssigned &&
-          jobMemory.assignedCreeps.length < (jobMemory.maxCreepsCount ?? 99)
-        ) {
-          jobId = id;
-          lastAssigned = jobMemory.lastAssigned;
-        }
-      }
-    });
-
+    this.FindBestJob(Object.keys(jobs));
     if (jobId !== undefined) {
       return { id: jobId, cache: jobs[jobId] };
     }
@@ -301,7 +299,7 @@ export default class implements IJobs {
               jobMemory.targetId = csSiteAtLocation.id;
               updatedMemory = true;
             } else {
-              const structureAtLocation = IRoomInterface.GetStructuresAtLocation(
+              const structureAtLocation = IRoomInterface.GetStructureAtLocation(
                 room,
                 jobMemory.pos,
                 jobMemory.structureType as StructureConstant
@@ -349,28 +347,6 @@ export default class implements IJobs {
           );
           if (!target || (jobMemory.amountToTransfer ?? 0) <= 0) {
             this.Delete(id);
-            // const targetStructureMemory = IStructureMemory.Get(
-            //   jobMemory.targetId
-            // );
-            // const fromTargetStructureMemory = IStructureMemory.Get(
-            //   jobMemory.fromTargetId ?? ""
-            // );
-            // if (fromTargetStructureMemory.data) {
-            //   delete fromTargetStructureMemory.data.energyIncoming[
-            //     jobMemory.targetId
-            //   ];
-            //   delete fromTargetStructureMemory.data.energyOutgoing[
-            //     jobMemory.targetId
-            //   ];
-            // }
-            // if (targetStructureMemory.data && jobMemory.fromTargetId) {
-            //   delete targetStructureMemory.data.energyIncoming[
-            //     jobMemory.fromTargetId
-            //   ];
-            //   delete targetStructureMemory.data.energyOutgoing[
-            //     jobMemory.fromTargetId
-            //   ];
-            // }
           }
         }
         break;
@@ -409,3 +385,10 @@ export default class implements IJobs {
     return IJobData.DeleteMemory(id, true, true).success;
   }
 }
+
+// Game.market.createOrder({
+//   type: ORDER_BUY,
+//   resourceType: CPU_UNLOCK,
+//   price: 44 * 1000 * 1000,
+//   totalAmount: 1,
+// });
