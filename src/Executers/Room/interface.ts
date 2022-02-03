@@ -12,6 +12,7 @@ import ICreepExecuter from "../Creep/interface";
 import IStructureExecuter from "../Structure/interface";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
+import ISetupRoom from "../../Managers/BaseModels/Helper/Room/setupRoom";
 
 interface IRoomExecuter {}
 
@@ -22,7 +23,7 @@ export default class implements IRoomExecuter {
     forEach(roomNamesWithVision, (roomName) => {
       const room = Game.rooms[roomName];
       if (!roomsCache[roomName]) {
-        IRoomData.Initialize({ room });
+    new ISetupRoom(room).Initialize();
       }
     });
 

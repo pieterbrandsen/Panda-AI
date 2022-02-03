@@ -134,7 +134,6 @@ export default class implements IRoomHelper {
       result.cache = cacheResult.data;
     }
 
-    ISetupRoom.SetupStructures(data.room);
     return result;
   }
 }

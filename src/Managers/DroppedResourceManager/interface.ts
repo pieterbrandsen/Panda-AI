@@ -3,6 +3,7 @@ import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
 import IDroppedResourceData from "../BaseModels/Helper/DroppedResource/droppedResourceMemory";
 import IDroppedResourceCache from "../BaseModels/Cache/droppedResourceInterface";
+import IJobs from "../BaseModels/Jobs/interface";
 
 interface ISourceManager {}
 
@@ -35,6 +36,7 @@ export default class implements ISourceManager {
     forEach(droppedResourceMemoryIds, (id) => {
       const resource = Game.getObjectById<Resource | null>(id);
       if (!resource) {
+        IJobs.Delete(id);
         IDroppedResourceData.DeleteMemory(id, true, true);
       }
     });

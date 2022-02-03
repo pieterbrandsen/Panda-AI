@@ -1,6 +1,5 @@
 import IDroppedResourceMemory from "../../Memory/droppedResourceInterface";
 import IDroppedResourceCache from "../../Cache/droppedResourceInterface";
-import IJobs from "../../Jobs/interface";
 
 interface IDroppedResourceHelper {}
 
@@ -76,10 +75,6 @@ export default class implements IDroppedResourceHelper {
       cache: undefined,
     };
 
-    const memoryData = IDroppedResourceMemory.Get(id);
-    if (memoryData.success) {
-      IJobs.Delete(id);
-    }
 
     if (isMemory) {
       const deleteResult = IDroppedResourceMemory.Delete(id);

@@ -194,13 +194,13 @@ export default class implements IJobs {
     creep: Creep,
     creepType: CreepTypes,
     executer: string
-  ): JobTypes[] {
+  ): JobTypes[] | string | undefined {
     if (creep.store.getUsedCapacity() > 0) {
       switch (creepType) {
         case "worker":
           return ["Build", "UpgradeController", "Repair"];
         case "transferer":
-          new IResourceStorage(creep, "Creep", executer).Manage(false, true);
+          return new IResourceStorage(creep, "Creep", executer).Manage(false, true);
         // skip default case
       }
     } else {
@@ -209,15 +209,12 @@ export default class implements IJobs {
           return ["HarvestMineral", "HarvestSource"];
         case "worker":
         case "transferer":
-          new IResourceStorage(creep, "Creep", executer).Manage(true, false);
-          break;
+          return new IResourceStorage(creep, "Creep", executer).Manage(true, false);
         case "claimer":
           return ["ReserveController"];
         // skip default case
       }
     }
-
-    return [];
   }
 
   static FindJobForCreep(creep: Creep): boolean {
@@ -234,11 +231,27 @@ export default class implements IJobs {
       roomNames = Object.keys(roomMemory.remoteRooms ?? {});
     }
 
-    const jobTypes = this.GetJobTypesToExecute(
+    const jobTypesOrJobId = this.GetJobTypesToExecute(
       creep,
       creepCache.type,
       creepCache.executer
     );
+    if (jobTypesOrJobId === undefined) {
+      return false;
+    }
+
+    let jobTypes:JobTypes[] = [];
+    if(Array.isArray(jobTypesOrJobId)) {
+      jobTypes = jobTypesOrJobId;
+    } else {
+      const jobId = jobTypesOrJobId as string;
+      const jobData = IJobData.GetMemory(jobId);
+      if (!jobData.success) {
+        return false;
+      }
+      return this.AssignCreepJob(creep.id,creepMemory,creepCache,jobId,jobData.cache as JobCache);
+    }
+
 
     if (creepMemory.permJobId) {
       const permJobData = IJobData.GetMemory(creepMemory.permJobId);

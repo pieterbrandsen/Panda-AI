@@ -1,4 +1,4 @@
-import { forOwn } from "lodash";
+import { forEach, forOwn } from "lodash";
 import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
@@ -36,11 +36,18 @@ export default class implements ICreepExecuter {
   }
 
   static ExecuterAllCreeps(creeps: StringMap<CreepCache>): void {
-    forOwn(creeps, (cache: CreepCache, id: string) => {
+    forEach(Object.keys(creeps), (id: string) => {
+      const creepData = ICreepData.GetMemory(id);
+      if (!creepData.success) {
+        return;
+      }
+      const creepMemory = creepData.memory as CreepMemory;
+
       const creep: Creep | null = Game.getObjectById(id);
       if (creep) {
         this.ExecuteCreep(creep);
       } else if (!Game.creeps[id]) {
+        IJobs.UnassignCreepJob(id,creepMemory,false);
         ICreepData.DeleteMemory(id, true, true);
       }
     });

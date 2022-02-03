@@ -7,7 +7,6 @@ import CachePredicates from "../Cache/predicates";
 import IJobData from "../Helper/Job/jobMemory";
 import IDroppedResourceCache from "../Cache/droppedResourceInterface";
 import IDroppedResourceData from "../Helper/DroppedResource/droppedResourceMemory";
-import IJobs from "../Jobs/interface";
 
 interface IResourceStorage {
   object: StructuresWithStorage | Creep;
@@ -25,7 +24,7 @@ interface IResourceStorage {
     inRoomRange: number
   ): BestStructureLoop | BestDroppedResourceLoop | null;
   FindStructureToEmptyTo(inRoomRange: number): BestStructureLoop | null;
-  Manage(): boolean;
+  Manage(): string | undefined;
 }
 
 export default class ResourceStorage implements IResourceStorage {
@@ -418,7 +417,7 @@ export default class ResourceStorage implements IResourceStorage {
     isSpending: boolean,
     targetStructureInformation?: BestStructureLoop,
     targetResourceInformation?: BestDroppedResourceLoop
-  ): void {
+  ): string | undefined {
     if (!this.memory || !this.cache) return;
     const targetDataResult = targetStructureInformation
       ? IStructureData.GetMemory(targetStructureInformation?.id ?? "")
@@ -506,28 +505,25 @@ export default class ResourceStorage implements IResourceStorage {
           this.object.id,
           this.memory as StructureMemory
         );
-      } else {
-        const creepId = (this.object as Creep).id;
-        const creepMemory = this.memory as CreepMemory;
-        const creepCache = this.cache as CreepCache;
-        IJobs.AssignCreepJob(
-          creepId,
-          creepMemory,
-          creepCache,
-          jobId,
-          jobData.cache as JobCache
+      } else if (this.type === "Resource") {
+        IDroppedResourceData.UpdateMemory(
+          this.object.id,
+          this.memory as DroppedResourceMemory
         );
+      }
+      else {
+        return id;
       }
     }
   }
 
-  Manage(fillFrom = true, emptyTo = true, inRoomRange = 999): boolean {
+  Manage(fillFrom = true, emptyTo = true, inRoomRange = 999): string | undefined {
     // const structureMemoryResult = IStructureMemory.Get(this.object.id);
     // const structureCacheResult = IStructureCache.Get(this.object.id);
     // if (!structureMemoryResult.success) return;
     // const structureMemory = structureMemoryResult.data as StructureMemory;
     // const structureCache = structureCacheResult.data as StructureCache;
-    if (!this.memory || !this.cache) return false;
+    if (!this.memory || !this.cache) return undefined;
 
     const levelFullCheck = this.IsObjectFullEnough();
     const levelEmptyCheck = this.IsObjectEmptyEnough();
@@ -536,7 +532,7 @@ export default class ResourceStorage implements IResourceStorage {
       if (targetInformation) {
         const targetStructureInformation = targetInformation as BestStructureLoop;
         const targetDroppedResourceInformation = targetInformation as BestDroppedResourceLoop;
-        this.ManageJob(
+        return this.ManageJob(
           levelEmptyCheck,
           false,
           targetStructureInformation.levels
@@ -546,7 +542,6 @@ export default class ResourceStorage implements IResourceStorage {
             ? targetDroppedResourceInformation
             : undefined
         );
-        return true;
       }
     }
 
@@ -555,10 +550,8 @@ export default class ResourceStorage implements IResourceStorage {
         inRoomRange
       );
       if (targetStructureInformation) {
-        this.ManageJob(levelFullCheck, true, targetStructureInformation);
-        return true;
+        return this.ManageJob(levelFullCheck, true, targetStructureInformation);
       }
     }
-    return false;
   }
 }
