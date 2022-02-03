@@ -136,11 +136,12 @@ export default class implements IJobs {
   static GetJobScore(memory: JobMemory): number {
     if (memory.assignedCreeps.length >= (memory.maxCreepsCount ?? 100))
       return 0;
+
     let score = 0;
-    score += Game.time / memory.lastAssigned;
-    if (memory.maxCreepsCount) {
-      score += memory.assignedCreeps.length / memory.maxCreepsCount;
-    }
+    score += (Game.time / memory.lastAssigned - 1) * Game.time;
+    // if (memory.maxCreepsCount) {
+    //  score += memory.assignedCreeps.length / memory.maxCreepsCount;
+    // }
     return score;
   }
 
