@@ -17,12 +17,13 @@ export default class extends BaseMemory implements ICreepMemory {
   /**
    * Create an new object of this type
    */
-  static Generate(isRemoteCreep: boolean): CreepMemory {
+  static Generate(isRemoteCreep: boolean, name: string): CreepMemory {
     return {
       version: super.MinimumVersion(this.type),
       energyOutgoing: {},
       energyIncoming: {},
       isRemoteCreep,
+      name,
     };
   }
 
@@ -48,7 +49,6 @@ export default class extends BaseMemory implements ICreepMemory {
 
   static Delete(id: string): CRUDResult<CreepMemory> {
     delete Memory.CreepsData.data[id];
-    delete Memory.creeps[id];
     return { success: true, data: undefined };
   }
 
@@ -60,9 +60,10 @@ export default class extends BaseMemory implements ICreepMemory {
 
   static Initialize(
     id: string,
+    name: string,
     isRemoteCreep: boolean
   ): CRUDResult<CreepMemory> {
-    const data = this.Generate(isRemoteCreep);
+    const data = this.Generate(isRemoteCreep, name);
     const result = this.Create(id, data);
     return { success: result.success, data: result.data };
   }

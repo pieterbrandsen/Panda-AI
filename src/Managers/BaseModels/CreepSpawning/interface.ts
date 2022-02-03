@@ -86,15 +86,16 @@ export default class CreepSpawning implements ICreepSpawning {
   }
 
   SetupCreepMemory(creep: SpawningObject, executer: string): boolean {
-    const memory: CreepInitializationData = {
+    const data: CreepInitializationData = {
       body: ICreepBodyPartHelper.ConvertBodyToStringMap(creep.body),
       executer,
       isRemoteCreep: this.isRemoteCreep,
-      name: creep.name,
+      id: creep.name,
       pos: this.spawns[0].pos,
       type: creep.type,
+      name: creep.name,
     };
-    return ICreepMemory.Initialize(memory).success;
+    return ICreepMemory.Initialize(data).success;
   }
 
   RequestCreep(type: CreepTypes): SpawningObject | undefined {
@@ -189,6 +190,8 @@ export default class CreepSpawning implements ICreepSpawning {
 
       if (aliveCreepCount < 2 && creepType === "miner") {
         scores[creepType] = 999;
+      } else if (aliveCreepCount < 1 && creepType === "transferer") {
+        scores[creepType] = 999;
       } else if (missingBodyPartCount <= 0 || missingCreepCount <= 0) {
         scores[key] = 0;
       } else if (missingBodyPartCount === 0 || aliveBodyPartCount === 0) {
@@ -255,6 +258,7 @@ export default class CreepSpawning implements ICreepSpawning {
       this.SetupCreepMemory(creep, executer);
       this.UpdateMissingBodyParts(creep.type, creep.body);
       this.spawns.shift();
+      Memory.updateCreepNames.push(creep.name);
       return true;
     }
     return false;

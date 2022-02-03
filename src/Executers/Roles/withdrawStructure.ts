@@ -1,6 +1,4 @@
-import IStructureData from "../../Managers/BaseModels/Helper/Structure/structureMemory";
-import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
-import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
+import IJobs from "../../Managers/BaseModels/Jobs/interface";
 
 interface ICreepWithdrawStructureRole {}
 
@@ -53,28 +51,11 @@ export default class implements ICreepWithdrawStructureRole {
         case ERR_NOT_ENOUGH_RESOURCES:
           return "done";
         case OK:
-          {
-            const targetMemoryResult = IStructureData.GetMemory(
-              this.jobMemory.targetId
-            );
-            if (targetMemoryResult.success) {
-              const targetMemory = targetMemoryResult.memory as StructureMemory;
-              targetMemory.energyOutgoing[
-                this.jobMemory.fromTargetId as string
-              ] -= amountToWithdraw;
-              this.creepMemory.energyIncoming[
-                this.jobMemory.targetId as string
-              ] -= amountToWithdraw;
-              (this.jobMemory.amountToTransfer as number) -= amountToWithdraw;
-
-              IJobData.UpdateMemory(
-                this.creepMemory.jobId as string,
-                this.jobMemory
-              );
-              ICreepData.UpdateMemory(this.creep.name, this.creepMemory);
-              IStructureData.UpdateMemory(target.id, targetMemory);
-            }
-          }
+          IJobs.UpdateAmount(
+            this.creepMemory.jobId as string,
+            this.jobMemory,
+            amountToWithdraw
+          );
           break;
         // skip default case
       }

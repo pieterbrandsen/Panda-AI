@@ -1,5 +1,4 @@
-import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
-import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
+import IJobs from "../../Managers/BaseModels/Jobs/interface";
 
 interface ICreepWithdrawResourceRole {}
 
@@ -50,16 +49,11 @@ export default class implements ICreepWithdrawResourceRole {
         case ERR_FULL:
           return "full";
         case OK:
-          this.creepMemory.energyIncoming[
-            this.jobMemory.targetId as string
-          ] -= amountToWithdraw;
-          (this.jobMemory.amountToTransfer as number) -= amountToWithdraw;
-
-          IJobData.UpdateMemory(
+          IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
-            this.jobMemory
+            this.jobMemory,
+            amountToWithdraw
           );
-          ICreepData.UpdateMemory(this.creep.name, this.creepMemory);
           break;
         // skip default case
       }

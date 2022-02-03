@@ -1,7 +1,6 @@
 import { clone, pickBy } from "lodash";
 import BaseMemory from "./interface";
 import RoomPosition from "../Helper/Room/roomPosition";
-import Predicates from "./predicates";
 
 interface IJobMemory {}
 
@@ -35,7 +34,7 @@ export default class extends BaseMemory implements IJobMemory {
       structureType,
       objectType,
       maxCreepsCount,
-      assignedCreeps: []
+      assignedCreeps: [],
     };
   }
 
@@ -66,7 +65,10 @@ export default class extends BaseMemory implements IJobMemory {
     return { success: true, data: undefined };
   }
 
-  static GetAll(getOnlyFreeJobs:boolean = false,predicate?: Predicate<JobMemory>): StringMap<JobMemory> {
+  static GetAll(
+    getOnlyFreeJobs = false,
+    predicate?: Predicate<JobMemory>
+  ): StringMap<JobMemory> {
     let { data } = Memory.JobsData;
     if (getOnlyFreeJobs) data = pickBy(data);
     data = super.GetAllData(data, this.type, predicate);

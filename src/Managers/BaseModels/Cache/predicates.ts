@@ -46,9 +46,9 @@ export default class {
     };
   };
 
-  static IsInRangeOf(pos: FreezedRoomPosition, range: number) {
-    return (cache: StructureCache): boolean => {
-      return Math.hypot(pos.x - cache.pos.x, pos.y - cache.pos.y) <= range;
+  static IsInRangeOf(pos: RoomPosition, range: number) {
+    return (cache: StructureCache | DroppedResourceCache): boolean => {
+      return pos.getRangeTo(cache.pos.x, cache.pos.y) <= range;
     };
   }
 }

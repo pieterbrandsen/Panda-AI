@@ -21,10 +21,11 @@ interface DroppedResourceMemory extends BaseMemory {
 }
 interface CreepMemory extends BaseMemory {
   jobId?: string;
-  permJobId?:string;
+  permJobId?: string;
   isRemoteCreep: boolean;
   energyIncoming: StringMap<number>;
   energyOutgoing: StringMap<number>;
+  name: string;
 }
 interface StructureMemory extends BaseMemory {
   jobId?: string;
@@ -54,6 +55,7 @@ interface Memory extends BaseMemory {
     DroppedResourceMemory,
     DroppedResourceCache
   >;
+  updateCreepNames: string[];
 }
 
 type MemoryObjects =

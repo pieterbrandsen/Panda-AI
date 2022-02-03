@@ -1,5 +1,5 @@
-import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 import IResourceStorage from "../../Managers/BaseModels/ResourceStorage/interface";
+import IJobs from "../../Managers/BaseModels/Jobs/interface";
 
 interface ICreepUpgradeControllerRole {}
 
@@ -51,11 +51,10 @@ export default class implements ICreepUpgradeControllerRole {
           this.creep.moveTo(target);
           break;
         case OK:
-          (this.jobMemory
-            .amountToTransfer as number) -= this.creepCache.body.work;
-          IJobData.UpdateMemory(
+          IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
-            this.jobMemory
+            this.jobMemory,
+            this.creepCache.body.work
           );
           break;
         // skip default case

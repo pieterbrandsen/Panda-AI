@@ -1,7 +1,6 @@
 import { forEach } from "lodash";
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
-import IJobData from "../BaseModels/Helper/Job/jobMemory";
 import IDroppedResourceData from "../BaseModels/Helper/DroppedResource/droppedResourceMemory";
 import IDroppedResourceCache from "../BaseModels/Cache/droppedResourceInterface";
 
@@ -50,33 +49,31 @@ export default class implements ISourceManager {
           executer: this.executer,
           resource: droppedResource,
         });
-        if (!droppedResourceData.success) {
-          return;
-        }
       }
-      const droppedResourceMemory = droppedResourceData.memory as DroppedResourceMemory;
+      // const droppedResourceMemory = droppedResourceData.memory as DroppedResourceMemory;
 
-      const jobId = droppedResourceMemory.jobId ?? "";
-      const jobData = IJobData.GetMemory(jobId);
-      if (!jobData.success) {
-        IJobData.Initialize({
-          executer: this.executer,
-          objectType: "Resource",
-          pos: droppedResource.pos,
-          targetId: droppedResource.id,
-          type: "WithdrawResource",
-          amountToTransfer: droppedResource.amount,
-        });
-        droppedResourceMemory.jobId = jobId;
-        IDroppedResourceData.UpdateMemory(
-          droppedResource.id,
-          droppedResourceMemory
-        );
-      } else {
-        const job = jobData.memory as JobMemory;
-        job.amountToTransfer = droppedResource.amount;
-        IJobData.UpdateMemory(jobId, job);
-      }
+      // const jobId = droppedResourceMemory.jobId ?? "";
+      // const jobData = IJobData.GetMemory(jobId);
+      // if (!jobData.success) {
+      //   IJobData.Initialize({
+      //     executer: this.executer,
+      //     objectType: "Resource",
+      //     pos: droppedResource.pos,
+      //     targetId: droppedResource.id,
+      //     type: "WithdrawResource",
+      //     amountToTransfer: droppedResource.amount,
+      //     fromTargetId: droppedResource.id,
+      //   });
+      //   droppedResourceMemory.jobId = jobId;
+      //   IDroppedResourceData.UpdateMemory(
+      //     droppedResource.id,
+      //     droppedResourceMemory
+      //   );
+      // } else {
+      //   const job = jobData.memory as JobMemory;
+      //   job.amountToTransfer = droppedResource.amount;
+      //   IJobData.UpdateMemory(jobId, job);
+      // }
     });
   }
 

@@ -5,10 +5,6 @@ import IJobs from "../../Jobs/interface";
 interface ICreepHelper {}
 
 export default class implements ICreepHelper {
-  static GetCreepId(name: string): string {
-    return name;
-  }
-
   static GetMemory(id: string): DoubleCRUDResult<CreepMemory, CreepCache> {
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
@@ -46,7 +42,7 @@ export default class implements ICreepHelper {
     }
 
     const cacheResult = ICreepCache.Create(id, cache);
-    if (cacheResult.success) {
+    if (cacheResult.success && result.success) {
       result.cache = cacheResult.data;
       result.success = true;
     }
@@ -67,7 +63,7 @@ export default class implements ICreepHelper {
 
     const memoryData = ICreepMemory.Get(id);
     if (memoryData.success) {
-      if (IJobs.UnassignCreepJob(id, memoryData.data as CreepMemory,false)) {
+      if (IJobs.UnassignCreepJob(id, memoryData.data as CreepMemory, false)) {
         result.success = true;
       }
     }
@@ -121,19 +117,24 @@ export default class implements ICreepHelper {
   static Initialize(
     data: CreepInitializationData
   ): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const id = this.GetCreepId(data.name);
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = ICreepMemory.Initialize(id, data.isRemoteCreep);
+    delete Memory.creeps[data.name];
+
+    const memoryResult = ICreepMemory.Initialize(
+      data.id,
+      data.name,
+      data.isRemoteCreep
+    );
     if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
     const cacheResult = ICreepCache.Initialize(
-      id,
+      data.id,
       data.executer,
       data.body,
       data.pos,

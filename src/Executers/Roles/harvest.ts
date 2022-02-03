@@ -1,4 +1,4 @@
-import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
+import IJobs from "../../Managers/BaseModels/Jobs/interface";
 import IResourceStorage from "../../Managers/BaseModels/ResourceStorage/interface";
 
 interface ICreepHarvestRole {}
@@ -57,11 +57,10 @@ export default class implements ICreepHarvestRole {
           break;
         case OK:
           if (this.jobCache.type === "HarvestMineral") {
-            (this.jobMemory
-              .amountToTransfer as number) -= this.creepCache.body.work;
-            IJobData.UpdateMemory(
+            IJobs.UpdateAmount(
               this.creepMemory.jobId as string,
-              this.jobMemory
+              this.jobMemory,
+              this.creepCache.body.work
             );
           }
           break;

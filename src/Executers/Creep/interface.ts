@@ -8,7 +8,7 @@ interface ICreepExecuter {}
 
 export default class implements ICreepExecuter {
   static ExecuteCreep(creep: Creep): void {
-    const creepData = ICreepData.GetMemory(ICreepData.GetCreepId(creep.name));
+    const creepData = ICreepData.GetMemory(creep.id);
     if (!creepData.success) {
       return;
     }
@@ -36,10 +36,10 @@ export default class implements ICreepExecuter {
 
   static ExecuterAllCreeps(creeps: StringMap<CreepCache>): void {
     forOwn(creeps, (cache: CreepCache, id: string) => {
-      const creep: Creep | undefined = Game.creeps[id];
+      const creep: Creep | null = Game.getObjectById(id);
       if (creep) {
         this.ExecuteCreep(creep);
-      } else {
+      } else if (!Game.creeps[id]) {
         ICreepData.DeleteMemory(id, true, true);
       }
     });

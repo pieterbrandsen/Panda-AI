@@ -25,6 +25,7 @@ interface DroppedResourceInitializationData {
 }
 
 interface CreepInitializationData {
+  id: string;
   name: string;
   isRemoteCreep: boolean;
   executer: string;

@@ -6,9 +6,7 @@ import ITransferRole from "./transfer";
 import IWithdrawStructureRole from "./withdrawStructure";
 import IWithdrawResourceRole from "./withdrawResource";
 import IUpgradeControllerRole from "./upgradeController";
-import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
-import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
 
 interface IExecuteCreepRole {}
 
@@ -111,22 +109,26 @@ export default class implements IExecuteCreepRole {
   }
 
   run(): void {
-    const spendJobs: JobTypes[] = ["Build","Repair","UpgradeController","TransferSpawn","TransferStructure"];
+    const spendJobs: JobTypes[] = ["Build", "Repair", "UpgradeController"];
     // const gatherJobs: JobTypes[] = ["WithdrawResource","WithdrawStructure","HarvestMineral","HarvestSource"];
 
     const result = this.executeRole();
-    const creepId = ICreepData.GetCreepId(this.creep.name);
+    const creepId = this.creep.id;
     switch (result) {
       case "done":
-        IJobs.UnassignCreepJob(creepId, this.creepMemory,false);
-        IJobData.DeleteMemory(this.creepMemory.jobId ?? "", true, true);
+        IJobs.UnassignCreepJob(creepId, this.creepMemory, false);
+        IJobs.Delete(this.creepMemory.jobId ?? "");
         break;
       case "empty":
-        IJobs.UnassignCreepJob(creepId, this.creepMemory,spendJobs.includes(this.jobCache.type));
-          break;
-          case "full":
-            IJobs.UnassignCreepJob(creepId, this.creepMemory,false);
-            break;
+        IJobs.UnassignCreepJob(
+          creepId,
+          this.creepMemory,
+          spendJobs.includes(this.jobCache.type)
+        );
+        break;
+      case "full":
+        IJobs.UnassignCreepJob(creepId, this.creepMemory, false);
+        break;
       default:
         break;
     }

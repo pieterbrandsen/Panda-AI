@@ -51,6 +51,7 @@ export default class extends BaseMemory implements IGlobalMemory {
         },
       },
       ...defaultObject,
+      updateCreepNames: [],
     };
   }
 

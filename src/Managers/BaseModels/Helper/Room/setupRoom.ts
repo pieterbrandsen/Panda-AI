@@ -47,8 +47,9 @@ export default class implements IRoomSetup {
         body: IBodyHelper.ConvertBodyToStringMap(body),
         isRemoteCreep,
         executer,
-        name: creep.name,
+        id: creep.id,
         pos: creep.pos,
+        name: creep.name,
         type,
       });
     });

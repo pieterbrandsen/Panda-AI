@@ -1,7 +1,7 @@
 import { forEach } from "lodash";
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
-import IJobMemory from "../BaseModels/Helper/Job/jobMemory";
+import IJobData from "../BaseModels/Helper/Job/jobMemory";
 import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
 
 interface ISourceManager {}
@@ -38,7 +38,7 @@ export default class implements ISourceManager {
           sourceMemory.pos,
           this.room
         );
-        const jobResult = IJobMemory.Initialize({
+        const jobResult = IJobData.Initialize({
           executer: this.executer,
           pos: sourceMemory.pos,
           targetId: sourceId,
@@ -48,7 +48,7 @@ export default class implements ISourceManager {
         });
 
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
-        const jobId = IJobMemory.GetJobId(
+        const jobId = IJobData.GetJobId(
           jobResult.cache.type,
           jobResult.memory.pos
         );

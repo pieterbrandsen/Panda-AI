@@ -5,6 +5,7 @@
   "main": "nm",
   "scripts": {
     "build": "rollup -c",
+    "watch-build": "rollup -cw",
     "lint": "eslint **/*",
     "lint-fix": "eslint **/* --fix",
     "push-main": "rollup -c --environment DEST:main",
