@@ -418,7 +418,7 @@ export default class ResourceStorage implements IResourceStorage {
     targetStructureInformation?: BestStructureLoop,
     targetResourceInformation?: BestDroppedResourceLoop
   ): string | undefined {
-    if (!this.memory || !this.cache) return;
+    if (!this.memory || !this.cache) return undefined;
     const targetDataResult = targetStructureInformation
       ? IStructureData.GetMemory(targetStructureInformation?.id ?? "")
       : IDroppedResourceData.GetMemory(targetResourceInformation?.id ?? "");
@@ -485,7 +485,7 @@ export default class ResourceStorage implements IResourceStorage {
         });
 
         if (!jobData.success) {
-          return;
+          return undefined;
         }
       }
 
@@ -510,19 +510,18 @@ export default class ResourceStorage implements IResourceStorage {
           this.object.id,
           this.memory as DroppedResourceMemory
         );
-      }
-      else {
-        return id;
+      } else {
+        return jobId;
       }
     }
+    return undefined;
   }
 
-  Manage(fillFrom = true, emptyTo = true, inRoomRange = 999): string | undefined {
-    // const structureMemoryResult = IStructureMemory.Get(this.object.id);
-    // const structureCacheResult = IStructureCache.Get(this.object.id);
-    // if (!structureMemoryResult.success) return;
-    // const structureMemory = structureMemoryResult.data as StructureMemory;
-    // const structureCache = structureCacheResult.data as StructureCache;
+  Manage(
+    fillFrom = true,
+    emptyTo = true,
+    inRoomRange = 999
+  ): string | undefined {
     if (!this.memory || !this.cache) return undefined;
 
     const levelFullCheck = this.IsObjectFullEnough();
@@ -553,5 +552,6 @@ export default class ResourceStorage implements IResourceStorage {
         return this.ManageJob(levelFullCheck, true, targetStructureInformation);
       }
     }
+    return undefined;
   }
 }

@@ -19,8 +19,11 @@ export default class implements IControllerManager {
 
   cache: RoomCache;
 
+  controller: StructureController;
+
   constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
     this.room = Game.rooms[roomName];
+    this.controller = this.room.controller as StructureController;
     this.memory = roomMemory;
     this.cache = roomCache;
     this.managerMemory = this.memory.controllerManager;
@@ -43,7 +46,7 @@ export default class implements IControllerManager {
           pos: controllerMemory.pos,
           targetId: controllerMemory.id,
           type: jobType,
-          amountToTransfer: 20 * 1000,
+          amountToTransfer: 10 * 1000 * this.controller.level,
           objectType: "Creep",
         });
       }
@@ -52,6 +55,7 @@ export default class implements IControllerManager {
 
   Run(): void {
     if (
+      !this.controller &&
       !this.isRemote &&
       this.managerMemory.controller &&
       !this.managerMemory.controller.isOwned

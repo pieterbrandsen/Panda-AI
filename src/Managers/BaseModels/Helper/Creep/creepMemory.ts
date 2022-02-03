@@ -60,14 +60,13 @@ export default class implements ICreepHelper {
       cache: undefined,
     };
 
-    
     const memoryData = ICreepMemory.Get(id);
     if (memoryData.success) {
       const memory = memoryData.data as CreepMemory;
       delete Memory.creeps[memory.name];
     }
 
-    if (isMemory && result.success) {
+    if (isMemory) {
       const deleteResult = ICreepMemory.Delete(id);
       if (deleteResult.success) {
         result.success = true;

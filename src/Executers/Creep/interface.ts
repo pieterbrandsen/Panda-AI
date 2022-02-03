@@ -1,4 +1,4 @@
-import { forEach, forOwn } from "lodash";
+import { forEach } from "lodash";
 import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
@@ -47,7 +47,7 @@ export default class implements ICreepExecuter {
       if (creep) {
         this.ExecuteCreep(creep);
       } else if (!Game.creeps[id]) {
-        IJobs.UnassignCreepJob(id,creepMemory,false);
+        IJobs.UnassignCreepJob(id, creepMemory, false);
         ICreepData.DeleteMemory(id, true, true);
       }
     });

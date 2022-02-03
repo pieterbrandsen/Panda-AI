@@ -72,8 +72,8 @@ export default class ICreepCountHelper {
           case "HarvestSource":
             amount = memory.maxCreepsCount ?? 5;
             break;
-            case "HarvestMineral":
-              amount = memory.maxCreepsCount ?? 2;
+          case "HarvestMineral":
+            amount = memory.maxCreepsCount ?? 2;
             break;
           case "TransferSpawn":
             if (
@@ -109,7 +109,6 @@ export default class ICreepCountHelper {
         creepCounts[ICreepBodyPartHelper.GetCreepType(cache.type)] += amount;
       }
     });
-
 
     forEach(Object.keys(creepCounts), (type) => {
       switch (type as CreepTypes) {

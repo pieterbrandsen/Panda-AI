@@ -134,7 +134,8 @@ export default class implements IJobs {
   }
 
   static GetJobScore(memory: JobMemory): number {
-    if (memory.assignedCreeps.length >= (memory.maxCreepsCount ?? 100)) return 0;
+    if (memory.assignedCreeps.length >= (memory.maxCreepsCount ?? 100))
+      return 0;
     let score = 0;
     score += Game.time / memory.lastAssigned;
     if (memory.maxCreepsCount) {
@@ -144,7 +145,7 @@ export default class implements IJobs {
   }
 
   static FindBestJob(jobIds: string[]): string | undefined {
-    let bestJobId: string | undefined = undefined;
+    let bestJobId: string | undefined;
     let bestScore = 0;
     forEach(jobIds, (jobId: string) => {
       const jobMemoryResult = IJobMemory.Get(jobId);
@@ -183,7 +184,7 @@ export default class implements IJobs {
       roomNames,
       Predicates.IsJobTypes(jobTypes)
     );
-    this.FindBestJob(Object.keys(jobs));
+    jobId = this.FindBestJob(Object.keys(jobs));
     if (jobId !== undefined) {
       return { id: jobId, cache: jobs[jobId] };
     }
@@ -200,7 +201,10 @@ export default class implements IJobs {
         case "worker":
           return ["Build", "UpgradeController", "Repair"];
         case "transferer":
-          return new IResourceStorage(creep, "Creep", executer).Manage(false, true);
+          return new IResourceStorage(creep, "Creep", executer).Manage(
+            false,
+            true
+          );
         // skip default case
       }
     } else {
@@ -209,12 +213,16 @@ export default class implements IJobs {
           return ["HarvestMineral", "HarvestSource"];
         case "worker":
         case "transferer":
-          return new IResourceStorage(creep, "Creep", executer).Manage(true, false);
+          return new IResourceStorage(creep, "Creep", executer).Manage(
+            true,
+            false
+          );
         case "claimer":
           return ["ReserveController"];
         // skip default case
       }
     }
+    return undefined;
   }
 
   static FindJobForCreep(creep: Creep): boolean {
@@ -240,8 +248,8 @@ export default class implements IJobs {
       return false;
     }
 
-    let jobTypes:JobTypes[] = [];
-    if(Array.isArray(jobTypesOrJobId)) {
+    let jobTypes: JobTypes[] = [];
+    if (Array.isArray(jobTypesOrJobId)) {
       jobTypes = jobTypesOrJobId;
     } else {
       const jobId = jobTypesOrJobId as string;
@@ -249,9 +257,14 @@ export default class implements IJobs {
       if (!jobData.success) {
         return false;
       }
-      return this.AssignCreepJob(creep.id,creepMemory,creepCache,jobId,jobData.cache as JobCache);
+      return this.AssignCreepJob(
+        creep.id,
+        creepMemory,
+        creepCache,
+        jobId,
+        jobData.cache as JobCache
+      );
     }
-
 
     if (creepMemory.permJobId) {
       const permJobData = IJobData.GetMemory(creepMemory.permJobId);
@@ -368,14 +381,8 @@ export default class implements IJobs {
           const controller = Game.getObjectById<StructureController | null>(
             jobMemory.targetId
           );
-          if (!controller || (jobMemory.amountToTransfer ?? 0) <= 0) {
+          if (!controller || (jobMemory.amountToTransfer ?? 0) <= 5 * 1000) {
             this.Delete(id);
-          } else if (
-            jobMemory.amountToTransfer &&
-            jobMemory.amountToTransfer < 1000
-          ) {
-            jobMemory.amountToTransfer = 20 * 1000;
-            updatedMemory = true;
           }
         }
         break;
@@ -400,8 +407,8 @@ export default class implements IJobs {
 }
 
 // Game.market.createOrder({
-//   type: ORDER_BUY,
-//   resourceType: CPU_UNLOCK,
-//   price: 44 * 1000 * 1000,
-//   totalAmount: 1,
+//   type: ORDER_SELL,
+//   resourceType: PIXEL,
+//   price: 10 * 1000,
+//   totalAmount: 1000,
 // });

@@ -1,6 +1,5 @@
 import IRoomMemory from "../../Memory/roomInterface";
 import IRoomCache from "../../Cache/roomInterface";
-import ISetupRoom from "./setupRoom";
 
 interface IRoomHelper {}
 

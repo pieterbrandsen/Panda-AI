@@ -43,12 +43,15 @@ export default class implements IMineralManager {
         if (createdSite) {
           managerMemory.extractorBuildJobId = createdSite;
           this.updatedMemory = true;
-        }
-        else {
-          const structure = IRoomHelper.GetStructureAtLocation(this.room,mineralMemory.pos,STRUCTURE_EXTRACTOR);
+        } else {
+          const structure = IRoomHelper.GetStructureAtLocation(
+            this.room,
+            mineralMemory.pos,
+            STRUCTURE_EXTRACTOR
+          );
           if (structure) {
             managerMemory.extractorId = structure.id;
-            this.updatedMemory = true; 
+            this.updatedMemory = true;
           }
         }
         return;
@@ -82,7 +85,7 @@ export default class implements IMineralManager {
           type: "HarvestMineral",
           amountToTransfer: mineral ? mineral.mineralAmount : 0,
           objectType: "Creep",
-          maxCreepsCount:maxCreepsAround
+          maxCreepsCount: maxCreepsAround,
         });
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
         const jobId = IJobMemory.GetJobId(

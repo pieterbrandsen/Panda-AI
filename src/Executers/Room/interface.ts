@@ -23,7 +23,7 @@ export default class implements IRoomExecuter {
     forEach(roomNamesWithVision, (roomName) => {
       const room = Game.rooms[roomName];
       if (!roomsCache[roomName]) {
-    new ISetupRoom(room).Initialize();
+        new ISetupRoom(room).Initialize();
       }
     });
 

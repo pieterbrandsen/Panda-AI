@@ -75,7 +75,6 @@ export default class implements IDroppedResourceHelper {
       cache: undefined,
     };
 
-
     if (isMemory) {
       const deleteResult = IDroppedResourceMemory.Delete(id);
       if (deleteResult.success) {

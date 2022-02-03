@@ -187,15 +187,16 @@ export default class ICreepBodyPartHelper {
           case "UpgradeController":
             bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
-            per1Lifetime = 2000;
-            multiplier = 1;
+            per1Lifetime = 1000;
+            multiplier = 2;
             break;
           // skip default case
         }
 
         let bodyPartsToBeAdded = Math.ceil(
-          amount / (per1Lifetime * multiplier)
+          amount / (per1Lifetime * multiplier) ?? 0
         );
+        if (bodyPartsToBeAdded === null) bodyPartsToBeAdded = 0;
 
         switch (cache.type) {
           case "UpgradeController":
@@ -203,8 +204,11 @@ export default class ICreepBodyPartHelper {
               this.spawnRoom.controller &&
               this.spawnRoom.controller.level === 8 &&
               bodyPartsToBeAdded > 15
-            )
+            ) {
               bodyPartsToBeAdded = 15;
+            } else if (bodyPartsToBeAdded > 15) {
+              bodyPartsToBeAdded = 15;
+            }
             break;
           default:
             if (bodyPartsToBeAdded > 40) bodyPartsToBeAdded = 40;
@@ -290,7 +294,7 @@ export default class ICreepBodyPartHelper {
       case "UpgradeController":
         return "worker";
       case "HarvestSource":
-        case "HarvestMineral":
+      case "HarvestMineral":
         return "miner";
       case "WithdrawStructure":
       case "WithdrawResource":

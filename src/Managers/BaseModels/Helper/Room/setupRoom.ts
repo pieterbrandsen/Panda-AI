@@ -8,12 +8,17 @@ import IBodyHelper from "../../CreepSpawning/bodyPartHelper";
 interface IRoomSetup {}
 
 export default class implements IRoomSetup {
-  room:Room;
-  structures:Structure[];
+  room: Room;
+
+  structures: Structure[];
+
   creeps: Creep[];
-roomMemory?:RoomMemory;
-updatedRoomMemory:boolean = false;
-  constructor(room:Room) {
+
+  roomMemory?: RoomMemory;
+
+  updatedRoomMemory = false;
+
+  constructor(room: Room) {
     this.room = room;
     this.structures = room.find(FIND_STRUCTURES);
     this.creeps = room.find(FIND_MY_CREEPS);
@@ -21,8 +26,9 @@ updatedRoomMemory:boolean = false;
     if (!roomData.success) return;
     this.roomMemory = roomData.memory as RoomMemory;
   }
+
   SetupStructures(): boolean {
-    const roomMemory = this.roomMemory;
+    const { roomMemory } = this;
     if (roomMemory === undefined) return false;
 
     forEach(this.structures, (structure) => {
@@ -30,8 +36,8 @@ updatedRoomMemory:boolean = false;
       switch (structure.structureType) {
         case "extractor":
           roomMemory.mineralManager.extractorId = structure.id;
-    this.updatedRoomMemory = true;
-    executer = IRoomHelper.GetExecuter(this.room.name, "Mineral");
+          this.updatedRoomMemory = true;
+          executer = IRoomHelper.GetExecuter(this.room.name, "Mineral");
           break;
         case "spawn":
         case "extension":
@@ -45,8 +51,9 @@ updatedRoomMemory:boolean = false;
       }
       IStructureData.Initialize({ executer, structure });
     });
-return true;
+    return true;
   }
+
   SetupCreeps(): boolean {
     forEach(this.creeps, (creep) => {
       const type = creep.name.split("-")[0] as CreepTypes;
@@ -70,13 +77,14 @@ return true;
   }
 
   Initialize(): boolean {
-    const roomData = IRoomData.Initialize({room:this.room});
+    const roomData = IRoomData.Initialize({ room: this.room });
     if (!roomData.success) return false;
 
     this.roomMemory = roomData.memory as RoomMemory;
     this.SetupStructures();
     this.SetupCreeps();
-    if (this.updatedRoomMemory) IRoomData.UpdateMemory(IRoomData.GetId(this.room.name), this.roomMemory);
+    if (this.updatedRoomMemory)
+      IRoomData.UpdateMemory(IRoomData.GetId(this.room.name), this.roomMemory);
     return true;
   }
 }

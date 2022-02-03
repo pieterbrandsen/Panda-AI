@@ -4,7 +4,7 @@ import IGlobalMemory from "./Managers/BaseModels/Memory/globalInterface";
 import IGlobalData from "./Managers/BaseModels/Helper/Global/globalMemory";
 import IRoomsExecuter from "./Executers/Room/interface";
 import ICreepData from "./Managers/BaseModels/Helper/Creep/creepMemory";
-import IJobs  from "./Managers/BaseModels/Jobs/interface";
+import IJobs from "./Managers/BaseModels/Jobs/interface";
 
 // eslint-disable-next-line
 export const loop = ErrorMapper.wrapLoop((): void => {
@@ -40,8 +40,8 @@ export const loop = ErrorMapper.wrapLoop((): void => {
         creepMemory,
         memoryData.cache as CreepCache
       ).success;
-        if (result) result = IJobs.UnassignCreepJob(name,creepMemory,false);
-        if (result) result = ICreepData.DeleteMemory(name, true, true).success;
+      IJobs.UnassignCreepJob(name, creepMemory, false);
+      if (result) result = ICreepData.DeleteMemory(name, true, true).success;
       if (result) Memory.updateCreepNames.splice(index, 1);
     } else if (!creep) {
       Memory.updateCreepNames.splice(index, 1);
