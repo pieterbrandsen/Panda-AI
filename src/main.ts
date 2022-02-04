@@ -1,32 +1,50 @@
-import HeapInitializer from "./heap/initialization";
-import HeapValidator from "./heap/validation";
-import GarbageCollection from "./memory/garbageCollection";
-import MemoryInitializer from "./memory/initialization";
-import MemoryValidator from "./memory/validation";
-import ExecuteRooms from "./rooms/executeRooms";
-import { VersionedMemoryTypeName } from "./utils/constants/memory";
-import { ErrorMapper } from "./utils/external/errorMapper";
+import { forEach } from "lodash";
+import { ErrorMapper } from "./tempErrorMapper";
+import IGlobalMemory from "./Managers/BaseModels/Memory/globalInterface";
+import IGlobalData from "./Managers/BaseModels/Helper/Global/globalMemory";
+import IRoomsExecuter from "./Executers/Room/interface";
+import ICreepData from "./Managers/BaseModels/Helper/Creep/creepMemory";
+import IJobs from "./Managers/BaseModels/Jobs/interface";
 
 // eslint-disable-next-line
 export const loop = ErrorMapper.wrapLoop((): void => {
-  if (
-    !MemoryValidator.IsMemoryValid(Memory.version, VersionedMemoryTypeName.Root)
-  ) {
-    MemoryInitializer.SetupRootMemory();
-    if (
-      !MemoryValidator.IsMemoryValid(
-        Memory.version,
-        VersionedMemoryTypeName.Root
-      )
-    )
-      return;
+  // const orders = Game.market.getAllOrders(order => order.resourceType == CPU_UNLOCK &&
+  //   order.type == ORDER_BUY &&
+  //   order.price > 40 * 1000 * 1000);
+
+  // for(let i=0; i<orders.length; i++) {
+  //   const order = orders[i];
+  //   const result = Game.market.deal(order.id, 100);
+  //   if (result == OK) {
+  //     const message = `Dealed ${order.amount} for ${order.price}`;
+  //     Game.notify(message,0);
+  //     console.log(message);
+  //   }
+  // }
+
+  if (!IGlobalMemory.ValidateSingle()) {
+    IGlobalData.Initialize();
+    return;
   }
 
-  if (!HeapValidator.IsHeapValid()) {
-    HeapInitializer.SetupHeap();
-    if (!HeapValidator.IsHeapValid()) return;
-  }
+  IRoomsExecuter.ExecuteAllRooms();
 
-  ExecuteRooms.ExecuteAll();
-  GarbageCollection.Check();
+  forEach(Memory.updateCreepNames, (name, index) => {
+    const creep = Game.creeps[name];
+    const memoryData = ICreepData.GetMemory(name);
+    if (creep && creep.id && memoryData.success) {
+      let result = true;
+      const creepMemory = memoryData.memory as CreepMemory;
+      result = ICreepData.CreateMemory(
+        creep.id,
+        creepMemory,
+        memoryData.cache as CreepCache
+      ).success;
+      IJobs.UnassignCreepJob(name, creepMemory, false);
+      if (result) result = ICreepData.DeleteMemory(name, true, true).success;
+      if (result) Memory.updateCreepNames.splice(index, 1);
+    } else if (!creep) {
+      Memory.updateCreepNames.splice(index, 1);
+    }
+  });
 });

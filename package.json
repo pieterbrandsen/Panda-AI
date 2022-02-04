@@ -5,11 +5,13 @@
   "main": "nm",
   "scripts": {
     "build": "rollup -c",
+    "watch-build": "rollup -cw",
     "lint": "eslint **/*",
     "lint-fix": "eslint **/* --fix",
     "push-main": "rollup -c --environment DEST:main",
     "push-s+": "rollup -c --environment DEST:s+",
     "push-pserver": "rollup -c --environment DEST:pserver",
+    "push-pserver2": "rollup -c --environment DEST:pserver2",
     "push-sim": "rollup -c --environment DEST:sim",
     "test": "jest",
     "test-server": "npm run build && node server/index.js 300",
@@ -21,6 +23,7 @@
     "test-only": "jest --watch --coverage",
     "watch-main": "rollup -cw --environment DEST:main",
     "watch-pserver": "rollup -cw --environment DEST:pserver",
+    "watch-pserver2": "rollup -cw --environment DEST:pserver2",
     "watch-sim": "rollup -cw --environment DEST:sim",
     "upload-coverage": "npm run test-cov-runInBand && codecov"
   },
