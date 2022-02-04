@@ -4,8 +4,6 @@ import BaseMemory from "./interface";
 interface IGlobalMemory {}
 
 export default class extends BaseMemory implements IGlobalMemory {
-  private static type: MemoryTypes = "Global";
-
   static ValidateSingle(): boolean {
     let isValid = true;
     if (Memory.version === undefined) {
@@ -52,6 +50,8 @@ export default class extends BaseMemory implements IGlobalMemory {
       },
       ...defaultObject,
       updateCreepNames: [],
+      stats: {version:0},
+      logs: {version:0},
     };
   }
 
