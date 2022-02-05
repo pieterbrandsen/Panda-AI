@@ -1,11 +1,11 @@
 import { clone, forEach } from "lodash";
 import BaseMemory from "./interface";
+import IStatsMemory from "./Stats/globalStats";
+import ILogsMemory from "./logsInterface";
 
 interface IGlobalMemory {}
 
 export default class extends BaseMemory implements IGlobalMemory {
-  private static type: MemoryTypes = "Global";
-
   static ValidateSingle(): boolean {
     let isValid = true;
     if (Memory.version === undefined) {
@@ -52,6 +52,8 @@ export default class extends BaseMemory implements IGlobalMemory {
       },
       ...defaultObject,
       updateCreepNames: [],
+      stats: IStatsMemory.Generate(),
+      logs: ILogsMemory.Generate(),
     };
   }
 

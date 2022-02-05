@@ -40,4 +40,10 @@ export default class extends BaseHeap implements IStructureHeap {
     delete global.StructuresData[id];
     return { success: true, data: undefined };
   }
+
+  static Initialize(id: string): CRUDResult<StructureHeap> {
+    const data = this.Generate();
+    const result = this.Create(id, data);
+    return { success: result.success, data: result.data };
+  }
 }

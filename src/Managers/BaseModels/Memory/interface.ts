@@ -11,18 +11,30 @@ export default abstract class implements IMemory {
   protected static MinimumVersion(type: MemoryTypes): number {
     switch (type) {
       case "Creep":
-        return Memory.CreepsData.version;
+        if (Memory.CreepsData) return Memory.CreepsData.version;
+        break;
       case "Structure":
-        return Memory.StructuresData.version;
+        if (Memory.StructuresData) return Memory.StructuresData.version;
+        break;
       case "Room":
-        return Memory.RoomsData.version;
+        if (Memory.RoomsData) return Memory.RoomsData.version;
+        break;
       case "Job":
-        return Memory.JobsData.version;
+        if (Memory.JobsData) return Memory.JobsData.version;
+        break;
       case "DroppedResource":
-        return Memory.DroppedResourceData.version;
-      default:
-        return 999;
+        if (Memory.DroppedResourceData)
+          return Memory.DroppedResourceData.version;
+        break;
+      case "Stats":
+        if (Memory.stats) return Memory.stats.version;
+        break;
+      case "Log":
+        if (Memory.logs) return Memory.logs.version;
+        break;
+      // skip default case
     }
+    return 999;
   }
 
   /**
@@ -53,6 +65,7 @@ export default abstract class implements IMemory {
     type: MemoryTypes
   ): boolean {
     const minimumVersion = this.MinimumVersion(type);
+
     let isValid = true;
     if (data.version !== minimumVersion) {
       isValid = false;

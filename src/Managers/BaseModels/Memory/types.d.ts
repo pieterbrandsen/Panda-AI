@@ -14,6 +14,8 @@ interface BaseMemory {
   version: number;
 }
 
+interface LogsMemory extends BaseMemory {}
+
 interface DroppedResourceMemory extends BaseMemory {
   jobId?: string;
   energyIncoming: StringMap<number>;
@@ -56,10 +58,14 @@ interface Memory extends BaseMemory {
     DroppedResourceCache
   >;
   updateCreepNames: string[];
+  stats: StatsMemory;
+  logs: LogsMemory;
 }
 
 type MemoryObjects =
   | DroppedResourceMemory
+  | LogsMemory
+  | StatsMemory
   | CreepMemory
   | StructureMemory
   | RoomMemory
@@ -78,6 +84,8 @@ interface FreezedRoomPosition {
 type MemoryTypes =
   | "Creep"
   | "DroppedResource"
+  | "Log"
+  | "Stats"
   | "Structure"
   | "Room"
   | "Global"

@@ -44,6 +44,7 @@ export default class implements ICreepBuilderRole {
           IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
             this.jobMemory,
+            this.jobCache,
             this.creepCache.body.work * 5
           );
           break;

@@ -1,15 +1,20 @@
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars */
-type JobTypes =
+type IncomingJobTypes =
   | "HarvestSource"
-  | "TransferSpawn"
-  | "TransferStructure"
   | "WithdrawStructure"
   | "WithdrawResource"
+  | "HarvestMineral";
+type OutgoingJobTypes =
+  | "TransferSpawn"
+  | "TransferStructure"
   | "UpgradeController"
-  | "HarvestMineral"
-  | "ReserveController"
   | "Build"
+  | "DroppedEnergyDecay"
+  | "SpawnCreeps"
   | "Repair";
+type OtherJobTypes = "ReserveController";
+type JobTypeTypes = "Incoming" | "Outgoing" | "Other";
+type JobTypes = IncomingJobTypes | OutgoingJobTypes | OtherJobTypes;
 
 type JobObjectExecuter = "Creep" | "Structure" | "Resource";
 

@@ -13,6 +13,8 @@ import IStructureExecuter from "../Structure/interface";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 import ISetupRoom from "../../Managers/BaseModels/Helper/Room/setupRoom";
+import IRoomHeap from "../../Managers/BaseModels/Heap/roomInterface";
+import UpdateRoomStats from "../../Managers/BaseModels/Helper/Stats/updateRoom";
 
 interface IRoomExecuter {}
 
@@ -48,9 +50,15 @@ export default class implements IRoomExecuter {
     if (!room) return false;
     const roomData = IRoomData.GetMemory(room.name);
     if (!roomData.success) return false;
+    const roomHeapData = IRoomHeap.Get(room.name);
+    if (!roomHeapData.success) {
+      IRoomHeap.Initialize(room.name);
+    }
+
     const roomMemory = roomData.memory as RoomMemory;
     const roomCache = roomData.cache as RoomCache;
 
+    UpdateRoomStats(room);
     IJobs.UpdateAllData(room);
 
     const { controller } = room;

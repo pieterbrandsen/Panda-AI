@@ -54,6 +54,7 @@ export default class implements ICreepUpgradeControllerRole {
           IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
             this.jobMemory,
+            this.jobCache,
             this.creepCache.body.work
           );
           break;

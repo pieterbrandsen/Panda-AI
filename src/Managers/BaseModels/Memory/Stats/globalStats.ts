@@ -1,0 +1,49 @@
+import { clone } from "lodash";
+import BaseMemory from "../interface";
+
+interface IGlobalStatsMemory {}
+
+export default class extends BaseMemory implements IGlobalStatsMemory {
+  private static type: MemoryTypes = "Stats";
+
+  static Validate(data: StringMap<StatsMemory>): ValidatedData {
+    return super.Validate(data, this.type);
+  }
+
+  static ValidateSingle(data: StatsMemory): boolean {
+    return super.ValidateSingle(data, this.type);
+  }
+
+  static Generate(): StatsMemory {
+    return {
+      version: super.MinimumVersion(this.type),
+      rooms: {},
+      resources: {
+        ACCESS_KEY: 0,
+        CPU_UNLOCK: 0,
+        PIXEL: 0,
+      },
+    };
+  }
+
+  static Get(): CRUDResult<StatsMemory> {
+    const data = clone(Memory.stats);
+    if (data === undefined) return { success: false, data: undefined };
+
+    return { success: this.ValidateSingle(data), data };
+  }
+
+  static Create(data: StatsMemory): CRUDResult<StatsMemory> {
+    const dataAtId = this.Get();
+    if (dataAtId.success) {
+      return { success: false, data: dataAtId.data };
+    }
+    const result = this.Update(data);
+    return { success: result.success, data: clone(result.data) };
+  }
+
+  static Update(data: StatsMemory): CRUDResult<StatsMemory> {
+    Memory.stats = data;
+    return { success: true, data };
+  }
+}

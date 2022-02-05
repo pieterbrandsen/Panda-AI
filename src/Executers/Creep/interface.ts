@@ -1,5 +1,6 @@
 import { forEach } from "lodash";
 import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
+import ICreepHeap from "../../Managers/BaseModels/Heap/creepInterface";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
 import ICreepRoleExecuter from "../Roles/interface";
@@ -41,6 +42,11 @@ export default class implements ICreepExecuter {
       if (!creepData.success) {
         return;
       }
+      const creepHeapData = ICreepHeap.Get(id);
+      if (!creepHeapData.success) {
+        ICreepHeap.Initialize(id);
+      }
+
       const creepMemory = creepData.memory as CreepMemory;
 
       const creep: Creep | null = Game.getObjectById(id);
