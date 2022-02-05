@@ -1,5 +1,7 @@
 import { clone, forEach } from "lodash";
 import BaseMemory from "./interface";
+import IStatsMemory from "./Stats/globalStats";
+import ILogsMemory from "./logsInterface";
 
 interface IGlobalMemory {}
 
@@ -50,8 +52,8 @@ export default class extends BaseMemory implements IGlobalMemory {
       },
       ...defaultObject,
       updateCreepNames: [],
-      stats: {version:0},
-      logs: {version:0},
+      stats: IStatsMemory.Generate(),
+      logs: ILogsMemory.Generate(),
     };
   }
 

@@ -5,6 +5,7 @@ import IMineralMemory from "../../MineralManager/memory";
 import ISourceMemory from "../../SourceManager/memory";
 import ISpawnMemory from "../../SpawnManager/memory";
 import IDroppedResourceManager from "../../DroppedResourceManager/memory";
+import IRoomStatsMemory from "./Stats/roomStats";
 
 interface IRoomMemory {}
 
@@ -56,7 +57,9 @@ export default class extends BaseMemory implements IRoomMemory {
 
   static Delete(id: string): CRUDResult<RoomMemory> {
     delete Memory.RoomsData.data[id];
-    return { success: true, data: undefined };
+
+    const result = IRoomStatsMemory.Delete(id).success;
+    return { success: result, data: undefined };
   }
 
   static GetAll(predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
@@ -72,6 +75,10 @@ export default class extends BaseMemory implements IRoomMemory {
   ): CRUDResult<RoomMemory> {
     const data = this.Generate(room, remoteRooms);
     const result = this.Create(id, data);
+    if (result.success) {
+      result.success = IRoomStatsMemory.Initialize(id).success;
+    }
+
     return { success: result.success, data: result.data };
   }
 }

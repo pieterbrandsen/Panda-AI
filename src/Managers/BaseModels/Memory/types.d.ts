@@ -14,13 +14,7 @@ interface BaseMemory {
   version: number;
 }
 
-interface StatsMemory extends BaseMemory {
-
-}
-
-interface LogsMemory extends BaseMemory {
-
-}
+interface LogsMemory extends BaseMemory {}
 
 interface DroppedResourceMemory extends BaseMemory {
   jobId?: string;

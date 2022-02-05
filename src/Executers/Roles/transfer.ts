@@ -54,6 +54,7 @@ export default class implements ICreepTransferRole {
           IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
             this.jobMemory,
+            this.jobCache,
             amountToTransfer
           );
           break;

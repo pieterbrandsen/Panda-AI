@@ -52,6 +52,10 @@ export default class implements ISourceManager {
           resource: droppedResource,
         });
       }
+
+      global.RoomsData[
+        this.room.name
+      ].stats.energyOutgoing.DroppedEnergyDecay += 1;
       // const droppedResourceMemory = droppedResourceData.memory as DroppedResourceMemory;
 
       // const jobId = droppedResourceMemory.jobId ?? "";

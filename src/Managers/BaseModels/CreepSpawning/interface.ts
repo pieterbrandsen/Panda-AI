@@ -248,6 +248,14 @@ export default class CreepSpawning implements ICreepSpawning {
     return body.sort((a, b) => bodyValues[a] - bodyValues[b]);
   }
 
+  static GetBodyCost(body: BodyPartConstant[]): number {
+    let cost = 0;
+    forEach(body, (part) => {
+      cost += BODYPART_COST[part];
+    });
+    return cost;
+  }
+
   SpawnCreep(creep: SpawningObject): boolean {
     if (creep.body.length === 0) return false;
     const spawn = this.spawns[0];
@@ -259,6 +267,9 @@ export default class CreepSpawning implements ICreepSpawning {
       this.UpdateMissingBodyParts(creep.type, creep.body);
       this.spawns.shift();
       Memory.updateCreepNames.push(creep.name);
+      global.RoomsData[this.spawnRoom.name].stats.spawnEnergyOutgoing[
+        creep.type
+      ] += CreepSpawning.GetBodyCost(creep.body);
       return true;
     }
     return false;

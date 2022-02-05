@@ -1,6 +1,5 @@
-import { clone, pickBy } from "lodash";
+import { clone } from "lodash";
 import BaseMemory from "./interface";
-import RoomPosition from "../Helper/Room/roomPosition";
 
 interface ILogsMemory {}
 
@@ -15,10 +14,9 @@ export default class extends BaseMemory implements ILogsMemory {
     return super.ValidateSingle(data, this.type);
   }
 
-  static Generate(
-  ): LogsMemory {
+  static Generate(): LogsMemory {
     return {
-        version: super.MinimumVersion(this.type),
+      version: super.MinimumVersion(this.type),
     };
   }
 

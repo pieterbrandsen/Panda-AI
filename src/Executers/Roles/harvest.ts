@@ -56,13 +56,14 @@ export default class implements ICreepHarvestRole {
           this.creep.moveTo(target);
           break;
         case OK:
-          if (this.jobCache.type === "HarvestMineral") {
-            IJobs.UpdateAmount(
-              this.creepMemory.jobId as string,
-              this.jobMemory,
-              this.creepCache.body.work
-            );
-          }
+          IJobs.UpdateAmount(
+            this.creepMemory.jobId as string,
+            this.jobMemory,
+            this.jobCache,
+            this.jobCache.type === "HarvestMineral"
+              ? this.creepCache.body.work
+              : this.creepCache.body.work * 2
+          );
           break;
         // skip default case
       }

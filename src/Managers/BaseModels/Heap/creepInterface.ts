@@ -40,4 +40,10 @@ export default class extends BaseHeap implements ICreepHeap {
     delete global.CreepsData[id];
     return { success: true, data: undefined };
   }
+
+  static Initialize(id: string): CRUDResult<CreepHeap> {
+    const data = this.Generate();
+    const result = this.Create(id, data);
+    return { success: result.success, data: result.data };
+  }
 }

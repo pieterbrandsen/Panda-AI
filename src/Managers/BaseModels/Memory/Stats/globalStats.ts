@@ -1,10 +1,9 @@
-import { clone, pickBy } from "lodash";
-import BaseMemory from "./interface";
-import RoomPosition from "../Helper/Room/roomPosition";
+import { clone } from "lodash";
+import BaseMemory from "../interface";
 
-interface IStatsMemory {}
+interface IGlobalStatsMemory {}
 
-export default class extends BaseMemory implements IStatsMemory {
+export default class extends BaseMemory implements IGlobalStatsMemory {
   private static type: MemoryTypes = "Stats";
 
   static Validate(data: StringMap<StatsMemory>): ValidatedData {
@@ -15,10 +14,15 @@ export default class extends BaseMemory implements IStatsMemory {
     return super.ValidateSingle(data, this.type);
   }
 
-  static Generate(
-  ): StatsMemory {
+  static Generate(): StatsMemory {
     return {
       version: super.MinimumVersion(this.type),
+      rooms: {},
+      resources: {
+        ACCESS_KEY: 0,
+        CPU_UNLOCK: 0,
+        PIXEL: 0,
+      },
     };
   }
 

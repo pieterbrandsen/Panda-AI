@@ -54,6 +54,7 @@ export default class implements ICreepWithdrawStructureRole {
           IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
             this.jobMemory,
+            this.jobCache,
             amountToWithdraw
           );
           break;
