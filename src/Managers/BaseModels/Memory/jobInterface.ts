@@ -85,7 +85,7 @@ export default class extends BaseMemory implements IJobMemory {
     structureType?: StructureConstant,
     maxCreepsCount?: number
   ): CRUDResult<JobMemory> {
-    const cache = this.Generate(
+    const memory = this.Generate(
       targetId,
       pos,
       objectType,
@@ -94,7 +94,7 @@ export default class extends BaseMemory implements IJobMemory {
       structureType,
       maxCreepsCount
     );
-    const result = this.Create(id, cache);
+    const result = this.Create(id, memory);
     return { data: result.data, success: result.success };
   }
 }
