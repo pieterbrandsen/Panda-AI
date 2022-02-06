@@ -8,16 +8,17 @@ export default function HandleAllShardActions(): void {
     const spawn = Game.spawns["TEST!"];
     if (!spawn) return;
 
-      const lastShardIndex = shardNames.indexOf(
-        global.lastShardTarget ?? shardNames[shardNames.length - 1]
-      );
-      const shardTarget =
-        lastShardIndex === shardNames.length - 1
-          ? shardNames[0]
-          : shardNames[lastShardIndex + 1];
-      console.log(lastShardIndex, shardTarget, global.lastShardTarget);
-      if (spawn.spawnCreep([MOVE], shardTarget))
-        global.lastShardTarget = shardTarget;
+    const lastShardIndex = shardNames.indexOf(
+      global.lastShardTarget ?? shardNames[shardNames.length - 1]
+    );
+    const shardTarget =
+      lastShardIndex === shardNames.length - 1
+        ? shardNames[0]
+        : shardNames[lastShardIndex + 1];
+    const spawnResult = spawn.spawnCreep([MOVE], shardTarget + "-"+ Game.time);
+    if (spawnResult === OK || spawnResult === ERR_NAME_EXISTS) {
+      global.lastShardTarget = shardTarget;
+    }
   };
   const moveToTarget = (
     creep: Creep,
@@ -29,12 +30,13 @@ export default function HandleAllShardActions(): void {
     return undefined;
   };
   forEach(shardNames, (shardName, index) => {
-    if (Game.time % 200 === 0 && index === 0) {
+    if (Game.time % 100 === 0 && index === 0) {
       spawnNewCreep();
     }
+    let loggedOrders=  false;
 
-    const creep = Game.creeps[shardName];
-    if (creep) {
+    const creeps = Object.values(Game.creeps).filter(c=>c.name.includes(shardName));
+    forEach(creeps, (creep) => {
       if (Game.shard.name === "shard0" && index === 0) {
         moveToTarget(creep, Game.flags.shard0.pos);
       } else if (Game.shard.name === "shard0" && index === 1) {
@@ -56,10 +58,13 @@ export default function HandleAllShardActions(): void {
       }
 
       if (Game.shard.name === shardName) {
-        // RawMemory.segments[1] = JSON.stringify({test:shardName})
-        // console.log(Game.market.getAllOrders())
+        const orders =JSON.stringify(Game.market.getAllOrders());
+        if (!loggedOrders && Game.time % 100 === 0) {
+        console.log(orders);
+        loggedOrders = true;
       }
-      creep.say(creep.name);
-    }
+        creep.say(creep.name);
+      }
+    });
   });
 }

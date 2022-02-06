@@ -65,9 +65,6 @@ export const loop = ErrorMapper.wrapLoop((): void => {
     PIXEL: Game.resources[PIXEL],
     ACCESS_KEY: Game.resources[ACCESS_KEY],
   };
-  if (Game.time % 2500 === 0) {
-    Game.notify(JSON.stringify(Memory.stats.resources), 0);
-  }
 
   IResetHeap.Reset();
   RawMemory.segments[98] = JSON.stringify(Memory.stats);

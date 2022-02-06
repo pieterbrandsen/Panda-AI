@@ -14,9 +14,9 @@ export default class extends BaseMemory implements IGlobalStatsMemory {
     return super.ValidateSingle(data, this.type);
   }
 
-  static Generate(): StatsMemory {
+  static Generate(version?: number): StatsMemory {
     return {
-      version: super.MinimumVersion(this.type),
+      version: version ?? super.MinimumVersion(this.type),
       rooms: {},
       resources: {
         ACCESS_KEY: 0,

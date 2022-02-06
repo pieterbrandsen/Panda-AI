@@ -14,9 +14,9 @@ export default class extends BaseMemory implements ILogsMemory {
     return super.ValidateSingle(data, this.type);
   }
 
-  static Generate(): LogsMemory {
+  static Generate(version?: number): LogsMemory {
     return {
-      version: super.MinimumVersion(this.type),
+      version: version ?? super.MinimumVersion(this.type),
     };
   }
 
