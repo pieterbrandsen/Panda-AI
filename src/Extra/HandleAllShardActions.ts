@@ -5,7 +5,9 @@ export default function HandleAllShardActions(): void {
   if (!Game.shard.name.includes("shard")) return;
 
   const spawnNewCreep = () => {
-    Object.values(Game.spawns).forEach((spawn) => {
+    const spawn = Game.spawns["TEST!"];
+    if (!spawn) return;
+
       const lastShardIndex = shardNames.indexOf(
         global.lastShardTarget ?? shardNames[shardNames.length - 1]
       );
@@ -16,7 +18,6 @@ export default function HandleAllShardActions(): void {
       console.log(lastShardIndex, shardTarget, global.lastShardTarget);
       if (spawn.spawnCreep([MOVE], shardTarget))
         global.lastShardTarget = shardTarget;
-    });
   };
   const moveToTarget = (
     creep: Creep,
@@ -28,7 +29,7 @@ export default function HandleAllShardActions(): void {
     return undefined;
   };
   forEach(shardNames, (shardName, index) => {
-    if (Game.time % 200 === 0) {
+    if (Game.time % 200 === 0 && index === 0) {
       spawnNewCreep();
     }
 
