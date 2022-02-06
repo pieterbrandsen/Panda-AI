@@ -52,8 +52,8 @@ export default class extends BaseMemory implements IGlobalMemory {
       },
       ...defaultObject,
       updateCreepNames: [],
-      stats: IStatsMemory.Generate(),
-      logs: ILogsMemory.Generate(),
+      stats: IStatsMemory.Generate(0),
+      logs: ILogsMemory.Generate(0),
     };
   }
 

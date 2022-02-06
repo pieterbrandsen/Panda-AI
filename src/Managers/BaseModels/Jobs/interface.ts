@@ -427,8 +427,8 @@ export default class implements IJobs {
 }
 
 // Game.market.createOrder({
-//   type: ORDER_SELL,
+//   type: ORDER_BUY,
 //   resourceType: PIXEL,
-//   price: 10 * 1000,
-//   totalAmount: 1000,
+//   price: 7630,
+//   totalAmount: 98400,
 // });

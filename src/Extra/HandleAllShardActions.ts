@@ -64,6 +64,7 @@ export default function HandleAllShardActions(): void {
         loggedOrders = true;
       }
         creep.say(creep.name);
+        creep.room.createConstructionSite(2,2,STRUCTURE_ROAD)
       }
     });
   });

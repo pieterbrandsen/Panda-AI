@@ -23,6 +23,11 @@ export default class extends BaseMemory implements IGlobalStatsMemory {
         CPU_UNLOCK: 0,
         PIXEL: 0,
       },
+      gcl: {
+        level: 0,
+        progress: 0,
+        progressTotal: 0,
+      },
     };
   }
 

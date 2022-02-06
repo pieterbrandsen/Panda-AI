@@ -1,7 +1,9 @@
-interface ControllerStatsMemory {
+interface GlobalControllerStatsMemory {
   level: number;
   progress: number;
   progressTotal: number;
+}
+interface ControllerStatsMemory extends GlobalControllerStatsMemory {
   ticksToDowngrade: number;
 }
 interface RoomStatsMemory {
@@ -17,6 +19,7 @@ interface StatsMemory extends BaseMemory {
     CPU_UNLOCK: number;
     ACCESS_KEY: number;
   };
+  gcl: GlobalControllerStatsMemory
 }
 
 type MemoryStatsObjects = RoomStatsMemory | StatsMemory;

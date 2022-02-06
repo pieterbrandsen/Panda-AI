@@ -1,6 +1,7 @@
 import { ErrorMapper } from "./Extra/ErrorMapper";
 import IGlobalMemory from "./Managers/BaseModels/Memory/globalInterface";
 import IGlobalData from "./Managers/BaseModels/Helper/Global/globalMemory";
+import UpdateGlobalStats from "./Managers/BaseModels/Helper/Stats/updateGlobal";
 import IRoomsExecuter from "./Executers/Room/interface";
 import IResetHeap from "./Managers/BaseModels/Helper/Heap/Reset";
 import IHeapMemory from "./Managers/BaseModels/Heap/globalInterface";
@@ -60,12 +61,9 @@ export const loop = ErrorMapper.wrapLoop((): void => {
 
   InitializeSpawnedCreeps();
   HandleAllShardActions();
-  Memory.stats.resources = {
-    CPU_UNLOCK: Game.resources[CPU_UNLOCK],
-    PIXEL: Game.resources[PIXEL],
-    ACCESS_KEY: Game.resources[ACCESS_KEY],
-  };
 
+
+  UpdateGlobalStats();
   IResetHeap.Reset();
   RawMemory.segments[98] = JSON.stringify(Memory.stats);
 });
