@@ -34,6 +34,11 @@ export default class implements ICreepRepairRole {
     const target: Structure | null = Game.getObjectById(
       this.jobMemory.targetId
     );
+
+    if ((this.jobMemory.amountToTransfer ?? 0) <= 0) {
+      return "done";
+    }
+
     if (target) {
       const result = this.creep.repair(target);
       switch (result) {
@@ -49,8 +54,8 @@ export default class implements ICreepRepairRole {
           );
           break;
         // skip default case
-      }
     }
+  }
     return "continue";
   }
 }

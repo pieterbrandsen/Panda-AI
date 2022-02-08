@@ -116,7 +116,7 @@ export default class implements IStructureHelper {
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = IStructureMemory.Initialize(id);
+    const memoryResult = IStructureMemory.Initialize(id,data.isSource);
     if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;

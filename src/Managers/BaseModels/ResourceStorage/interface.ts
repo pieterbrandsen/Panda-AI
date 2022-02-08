@@ -413,7 +413,7 @@ export default class ResourceStorage implements IResourceStorage {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
         if (structure) {
           const levelCheck = this.CanStructureBeFilled(structure);
-          if (
+        if (
             levelCheck.result &&
             levelCheck.level.current - levelCheck.level.min > 0
           ) {
@@ -547,7 +547,6 @@ export default class ResourceStorage implements IResourceStorage {
     inRoomRange = 999
   ): string | undefined {
     if (!this.memory || !this.cache) return undefined;
-
     const levelFullCheck = this.IsObjectFullEnough();
     const levelEmptyCheck = this.IsObjectEmptyEnough();
     if (fillFrom) {

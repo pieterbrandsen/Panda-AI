@@ -33,6 +33,7 @@ export default class implements IRoomSetup {
 
     forEach(this.structures, (structure) => {
       let executer = "";
+      let isSource = false;
       switch (structure.structureType) {
         case "extractor":
           if (roomMemory.mineralManager.mineral) roomMemory.mineralManager.mineral.structureId = structure.id;
@@ -57,6 +58,7 @@ export default class implements IRoomSetup {
               const source = this.room.find(FIND_SOURCES_ACTIVE).find((s) => s.pos.inRangeTo(structure.pos,3));
               if (source) {
                 const sourceMemory = roomMemory.sourceManager.sources[source.id];
+                isSource = true;
                 if (sourceMemory) sourceMemory.structureId = structure.id;
                 this.updatedRoomMemory = true;
               }
@@ -65,7 +67,7 @@ export default class implements IRoomSetup {
         default:
           break;
       }
-      IStructureData.Initialize({ executer, structure });
+      IStructureData.Initialize({ executer, structure,isSource });
     });
     return true;
   }

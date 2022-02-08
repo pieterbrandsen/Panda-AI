@@ -116,7 +116,6 @@ export default class implements IExecuteCreepRole {
     const creepId = this.creep.id;
     switch (result) {
       case "done":
-        IJobs.UnassignCreepJob(creepId, this.creepMemory, false);
         IJobs.Delete(this.creepMemory.jobId ?? "");
         break;
       case "empty":

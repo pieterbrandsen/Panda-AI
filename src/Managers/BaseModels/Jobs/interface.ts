@@ -439,7 +439,7 @@ export default class implements IJobs {
           const controller = Game.getObjectById<StructureController | null>(
             jobMemory.targetId
           );
-          if (!controller || (jobMemory.amountToTransfer ?? 0) <= 5 * 1000) {
+          if (!controller || (jobMemory.amountToTransfer ?? 0) <= 10 * 1000) {
             this.Delete(id);
           }
         }

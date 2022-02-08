@@ -17,11 +17,12 @@ export default class extends BaseMemory implements IStructureMemory {
   /**
    * Create an new object of this type
    */
-  static Generate(): StructureMemory {
+  static Generate(isSource:boolean = false): StructureMemory {
     return {
       version: super.MinimumVersion(this.type),
       energyIncoming: {},
       energyOutgoing: {},
+      isSourceStructure: isSource,
     };
   }
 
@@ -64,8 +65,8 @@ export default class extends BaseMemory implements IStructureMemory {
     return data;
   }
 
-  static Initialize(id: string): CRUDResult<StructureMemory> {
-    const cache = this.Generate();
+  static Initialize(id: string,isSource?:boolean): CRUDResult<StructureMemory> {
+    const cache = this.Generate(isSource);
     const result = this.Create(id, cache);
     return { data: result.data, success: result.success };
   }

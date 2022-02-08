@@ -3,6 +3,7 @@ import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IResourceStorage from "../BaseModels/ResourceStorage/interface";
+import IStructureData from "../BaseModels/Helper/Structure/structureMemory";
 
 export default function HandleSourceAndControllerStructure(
   target: Source | StructureController,
@@ -96,6 +97,11 @@ export default function HandleSourceAndControllerStructure(
       memory as ControllerMemory
     );
   } else if (updatedMemory && type === "source") {
+    const structureData = IStructureData.GetMemory(memory.structureId ?? "");
+    if (structureData.success) {
+      const structureMemory = structureData.memory as StructureMemory;
+      structureMemory.isSourceStructure = true;
+    }
     IRoomMemory.UpdateSourceMemory(
       target.room.name,
       target.id,
