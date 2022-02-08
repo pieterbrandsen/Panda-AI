@@ -1,8 +1,9 @@
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IResourceStorage from "../../../Managers/BaseModels/ResourceStorage/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface ICreepWithdrawStructureRole {}
+interface ICreepUpgradeControllerRole {}
 
-export default class implements ICreepWithdrawStructureRole {
+export default class implements ICreepUpgradeControllerRole {
   creep: Creep;
 
   creepCache: CreepCache;
@@ -28,34 +29,33 @@ export default class implements ICreepWithdrawStructureRole {
   }
 
   run(): JobResult {
-    const resource: ResourceConstant = RESOURCE_ENERGY;
-    const target: StructuresWithStorage | null = Game.getObjectById(
-      this.jobMemory.targetId ?? ""
+    if (this.creep.store.getUsedCapacity() === 0) {
+      const closeStructure = new IResourceStorage(
+        this.creep,
+        "Creep",
+        this.creepCache.executer
+      ).Manage(true, false, false,5);
+      if (!closeStructure) {
+        return "empty";
+      }
+      return "continue";
+    }
+
+    const target: StructureController | null = Game.getObjectById(
+      this.jobMemory.targetId
     );
     if (target) {
-      if (target.store.getUsedCapacity(resource) === 0) {
-        return "done";
-      }
-
-      const amountToWithdraw = Math.min(
-        target.store.getUsedCapacity(resource),
-        this.creep.store.getFreeCapacity(resource)
-      );
-      const result = this.creep.withdraw(target, resource, amountToWithdraw);
+      const result = this.creep.upgradeController(target);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
           break;
-        case ERR_FULL:
-          return "full";
-        case ERR_NOT_ENOUGH_RESOURCES:
-          return "done";
         case OK:
           IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
             this.jobMemory,
             this.jobCache,
-            amountToWithdraw
+            this.creepCache.body.work
           );
           break;
         // skip default case

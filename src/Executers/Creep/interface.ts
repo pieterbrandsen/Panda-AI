@@ -3,7 +3,7 @@ import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
 import ICreepHeap from "../../Managers/BaseModels/Heap/creepInterface";
 import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
 import IJobs from "../../Managers/BaseModels/Jobs/interface";
-import ICreepRoleExecuter from "../Roles/interface";
+import ICreepRoleExecuter from "./Roles/interface";
 
 interface ICreepExecuter {}
 

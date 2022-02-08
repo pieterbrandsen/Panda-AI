@@ -1,5 +1,5 @@
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
-import IResourceStorage from "../../Managers/BaseModels/ResourceStorage/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
+import IResourceStorage from "../../../Managers/BaseModels/ResourceStorage/interface";
 
 interface ICreepHarvestRole {}
 
@@ -39,7 +39,7 @@ export default class implements ICreepHarvestRole {
             this.creep,
             "Creep",
             this.creepCache.executer
-          ).Manage(false, true, 3)
+          ).Manage(false, true, false,3)
         ) {
           this.creep.drop(RESOURCE_ENERGY);
         }

@@ -1,9 +1,8 @@
-import IResourceStorage from "../../Managers/BaseModels/ResourceStorage/interface";
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface ICreepUpgradeControllerRole {}
+interface ICreepBuilderRole {}
 
-export default class implements ICreepUpgradeControllerRole {
+export default class implements ICreepBuilderRole {
   creep: Creep;
 
   creepCache: CreepCache;
@@ -30,22 +29,13 @@ export default class implements ICreepUpgradeControllerRole {
 
   run(): JobResult {
     if (this.creep.store.getUsedCapacity() === 0) {
-      const closeStructure = new IResourceStorage(
-        this.creep,
-        "Creep",
-        this.creepCache.executer
-      ).Manage(true, false, 5);
-      if (!closeStructure) {
-        return "empty";
-      }
-      return "continue";
+      return "empty";
     }
-
-    const target: StructureController | null = Game.getObjectById(
+    const target: ConstructionSite | null = Game.getObjectById(
       this.jobMemory.targetId
     );
     if (target) {
-      const result = this.creep.upgradeController(target);
+      const result = this.creep.build(target);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
@@ -55,7 +45,7 @@ export default class implements ICreepUpgradeControllerRole {
             this.creepMemory.jobId as string,
             this.jobMemory,
             this.jobCache,
-            this.creepCache.body.work
+            this.creepCache.body.work * 5
           );
           break;
         // skip default case

@@ -6,7 +6,7 @@ import ITransferRole from "./transfer";
 import IWithdrawStructureRole from "./withdrawStructure";
 import IWithdrawResourceRole from "./withdrawResource";
 import IUpgradeControllerRole from "./upgradeController";
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
 interface IExecuteCreepRole {}
 

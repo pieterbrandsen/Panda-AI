@@ -1,4 +1,4 @@
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
 interface ICreepRepairRole {}
 
