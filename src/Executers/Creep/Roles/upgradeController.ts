@@ -38,6 +38,7 @@ export default class implements ICreepUpgradeControllerRole {
       if (!closeStructure) {
         return "empty";
       }
+      if (Game.time % 25 === 0) return "empty";
       return "continue";
     }
 
