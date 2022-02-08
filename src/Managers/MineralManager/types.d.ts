@@ -3,9 +3,9 @@ interface MineralMemory {
   pos: FreezedRoomPosition;
   id: string;
   type: MineralConstant;
+  structureId?: string;
+  structureBuildJobId?: string;
 }
 interface MineralManager {
   mineral?: MineralMemory;
-  extractorId?: string;
-  extractorBuildJobId?: string;
 }

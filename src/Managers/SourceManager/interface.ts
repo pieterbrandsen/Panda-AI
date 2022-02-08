@@ -3,6 +3,7 @@ import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
 import IJobData from "../BaseModels/Helper/Job/jobMemory";
 import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
+import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControllerStructure";
 
 interface ISourceManager {}
 
@@ -32,12 +33,13 @@ export default class implements ISourceManager {
     const { managerMemory } = this;
     const sourceIds = Object.keys(managerMemory.sources);
     forEach(sourceIds, (sourceId) => {
+      const source = Game.getObjectById<Source>(sourceId);
       const sourceMemory = managerMemory.sources[sourceId];
       if (!sourceMemory.jobId) {
         const maxCreepsAround = IRoomPosition.GetNonWallPositionsAround(
           sourceMemory.pos,
           this.room
-        );
+        ).length;
         const jobResult = IJobData.Initialize({
           executer: this.executer,
           pos: sourceMemory.pos,
@@ -57,6 +59,8 @@ export default class implements ISourceManager {
           this.updatedMemory = true;
         }
       }
+
+      if (source) HandleSourceAndControllerStructure(source,sourceMemory,"source",this.executer,this.room.controller);
     });
   }
 
