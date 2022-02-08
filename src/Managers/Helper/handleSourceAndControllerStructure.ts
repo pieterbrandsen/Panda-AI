@@ -73,7 +73,13 @@ export default function HandleSourceAndControllerStructure(
     const structure = Game.getObjectById<
       null | StructureContainer | StructureLink
     >(memory.structureId);
-    if (structure && structure.structureType === "container") {
+    if (structure && structure.structureType !== structureType) {
+      structure.destroy();
+      delete memory.structureId;
+      delete memory.structureBuildJobId;
+      updatedMemory = true;
+    }
+    else if (structure && structure.structureType === "container") {
       const resourceStorage = new IResourceStorage(
         structure as StructuresWithStorage,
         "Structure",
