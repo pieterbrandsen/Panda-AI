@@ -33,9 +33,10 @@ export default class implements IRoomSetup {
 
     forEach(this.structures, (structure) => {
       let executer = "";
+      let isSource = false;
       switch (structure.structureType) {
         case "extractor":
-          roomMemory.mineralManager.extractorId = structure.id;
+          if (roomMemory.mineralManager.mineral) roomMemory.mineralManager.mineral.structureId = structure.id;
           this.updatedRoomMemory = true;
           executer = IRoomHelper.GetExecuter(this.room.name, "Mineral");
           break;
@@ -46,10 +47,27 @@ export default class implements IRoomSetup {
         case "controller":
           executer = IRoomHelper.GetExecuter(this.room.name, "Controller");
           break;
+          case "container": {
+            if (structure.room.controller && structure.pos.inRangeTo(structure.room.controller.pos,3)) {
+              executer = IRoomHelper.GetExecuter(this.room.name, "Controller");
+              if (roomMemory.controllerManager.controller) roomMemory.controllerManager.controller.structureId = structure.id;
+              this.updatedRoomMemory = true;
+            }
+            else {
+              executer = IRoomHelper.GetExecuter(this.room.name, "Source");
+              const source = this.room.find(FIND_SOURCES_ACTIVE).find((s) => s.pos.inRangeTo(structure.pos,3));
+              if (source) {
+                const sourceMemory = roomMemory.sourceManager.sources[source.id];
+                isSource = true;
+                if (sourceMemory) sourceMemory.structureId = structure.id;
+                this.updatedRoomMemory = true;
+              }
+            }
+          }
         default:
           break;
       }
-      IStructureData.Initialize({ executer, structure });
+      IStructureData.Initialize({ executer, structure,isSource });
     });
     return true;
   }
@@ -83,6 +101,11 @@ export default class implements IRoomSetup {
     this.roomMemory = roomData.memory as RoomMemory;
     this.SetupStructures();
     this.SetupCreeps();
+
+    forEach(this.room.find(FIND_CONSTRUCTION_SITES), (c) => {
+      c.remove();
+    })
+
     if (this.updatedRoomMemory)
       IRoomData.UpdateMemory(IRoomData.GetId(this.room.name), this.roomMemory);
     return true;

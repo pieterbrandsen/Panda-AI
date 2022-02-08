@@ -1,8 +1,8 @@
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface ICreepWithdrawResourceRole {}
+interface ICreepRepairRole {}
 
-export default class implements ICreepWithdrawResourceRole {
+export default class implements ICreepRepairRole {
   creep: Creep;
 
   creepCache: CreepCache;
@@ -28,37 +28,34 @@ export default class implements ICreepWithdrawResourceRole {
   }
 
   run(): JobResult {
-    const target: Resource | null = Game.getObjectById(
-      this.jobMemory.targetId ?? ""
+    if (this.creep.store.getUsedCapacity() === 0) {
+      return "empty";
+    }
+    const target: Structure | null = Game.getObjectById(
+      this.jobMemory.targetId
     );
-    if (target) {
-      const resource: ResourceConstant = target.resourceType;
-      if (target.amount === 0) {
-        return "done";
-      }
 
-      const amountToWithdraw = Math.min(
-        target.amount,
-        this.creep.store.getFreeCapacity(resource)
-      );
-      const result = this.creep.pickup(target);
+    if ((this.jobMemory.amountToTransfer ?? 0) <= 0) {
+      return "done";
+    }
+
+    if (target) {
+      const result = this.creep.repair(target);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
           break;
-        case ERR_FULL:
-          return "full";
         case OK:
           IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
             this.jobMemory,
             this.jobCache,
-            amountToWithdraw
+            this.creepCache.body.work * 100
           );
           break;
         // skip default case
-      }
     }
+  }
     return "continue";
   }
 }

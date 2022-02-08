@@ -33,7 +33,7 @@ export default class implements IMineralManager {
 
     const mineralMemory = managerMemory.mineral;
     if (mineralMemory) {
-      if (!managerMemory.extractorId && !managerMemory.extractorBuildJobId) {
+      if (!mineralMemory.structureId && !mineralMemory.structureBuildJobId) {
         const createdSite = IRoomConstruction.CreateConstructionSite(
           this.room,
           mineralMemory.pos,
@@ -41,7 +41,7 @@ export default class implements IMineralManager {
           this.executer
         );
         if (createdSite) {
-          managerMemory.extractorBuildJobId = createdSite;
+          mineralMemory.structureBuildJobId = createdSite;
           this.updatedMemory = true;
         } else {
           const structure = IRoomHelper.GetStructureAtLocation(
@@ -50,13 +50,13 @@ export default class implements IMineralManager {
             STRUCTURE_EXTRACTOR
           );
           if (structure) {
-            managerMemory.extractorId = structure.id;
+            mineralMemory.structureId = structure.id;
             this.updatedMemory = true;
           }
         }
         return;
       }
-      if (managerMemory.extractorBuildJobId) {
+      if (mineralMemory.structureBuildJobId) {
         if (Game.time % 100) {
           const createdSite = IRoomConstruction.CreateConstructionSite(
             this.room,
@@ -65,7 +65,11 @@ export default class implements IMineralManager {
             this.executer
           );
           if (!createdSite) {
-            delete managerMemory.extractorBuildJobId;
+            delete mineralMemory.structureBuildJobId;
+            this.updatedMemory = true;
+          }
+          else { 
+            mineralMemory.structureBuildJobId = createdSite;
             this.updatedMemory = true;
           }
         }
@@ -77,7 +81,7 @@ export default class implements IMineralManager {
         const maxCreepsAround = IRoomPosition.GetNonWallPositionsAround(
           mineralMemory.pos,
           this.room
-        );
+        ).length;
         const jobResult = IJobMemory.Initialize({
           executer: this.executer,
           pos: mineralMemory.pos,
@@ -94,6 +98,14 @@ export default class implements IMineralManager {
         );
         if (jobId) {
           mineralMemory.jobId = jobId;
+          this.updatedMemory = true;
+        }
+      }
+
+      if (mineralMemory.structureId) {
+        const extractor = Game.getObjectById<StructureExtractor | null>(mineralMemory.structureId);
+        if (!extractor) {
+          delete mineralMemory.structureId;
           this.updatedMemory = true;
         }
       }

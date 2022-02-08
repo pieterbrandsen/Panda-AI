@@ -6,8 +6,6 @@ export default class implements ISpawnMemory {
   static SetupMemory(room: Room): MineralManager {
     const mineral = room.find(FIND_MINERALS)[0];
     return {
-      extractorBuildJobId: undefined,
-      extractorId: undefined,
       mineral: mineral
         ? {
             jobId: undefined,

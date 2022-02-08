@@ -1,8 +1,9 @@
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IResourceStorage from "../../../Managers/BaseModels/ResourceStorage/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface ICreepRepairRole {}
+interface ICreepUpgradeControllerRole {}
 
-export default class implements ICreepRepairRole {
+export default class implements ICreepUpgradeControllerRole {
   creep: Creep;
 
   creepCache: CreepCache;
@@ -29,13 +30,23 @@ export default class implements ICreepRepairRole {
 
   run(): JobResult {
     if (this.creep.store.getUsedCapacity() === 0) {
-      return "empty";
+      const closeStructure = new IResourceStorage(
+        this.creep,
+        "Creep",
+        this.creepCache.executer
+      ).Manage(true, false, false,5);
+      if (!closeStructure) {
+        return "empty";
+      }
+      if (Game.time % 25 === 0) return "empty";
+      return "continue";
     }
-    const target: Structure | null = Game.getObjectById(
+
+    const target: StructureController | null = Game.getObjectById(
       this.jobMemory.targetId
     );
     if (target) {
-      const result = this.creep.repair(target);
+      const result = this.creep.upgradeController(target);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
@@ -45,7 +56,7 @@ export default class implements ICreepRepairRole {
             this.creepMemory.jobId as string,
             this.jobMemory,
             this.jobCache,
-            this.creepCache.body.work * 100
+            this.creepCache.body.work
           );
           break;
         // skip default case

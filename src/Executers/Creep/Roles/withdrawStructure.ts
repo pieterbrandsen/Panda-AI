@@ -1,8 +1,8 @@
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface ICreepTransferRole {}
+interface ICreepWithdrawStructureRole {}
 
-export default class implements ICreepTransferRole {
+export default class implements ICreepWithdrawStructureRole {
   creep: Creep;
 
   creepCache: CreepCache;
@@ -30,32 +30,32 @@ export default class implements ICreepTransferRole {
   run(): JobResult {
     const resource: ResourceConstant = RESOURCE_ENERGY;
     const target: StructuresWithStorage | null = Game.getObjectById(
-      this.jobMemory.targetId
+      this.jobMemory.targetId ?? ""
     );
     if (target) {
-      if (target.store.getFreeCapacity(resource) === 0) {
+      if (target.store.getUsedCapacity(resource) === 0) {
         return "done";
       }
 
-      const amountToTransfer = Math.min(
-        target.store.getFreeCapacity(resource),
-        this.creep.store.energy
+      const amountToWithdraw = Math.min(
+        target.store.getUsedCapacity(resource),
+        this.creep.store.getFreeCapacity(resource)
       );
-      const result = this.creep.transfer(target, resource, amountToTransfer);
+      const result = this.creep.withdraw(target, resource, amountToWithdraw);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
           break;
         case ERR_FULL:
-          return "done";
+          return "full";
         case ERR_NOT_ENOUGH_RESOURCES:
-          return "empty";
+          return "done";
         case OK:
           IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
             this.jobMemory,
             this.jobCache,
-            amountToTransfer
+            amountToWithdraw
           );
           break;
         // skip default case

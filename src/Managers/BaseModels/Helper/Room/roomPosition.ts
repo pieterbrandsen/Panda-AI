@@ -1,3 +1,5 @@
+import { reduce } from "lodash";
+
 interface IRoomPosition {}
 
 export default class implements IRoomPosition {
@@ -21,7 +23,7 @@ export default class implements IRoomPosition {
     pos: FreezedRoomPosition,
     room: Room,
     maxDistance = 1
-  ): number {
+  ): RoomPosition[] {
     const nonWallPositions = room
       .lookForAtArea(
         LOOK_TERRAIN,
@@ -36,6 +38,46 @@ export default class implements IRoomPosition {
           terrain.terrain !== "wall" &&
           (terrain.x !== pos.x || terrain.y !== pos.y)
       );
-    return nonWallPositions.length;
+
+    return nonWallPositions.map((terrain) => new RoomPosition(terrain.x, terrain.y, room.name));
+  }
+  static FindBestPosInRange(room:Room,targetPos: RoomPosition,range:number,type:"source"|"controller"):RoomPosition | undefined {
+    const nonWallPositionsAroundTarget = this.GetNonWallPositionsAround(targetPos,room,range);
+    const adjacentPositions = this.GetNonWallPositionsAround(targetPos,room,1);
+
+    let bestPos:RoomPosition | undefined = undefined;
+    let bestPosScore = 0;
+    
+      for (const pos of nonWallPositionsAroundTarget) {
+        if (type === "source") {
+            const adjacentPositionsRangeScore = reduce(
+              adjacentPositions,
+              (sum, adjacentPosition) => {
+                return sum + adjacentPosition.getRangeTo(pos);
+              },
+              0
+            );
+
+            if (adjacentPositionsRangeScore < bestPosScore || bestPosScore === 0) {
+              bestPos = pos;
+              bestPosScore = adjacentPositionsRangeScore;
+            }
+          }
+          else if (type === "controller") {
+            const adjacentPositionsRangeScore = this.GetNonWallPositionsAround(pos,room,1).length;
+            if (adjacentPositionsRangeScore > bestPosScore || bestPosScore === 0) {
+              bestPos = pos;
+              bestPosScore = adjacentPositionsRangeScore;
+            }
+            else if (adjacentPositionsRangeScore === bestPosScore && bestPos) {
+              if (pos.getRangeTo(targetPos) < (bestPos as RoomPosition).getRangeTo(targetPos)) {
+                bestPos = pos;
+                bestPosScore = adjacentPositionsRangeScore;
+              }
+            }
+          }
+      }
+
+    return bestPos;
   }
 }

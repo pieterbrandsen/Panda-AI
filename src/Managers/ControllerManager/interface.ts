@@ -1,6 +1,7 @@
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
 import IJobData from "../BaseModels/Helper/Job/jobMemory";
+import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControllerStructure";
 
 interface IControllerManager {}
 
@@ -46,10 +47,12 @@ export default class implements IControllerManager {
           pos: controllerMemory.pos,
           targetId: controllerMemory.id,
           type: jobType,
-          amountToTransfer: 10 * 1000 * this.controller.level,
+          amountToTransfer: 10*1000 + 5000 * this.controller.level,
           objectType: "Creep",
         });
       }
+
+      HandleSourceAndControllerStructure(this.controller,controllerMemory,"controller",this.executer,this.controller);
     }
   }
 

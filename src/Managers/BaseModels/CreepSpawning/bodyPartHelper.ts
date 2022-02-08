@@ -228,6 +228,7 @@ export default class ICreepBodyPartHelper {
           break;
         case "transferer":
           if (parts[type][CARRY] > 100) parts[type][CARRY] = 100;
+          else if (parts[type][CARRY] < 8) parts[type][CARRY] = 8;
           break;
         default:
           break;

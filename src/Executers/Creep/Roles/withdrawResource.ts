@@ -1,8 +1,8 @@
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface ICreepBuilderRole {}
+interface ICreepWithdrawResourceRole {}
 
-export default class implements ICreepBuilderRole {
+export default class implements ICreepWithdrawResourceRole {
   creep: Creep;
 
   creepCache: CreepCache;
@@ -28,24 +28,32 @@ export default class implements ICreepBuilderRole {
   }
 
   run(): JobResult {
-    if (this.creep.store.getUsedCapacity() === 0) {
-      return "empty";
-    }
-    const target: ConstructionSite | null = Game.getObjectById(
-      this.jobMemory.targetId
+    const target: Resource | null = Game.getObjectById(
+      this.jobMemory.targetId ?? ""
     );
     if (target) {
-      const result = this.creep.build(target);
+      const resource: ResourceConstant = target.resourceType;
+      if (target.amount === 0) {
+        return "done";
+      }
+
+      const amountToWithdraw = Math.min(
+        target.amount,
+        this.creep.store.getFreeCapacity(resource)
+      );
+      const result = this.creep.pickup(target);
       switch (result) {
         case ERR_NOT_IN_RANGE:
           this.creep.moveTo(target);
           break;
+        case ERR_FULL:
+          return "full";
         case OK:
           IJobs.UpdateAmount(
             this.creepMemory.jobId as string,
             this.jobMemory,
             this.jobCache,
-            this.creepCache.body.work * 5
+            amountToWithdraw
           );
           break;
         // skip default case

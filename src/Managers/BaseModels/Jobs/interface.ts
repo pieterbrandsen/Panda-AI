@@ -28,6 +28,40 @@ export default class implements IJobs {
     return array;
   }
 
+  static UnassignStructureJob(
+    structureId: string,
+    memory: StructureMemory,
+    saveJob: boolean
+  ): boolean {
+    if (memory && memory.jobId) {
+      const jobData = IJobMemory.Get(memory.jobId);
+      if (jobData.success) {
+        const job = jobData.data as JobMemory;
+        const targetStructureData = IStructureData.GetMemory(job.targetId);
+        if (targetStructureData.success) {
+          const targetMemory = targetStructureData.memory as StructureMemory;
+        if (targetMemory && job.fromTargetId) {
+          delete targetMemory.energyOutgoing[job.fromTargetId];
+          delete targetMemory.energyIncoming[job.fromTargetId];
+
+          IStructureMemory.Update(job.targetId, memory);
+        }
+      }
+
+        delete memory.energyIncoming[job.targetId];
+        delete memory.energyOutgoing[job.targetId];
+
+        if (job.fromTargetId) delete job.fromTargetId;
+      }
+    }
+
+    if (saveJob) {
+      memory.permJobId = memory.jobId;
+    }
+    delete memory.jobId;
+    return IStructureData.UpdateMemory(structureId, memory).success;
+  }
+
   static UnassignCreepJob(
     creepId: string,
     memory: CreepMemory,
@@ -110,11 +144,15 @@ export default class implements IJobs {
     jobId: string,
     memory: JobMemory,
     cache: JobCache,
-    amount: number
+    amount: number, 
+    sendStats: boolean = false
   ): boolean {
     if (memory.amountToTransfer) {
       memory.amountToTransfer -= amount;
     }
+
+    if (!sendStats) return IJobData.UpdateMemory(jobId, memory).success;
+
     const roomName = IRoomHelper.GetRoomName(cache.executer);
     const globalRoomData = IRoomHeap.Get(roomName);
     if (globalRoomData.success) {
@@ -401,7 +439,7 @@ export default class implements IJobs {
           const controller = Game.getObjectById<StructureController | null>(
             jobMemory.targetId
           );
-          if (!controller || (jobMemory.amountToTransfer ?? 0) <= 5 * 1000) {
+          if (!controller || (jobMemory.amountToTransfer ?? 0) <= 10 * 1000) {
             this.Delete(id);
           }
         }

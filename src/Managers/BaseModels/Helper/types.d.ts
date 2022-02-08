@@ -17,6 +17,7 @@ interface JobInitializationData {
 interface StructureInitializationData {
   structure: Structure;
   executer: string;
+  isSource?: boolean;
 }
 
 interface DroppedResourceInitializationData {

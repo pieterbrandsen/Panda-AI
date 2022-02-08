@@ -21,9 +21,9 @@ interface IResourceStorage {
   IsObjectEmptyEnough(structure?: StructuresWithStorage): LevelCheckResult;
   IsObjectFullEnough(structure?: StructuresWithStorage): LevelCheckResult;
   FindStructureToFillFrom(
-    inRoomRange: number
+    inRoomRange: number, onlyLinks:boolean
   ): BestStructureLoop | BestDroppedResourceLoop | null;
-  FindStructureToEmptyTo(inRoomRange: number): BestStructureLoop | null;
+  FindStructureToEmptyTo(inRoomRange: number, onlyLinks:boolean): BestStructureLoop | null;
   Manage(): string | undefined;
 }
 
@@ -129,6 +129,13 @@ export default class ResourceStorage implements IResourceStorage {
       min: 0,
       current: used,
     };
+    const averageToCapacity: StorageLevels = {
+      max: capacity,
+      high: capacity * 0.9,
+      low: capacity * 0.1,
+      min: 0,
+      current: used,
+    };
     const emptyToZero: StorageLevels = {
       max: capacity,
       high: 0,
@@ -143,8 +150,24 @@ export default class ResourceStorage implements IResourceStorage {
       if (structureMemory && structureMemory.isSourceStructure) {
         return emptyToZero;
       }
+      // is structure container or link in range of controller
+      if (
+        structure.structureType === STRUCTURE_CONTAINER ||
+        structure.structureType === STRUCTURE_LINK
+      ) {
+        if (structure.room.controller && 
+          structure.pos.inRangeTo(
+            structure.room.controller,
+            3
+          )
+        ) {
+          return fillToCapacity;
+        }
+      }
 
       switch (structure.structureType) {
+        case "link":
+          return averageToCapacity;
         case "container":
         case "extension":
         case "lab":
@@ -284,7 +307,7 @@ export default class ResourceStorage implements IResourceStorage {
   }
 
   FindStructureToFillFrom(
-    inRoomRange: number
+    inRoomRange: number, onlyLinks:boolean
   ): BestStructureLoop | BestDroppedResourceLoop | null {
     let bestStructure:
       | BestStructureLoop
@@ -297,7 +320,7 @@ export default class ResourceStorage implements IResourceStorage {
         false,
         [this.object.room.name],
         CachePredicates.IsStructureTypes(
-          this.energyWithdrawStructureTypes,
+          !onlyLinks ? this.energyTransferStructureTypes : [STRUCTURE_LINK],
           true
         ),
         CachePredicates.IsInRangeOf(
@@ -369,7 +392,7 @@ export default class ResourceStorage implements IResourceStorage {
     return bestStructure;
   }
 
-  FindStructureToEmptyTo(inRoomRange: number): BestStructureLoop | null {
+  FindStructureToEmptyTo(inRoomRange: number, onlyLinks:boolean): BestStructureLoop | null {
     let bestStructure: BestStructureLoop | null = null;
     let bestScore = 0;
     forOwn(
@@ -378,7 +401,7 @@ export default class ResourceStorage implements IResourceStorage {
         false,
         [this.object.room.name],
         CachePredicates.IsStructureTypes(
-          this.energyTransferStructureTypes,
+          !onlyLinks ? this.energyTransferStructureTypes : [STRUCTURE_LINK],
           true
         ),
         CachePredicates.IsInRangeOf(
@@ -390,7 +413,7 @@ export default class ResourceStorage implements IResourceStorage {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
         if (structure) {
           const levelCheck = this.CanStructureBeFilled(structure);
-          if (
+        if (
             levelCheck.result &&
             levelCheck.level.current - levelCheck.level.min > 0
           ) {
@@ -416,7 +439,7 @@ export default class ResourceStorage implements IResourceStorage {
     thisLevel: LevelCheckResult,
     isSpending: boolean,
     targetStructureInformation?: BestStructureLoop,
-    targetResourceInformation?: BestDroppedResourceLoop
+    targetResourceInformation?: BestDroppedResourceLoop,
   ): string | undefined {
     if (!this.memory || !this.cache) return undefined;
     const targetDataResult = targetStructureInformation
@@ -520,14 +543,14 @@ export default class ResourceStorage implements IResourceStorage {
   Manage(
     fillFrom = true,
     emptyTo = true,
+    onlyLinks:boolean = false,
     inRoomRange = 999
   ): string | undefined {
     if (!this.memory || !this.cache) return undefined;
-
     const levelFullCheck = this.IsObjectFullEnough();
     const levelEmptyCheck = this.IsObjectEmptyEnough();
     if (fillFrom) {
-      const targetInformation = this.FindStructureToFillFrom(inRoomRange);
+      const targetInformation = this.FindStructureToFillFrom(inRoomRange,onlyLinks);
       if (targetInformation) {
         const targetStructureInformation = targetInformation as BestStructureLoop;
         const targetDroppedResourceInformation = targetInformation as BestDroppedResourceLoop;
@@ -546,10 +569,11 @@ export default class ResourceStorage implements IResourceStorage {
 
     if (emptyTo) {
       const targetStructureInformation = this.FindStructureToEmptyTo(
-        inRoomRange
+        inRoomRange,
+        onlyLinks
       );
       if (targetStructureInformation) {
-        return this.ManageJob(levelFullCheck, true, targetStructureInformation);
+        return this.ManageJob(levelFullCheck, true,targetStructureInformation);
       }
     }
     return undefined;

@@ -6,7 +6,7 @@ import ITransferRole from "./transfer";
 import IWithdrawStructureRole from "./withdrawStructure";
 import IWithdrawResourceRole from "./withdrawResource";
 import IUpgradeControllerRole from "./upgradeController";
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
+import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
 interface IExecuteCreepRole {}
 
@@ -116,7 +116,6 @@ export default class implements IExecuteCreepRole {
     const creepId = this.creep.id;
     switch (result) {
       case "done":
-        IJobs.UnassignCreepJob(creepId, this.creepMemory, false);
         IJobs.Delete(this.creepMemory.jobId ?? "");
         break;
       case "empty":
