@@ -3,7 +3,7 @@ import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 interface ICreepTransferRole {}
 
 export default class implements ICreepTransferRole {
-    structure: StructureLink;
+  structure: StructureLink;
 
   cache: StructureCache;
 
@@ -32,15 +32,18 @@ export default class implements ICreepTransferRole {
       this.jobMemory.targetId
     );
     const from: StructureLink | null = Game.getObjectById(
-        this.jobMemory.fromTargetId ?? ""
-      );
+      this.jobMemory.fromTargetId ?? ""
+    );
     if (from && target) {
-        const resource = RESOURCE_ENERGY;
+      const resource = RESOURCE_ENERGY;
       const amountToTransfer = Math.min(
         target.store.getFreeCapacity(resource),
         this.structure.store.energy
       );
-      if (target.store.getUsedCapacity(resource) === 0 || amountToTransfer <= 0) {
+      if (
+        target.store.getUsedCapacity(resource) === 0 ||
+        amountToTransfer <= 0
+      ) {
         return "done";
       }
 

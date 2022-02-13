@@ -54,8 +54,8 @@ export default class implements ICreepRepairRole {
           );
           break;
         // skip default case
+      }
     }
-  }
     return "continue";
   }
 }

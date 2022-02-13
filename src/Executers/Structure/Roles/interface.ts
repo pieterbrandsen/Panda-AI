@@ -4,7 +4,7 @@ import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 interface IExecuteCreepRole {}
 
 export default class implements IExecuteCreepRole {
-    structure: Structure;
+  structure: Structure;
 
   structureCache: StructureCache;
 
@@ -30,15 +30,15 @@ export default class implements IExecuteCreepRole {
 
   executeRole(): JobResult {
     switch (this.jobCache.type) {
-        case "TransferStructure":
-            if (this.structure.structureType !== STRUCTURE_LINK) return "done"; 
-            return new ILinkRole(
-                this.structure as StructureLink,
-                this.structureCache,
-                this.structureMemory,
-                this.jobCache,
-                this.jobMemory
-            ).run();
+      case "TransferStructure":
+        if (this.structure.structureType !== STRUCTURE_LINK) return "done";
+        return new ILinkRole(
+          this.structure as StructureLink,
+          this.structureCache,
+          this.structureMemory,
+          this.jobCache,
+          this.jobMemory
+        ).run();
       default:
         return "done";
     }
@@ -53,10 +53,7 @@ export default class implements IExecuteCreepRole {
         IJobs.Delete(this.structureMemory.jobId ?? "");
         break;
       case "empty":
-        IJobs.UnassignStructureJob(
-            structureId,
-          this.structureMemory,false
-        );
+        IJobs.UnassignStructureJob(structureId, this.structureMemory, false);
         break;
       case "full":
         IJobs.UnassignStructureJob(structureId, this.structureMemory, false);

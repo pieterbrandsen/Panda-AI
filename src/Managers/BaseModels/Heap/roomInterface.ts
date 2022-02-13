@@ -36,12 +36,20 @@ export default class extends BaseHeap implements IBaseHeap {
           miner: 0,
           transferer: 0,
           worker: 0,
+          extractor: 0,
         },
         controller: {
           level: 0,
           progress: 0,
           progressTotal: 0,
           ticksToDowngrade: 0,
+        },
+        creepsCount: 0,
+        structuresCount: 0,
+        isSpawning: {},
+        spawnEnergy: {
+          energy: 0,
+          capacity: 0,
         },
       },
     };

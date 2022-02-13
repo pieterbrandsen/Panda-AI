@@ -31,6 +31,12 @@ export default class implements ICreepWithdrawResourceRole {
     const target: Resource | null = Game.getObjectById(
       this.jobMemory.targetId ?? ""
     );
+    if (
+      this.creepMemory.energyIncoming[this.jobMemory.targetId] < 0 ||
+      !this.creepMemory.energyIncoming[this.jobMemory.targetId]
+    )
+      return "full";
+
     if (target) {
       const resource: ResourceConstant = target.resourceType;
       if (target.amount === 0) {

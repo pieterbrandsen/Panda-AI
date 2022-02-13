@@ -1,4 +1,4 @@
-type CreepTypes = "miner" | "worker" | "transferer" | "claimer";
+type CreepTypes = "miner" | "extractor" | "worker" | "transferer" | "claimer";
 interface SpawningObject {
   type: CreepTypes;
   name: string;

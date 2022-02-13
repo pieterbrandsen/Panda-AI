@@ -60,7 +60,14 @@ export default class implements ISourceManager {
         }
       }
 
-      if (source) HandleSourceAndControllerStructure(source,sourceMemory,"source",this.executer,this.room.controller);
+      if (source)
+        HandleSourceAndControllerStructure(
+          source,
+          sourceMemory,
+          "source",
+          this.executer,
+          this.room.controller
+        );
     });
   }
 
