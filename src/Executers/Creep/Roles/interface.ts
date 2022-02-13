@@ -111,6 +111,7 @@ export default class implements IExecuteCreepRole {
   run(): void {
     const spendJobs: JobTypes[] = ["Build", "Repair", "UpgradeController"];
     // const gatherJobs: JobTypes[] = ["WithdrawResource","WithdrawStructure","HarvestMineral","HarvestSource"];
+    const gatherJobs: JobTypes[] = ["HarvestMineral", "HarvestSource"];
 
     const result = this.executeRole();
     const creepId = this.creep.id;
@@ -126,7 +127,11 @@ export default class implements IExecuteCreepRole {
         );
         break;
       case "full":
-        IJobs.UnassignCreepJob(creepId, this.creepMemory, false);
+        IJobs.UnassignCreepJob(
+          creepId,
+          this.creepMemory,
+          gatherJobs.includes(this.jobCache.type)
+        );
         break;
       default:
         break;

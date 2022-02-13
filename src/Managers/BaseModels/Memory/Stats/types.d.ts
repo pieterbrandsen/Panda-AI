@@ -11,6 +11,13 @@ interface RoomStatsMemory {
   energyOutgoing: StringMapGeneric<number, OutgoingJobTypes>;
   controller: ControllerStatsMemory;
   spawnEnergyOutgoing: StringMapGeneric<number, CreepTypes>;
+  creepsCount: number;
+  structuresCount: number;
+  isSpawning?: StringMap<boolean>;
+  spawnEnergy?: {
+    energy: number;
+    capacity: number;
+  };
 }
 interface StatsMemory extends BaseMemory {
   rooms: StringMap<RoomStatsMemory>;
@@ -19,7 +26,7 @@ interface StatsMemory extends BaseMemory {
     CPU_UNLOCK: number;
     ACCESS_KEY: number;
   };
-  gcl: GlobalControllerStatsMemory
+  gcl: GlobalControllerStatsMemory;
 }
 
 type MemoryStatsObjects = RoomStatsMemory | StatsMemory;

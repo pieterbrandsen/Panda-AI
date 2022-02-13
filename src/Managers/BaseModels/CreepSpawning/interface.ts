@@ -4,7 +4,8 @@ import IJobCache from "../Cache/jobInterface";
 import CachePredicates from "../Cache/predicates";
 import ICreepCache from "../Cache/creepInterface";
 import IStructureCache from "../Cache/structureInterface";
-import ICreepMemory from "../Helper/Creep/creepMemory";
+import ICreepData from "../Helper/Creep/creepMemory";
+import IRoomData from "../Helper/Room/roomMemory";
 import bodyIteratee from "./bodyConstants";
 import ICreepBodyPartHelper from "./bodyPartHelper";
 import ICreepCountHelper from "./creepCountHelper";
@@ -95,7 +96,7 @@ export default class CreepSpawning implements ICreepSpawning {
       type: creep.type,
       name: creep.name,
     };
-    return ICreepMemory.Initialize(data).success;
+    return ICreepData.Initialize(data).success;
   }
 
   RequestCreep(type: CreepTypes): SpawningObject | undefined {
@@ -110,8 +111,18 @@ export default class CreepSpawning implements ICreepSpawning {
   GetBodyLoop(type: CreepTypes): BodyCostRoomTypes | undefined {
     if (type === "miner") {
       const { controller } = this.spawnRoom;
-      if (controller && !(controller.level > 6)) {
-        return bodyIteratee[type].starter;
+      if (controller && controller.level < 6 && !this.isRemoteCreep) {
+        const roomData = IRoomData.GetMemory(this.spawnRoom.name);
+        if (roomData.success) {
+          const roomMemory = roomData.memory as RoomMemory;
+          if (
+            Object.values(roomMemory.sourceManager.sources)
+              .map((s) => s.structureId === undefined)
+              .filter((s) => s).length > 0
+          ) {
+            return bodyIteratee[type].starter;
+          }
+        }
       }
     }
 
@@ -170,6 +181,7 @@ export default class CreepSpawning implements ICreepSpawning {
       worker: 0,
       transferer: 0,
       claimer: 0,
+      extractor: 0,
     };
 
     forEach(Object.keys(scores), (key) => {
@@ -219,6 +231,7 @@ export default class CreepSpawning implements ICreepSpawning {
   UpdateMissingBodyParts(type: CreepTypes, body: BodyPartConstant[]): void {
     switch (type) {
       case "miner":
+      case "extractor":
       case "worker":
         this.missingBodyParts[type].work += (
           body.find((part) => part === WORK) ?? []

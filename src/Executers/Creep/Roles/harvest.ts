@@ -1,5 +1,4 @@
 import IJobs from "../../../Managers/BaseModels/Jobs/interface";
-import IResourceStorage from "../../../Managers/BaseModels/ResourceStorage/interface";
 
 interface ICreepHarvestRole {}
 
@@ -34,16 +33,16 @@ export default class implements ICreepHarvestRole {
       this.creep.store.getFreeCapacity() === 0
     ) {
       if (this.jobCache.type === "HarvestSource") {
-        if (
-          !new IResourceStorage(
-            this.creep,
-            "Creep",
-            this.creepCache.executer
-          ).Manage(false, true, false,3)
-        ) {
-          this.creep.drop(RESOURCE_ENERGY);
-        }
-        return "continue";
+        // if (
+        //   !new IResourceStorage(
+        //     this.creep,
+        //     "Creep",
+        //     this.creepCache.executer
+        //   ).Manage(false, true, false, true, 3)
+        // ) {
+        //   this.creep.drop(RESOURCE_ENERGY);
+        // }
+        // return "continue";
       }
       return "full";
     }

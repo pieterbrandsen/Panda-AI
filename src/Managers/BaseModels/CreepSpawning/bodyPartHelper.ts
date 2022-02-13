@@ -53,6 +53,7 @@ export default class ICreepBodyPartHelper {
       worker: ICreepBodyPartHelper.GetEmptyBodyParts(),
       transferer: ICreepBodyPartHelper.GetEmptyBodyParts(),
       claimer: ICreepBodyPartHelper.GetEmptyBodyParts(),
+      extractor: ICreepBodyPartHelper.GetEmptyBodyParts(),
     };
   }
 
@@ -132,7 +133,8 @@ export default class ICreepBodyPartHelper {
             bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             if (
               this.spawnRoom.controller &&
-              this.spawnRoom.controller.level > 6
+              this.spawnRoom.controller.level > 6 &&
+              this.spawnRoom.storage
             ) {
               amount = memory.amountToTransfer ?? 0;
               per1Lifetime = 1000;
@@ -194,9 +196,9 @@ export default class ICreepBodyPartHelper {
         }
 
         let bodyPartsToBeAdded = Math.ceil(
-          amount / (per1Lifetime * multiplier) ?? 0
+          amount / (per1Lifetime * multiplier)
         );
-        if (bodyPartsToBeAdded === null) bodyPartsToBeAdded = 0;
+        if (!bodyPartsToBeAdded) bodyPartsToBeAdded = 0;
 
         switch (cache.type) {
           case "UpgradeController":
@@ -260,6 +262,7 @@ export default class ICreepBodyPartHelper {
 
   static GetBodyPartForCreepType(type: CreepTypes): BodyPartConstant {
     switch (type) {
+      case "extractor":
       case "miner":
       case "worker":
         return WORK;

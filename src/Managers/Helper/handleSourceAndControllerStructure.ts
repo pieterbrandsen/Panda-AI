@@ -2,7 +2,6 @@ import IRoomConstruction from "../BaseModels/Helper/Room/roomConstruction";
 import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
 import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
 import IRoomMemory from "../BaseModels/Memory/roomInterface";
-import IResourceStorage from "../BaseModels/ResourceStorage/interface";
 import IStructureData from "../BaseModels/Helper/Structure/structureMemory";
 
 export default function HandleSourceAndControllerStructure(
@@ -25,7 +24,7 @@ export default function HandleSourceAndControllerStructure(
       range,
       type
     );
-      if (bestPosition) {
+    if (bestPosition) {
       const createdSite = IRoomConstruction.CreateConstructionSite(
         target.room,
         bestPosition,
@@ -41,16 +40,22 @@ export default function HandleSourceAndControllerStructure(
           bestPosition,
           structureType
         );
-        if (structure) {
+        const structureData = IStructureData.GetMemory(
+          memory.structureId ?? ""
+        );
+        if (structure && structureData.success) {
+          const structureMemory = structureData.memory as StructureMemory;
+          structureMemory.isSourceStructure = true;
           memory.structureId = structure.id;
           memory.structureType = structure.structureType as BuildableStructureConstant;
           updatedMemory = true;
+          IStructureData.UpdateMemory(structure.id, structureMemory);
         }
       }
     }
   }
 
-  if (memory.structureBuildJobId) {
+  if (memory.structureBuildJobId && !updatedMemory) {
     if (Game.time % 100) {
       const createdSite = IRoomConstruction.CreateConstructionSite(
         target.room,
@@ -69,7 +74,7 @@ export default function HandleSourceAndControllerStructure(
     return;
   }
 
-  if (memory.structureId) {
+  if (memory.structureId && !updatedMemory) {
     const structure = Game.getObjectById<
       null | StructureContainer | StructureLink
     >(memory.structureId);
@@ -78,18 +83,17 @@ export default function HandleSourceAndControllerStructure(
       delete memory.structureId;
       delete memory.structureBuildJobId;
       updatedMemory = true;
-    }
-    else if (structure && structure.structureType === "container") {
-      const resourceStorage = new IResourceStorage(
-        structure as StructuresWithStorage,
-        "Structure",
-        executer
-      );
-      if (type === "controller") {
-        resourceStorage.Manage(false, true);
-      } else {
-        resourceStorage.Manage(true, false);
-      }
+      // } else if (structure && structure.structureType === "container") {
+      //   const resourceStorage = new IResourceStorage(
+      //     structure as StructuresWithStorage,
+      //     "Structure",
+      //     executer
+      //   );
+      //   if (type === "controller") {
+      //     resourceStorage.Manage(false, true);
+      //   } else {
+      //     resourceStorage.Manage(true, false);
+      //   }
     } else {
       delete memory.structureId;
       delete memory.structureBuildJobId;
@@ -97,12 +101,14 @@ export default function HandleSourceAndControllerStructure(
     }
   }
 
-  if (updatedMemory && type === "controller") {
+  if (!updatedMemory) return;
+
+  if (type === "controller") {
     IRoomMemory.UpdateControllerMemory(
       target.room.name,
       memory as ControllerMemory
     );
-  } else if (updatedMemory && type === "source") {
+  } else if (type === "source") {
     const structureData = IStructureData.GetMemory(memory.structureId ?? "");
     if (structureData.success) {
       const structureMemory = structureData.memory as StructureMemory;
@@ -114,5 +120,4 @@ export default function HandleSourceAndControllerStructure(
       memory as SourceMemory
     );
   }
-  return;
 }

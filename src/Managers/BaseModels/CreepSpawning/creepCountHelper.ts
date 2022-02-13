@@ -41,6 +41,7 @@ export default class ICreepCountHelper {
       worker: 0,
       transferer: 0,
       claimer: 0,
+      extractor: 0,
     };
   }
 

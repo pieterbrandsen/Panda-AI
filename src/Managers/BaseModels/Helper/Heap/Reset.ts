@@ -41,6 +41,29 @@ export default class implements IResetHeap {
           );
           data.stats.spawnEnergyOutgoing[key] = 0;
         });
+
+        roomStats.controller = data.stats.controller;
+        if (data.stats.controller)
+          data.stats.controller = {
+            level: 0,
+            progress: 0,
+            progressTotal: 0,
+            ticksToDowngrade: 0,
+          };
+
+        roomStats.creepsCount = AverageValue(
+          roomStats.creepsCount,
+          data.stats.creepsCount
+        );
+        data.stats.creepsCount = 0;
+        roomStats.structuresCount = AverageValue(
+          roomStats.structuresCount,
+          data.stats.structuresCount
+        );
+        data.stats.structuresCount = 0;
+
+        roomStats.isSpawning = data.stats.isSpawning;
+        data.stats.isSpawning = {};
       }
     });
 

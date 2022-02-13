@@ -32,6 +32,13 @@ export default class implements ICreepTransferRole {
     const target: StructuresWithStorage | null = Game.getObjectById(
       this.jobMemory.targetId
     );
+
+    if (
+      this.creepMemory.energyOutgoing[this.jobMemory.targetId] === 0 ||
+      !this.creepMemory.energyOutgoing[this.jobMemory.targetId]
+    )
+      return "empty";
+      
     if (target) {
       if (target.store.getFreeCapacity(resource) === 0) {
         return "done";

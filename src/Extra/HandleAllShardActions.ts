@@ -15,7 +15,7 @@ export default function HandleAllShardActions(): void {
       lastShardIndex === shardNames.length - 1
         ? shardNames[0]
         : shardNames[lastShardIndex + 1];
-    const spawnResult = spawn.spawnCreep([MOVE], shardTarget + "-"+ Game.time);
+    const spawnResult = spawn.spawnCreep([MOVE], `${shardTarget}-${Game.time}`);
     if (spawnResult === OK || spawnResult === ERR_NAME_EXISTS) {
       global.lastShardTarget = shardTarget;
     }
@@ -27,15 +27,19 @@ export default function HandleAllShardActions(): void {
     if (!creep.pos.inRangeTo(targetPos, 0)) {
       return creep.moveTo(targetPos);
     }
+
+    creep.room.createConstructionSite(2, 2, STRUCTURE_ROAD);
     return undefined;
   };
   forEach(shardNames, (shardName, index) => {
     if (Game.time % 100 === 0 && index === 0) {
       spawnNewCreep();
     }
-    let loggedOrders=  false;
+    let loggedOrders = false;
 
-    const creeps = Object.values(Game.creeps).filter(c=>c.name.includes(shardName));
+    const creeps = Object.values(Game.creeps).filter((c) =>
+      c.name.includes(shardName)
+    );
     forEach(creeps, (creep) => {
       if (Game.shard.name === "shard0" && index === 0) {
         moveToTarget(creep, Game.flags.shard0.pos);
@@ -58,13 +62,12 @@ export default function HandleAllShardActions(): void {
       }
 
       if (Game.shard.name === shardName) {
-        const orders =JSON.stringify(Game.market.getAllOrders());
+        const orders = JSON.stringify(Game.market.getAllOrders());
         if (!loggedOrders && Game.time % 100 === 0) {
-        console.log(orders);
-        loggedOrders = true;
-      }
+          console.log(orders);
+          loggedOrders = true;
+        }
         creep.say(creep.name);
-        creep.room.createConstructionSite(2,2,STRUCTURE_ROAD)
       }
     });
   });

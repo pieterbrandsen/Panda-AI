@@ -32,6 +32,12 @@ export default class implements ICreepWithdrawStructureRole {
     const target: StructuresWithStorage | null = Game.getObjectById(
       this.jobMemory.targetId ?? ""
     );
+    if (
+      this.creepMemory.energyIncoming[this.jobMemory.targetId] < 0 ||
+      !this.creepMemory.energyIncoming[this.jobMemory.targetId]
+    )
+      return "full";
+      
     if (target) {
       if (target.store.getUsedCapacity(resource) === 0) {
         return "done";

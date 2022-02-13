@@ -54,11 +54,20 @@ export default class extends BaseMemory implements IRoomMemory {
     Memory.RoomsData.data[id] = data;
     return { success: true, data };
   }
-  static UpdateSourceMemory(roomId: string, sourceId:string,data: SourceMemory): CRUDResult<SourceMemory> {
+
+  static UpdateSourceMemory(
+    roomId: string,
+    sourceId: string,
+    data: SourceMemory
+  ): CRUDResult<SourceMemory> {
     Memory.RoomsData.data[roomId].sourceManager.sources[sourceId] = data;
     return { success: true, data };
   }
-  static UpdateControllerMemory(roomId: string, data: ControllerMemory): CRUDResult<ControllerMemory> {
+
+  static UpdateControllerMemory(
+    roomId: string,
+    data: ControllerMemory
+  ): CRUDResult<ControllerMemory> {
     Memory.RoomsData.data[roomId].controllerManager.controller = data;
     return { success: true, data };
   }

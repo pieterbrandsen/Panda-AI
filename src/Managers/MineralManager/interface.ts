@@ -67,8 +67,7 @@ export default class implements IMineralManager {
           if (!createdSite) {
             delete mineralMemory.structureBuildJobId;
             this.updatedMemory = true;
-          }
-          else { 
+          } else {
             mineralMemory.structureBuildJobId = createdSite;
             this.updatedMemory = true;
           }
@@ -103,7 +102,9 @@ export default class implements IMineralManager {
       }
 
       if (mineralMemory.structureId) {
-        const extractor = Game.getObjectById<StructureExtractor | null>(mineralMemory.structureId);
+        const extractor = Game.getObjectById<StructureExtractor | null>(
+          mineralMemory.structureId
+        );
         if (!extractor) {
           delete mineralMemory.structureId;
           this.updatedMemory = true;
@@ -113,7 +114,11 @@ export default class implements IMineralManager {
   }
 
   Run(): void {
-    if (this.room.controller ? this.room.controller.level < 6 : true) return;
+    if (
+      (this.room.controller ? this.room.controller.level < 6 : true) ||
+      !this.room.storage
+    )
+      return;
 
     this.UpdateMineral();
     if (this.updatedMemory) {

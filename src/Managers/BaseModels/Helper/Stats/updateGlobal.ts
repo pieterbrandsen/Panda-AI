@@ -11,12 +11,11 @@ export default function UpdateGlobalStats(): boolean {
     ACCESS_KEY: Game.resources[ACCESS_KEY],
   };
 
-    Memory.stats.gcl = {
-        level: Game.gcl.level,
-        progress: Game.gcl.progress,
-        progressTotal: Game.gcl.progressTotal,
-    };
-
+  Memory.stats.gcl = {
+    level: Game.gcl.level,
+    progress: Game.gcl.progress,
+    progressTotal: Game.gcl.progressTotal,
+  };
 
   return IGlobalStats.Update(globalStatsMemory).success;
 }
