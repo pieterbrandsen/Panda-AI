@@ -90,7 +90,14 @@ export default class implements IJobs {
         }
 
         if (targetMemory && job.fromTargetId) {
-      console.log("Delete",memory.jobId,creepId,targetMemory.energyIncoming[job.fromTargetId] + " - " + targetMemory.energyOutgoing[job.fromTargetId]);
+          console.log(
+            "Delete",
+            memory.jobId,
+            creepId,
+            `${targetMemory.energyIncoming[job.fromTargetId]} - ${
+              targetMemory.energyOutgoing[job.fromTargetId]
+            }`
+          );
 
           delete targetMemory.energyOutgoing[job.fromTargetId];
           delete targetMemory.energyIncoming[job.fromTargetId];
@@ -139,7 +146,11 @@ export default class implements IJobs {
     if (!IJobMemory.Update(jobId, job).success) {
       return false;
     }
-    if (jobCache.type.includes("Transfer") || jobCache.type.includes("Withdraw")) console.log("Assign", jobId,creepId);
+    if (
+      jobCache.type.includes("Transfer") ||
+      jobCache.type.includes("Withdraw")
+    )
+      console.log("Assign", jobId, creepId);
     return ICreepData.UpdateMemory(creepId, creepMemory, creepCache).success;
   }
 
@@ -273,11 +284,11 @@ export default class implements IJobs {
             3
           );
           if (!result) {
-            creep.drop(RESOURCE_ENERGY); 
+            creep.drop(RESOURCE_ENERGY);
             return undefined;
           }
           return result;
-          }
+        }
         case "worker":
           return ["Build", "UpgradeController", "Repair"];
         case "transferer":

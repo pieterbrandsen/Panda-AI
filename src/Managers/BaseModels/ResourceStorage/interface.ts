@@ -582,7 +582,14 @@ export default class ResourceStorage implements IResourceStorage {
         this.memory.energyIncoming[id] = amountTransferring;
       }
 
-      console.log("Add",jobId,this.object.id,targetMemory.energyIncoming[this.object.id] + " - " + targetMemory.energyOutgoing[this.object.id]);
+      console.log(
+        "Add",
+        jobId,
+        this.object.id,
+        `${targetMemory.energyIncoming[this.object.id]} - ${
+          targetMemory.energyOutgoing[this.object.id]
+        }`
+      );
       if (targetStructureInformation)
         IStructureData.UpdateMemory(id, targetMemory);
       else IDroppedResourceData.UpdateMemory(id, targetMemory);

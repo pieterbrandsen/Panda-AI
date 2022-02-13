@@ -38,7 +38,7 @@ export default class implements ICreepTransferRole {
       !this.creepMemory.energyOutgoing[this.jobMemory.targetId]
     )
       return "empty";
-      
+
     if (target) {
       if (target.store.getFreeCapacity(resource) === 0) {
         return "done";

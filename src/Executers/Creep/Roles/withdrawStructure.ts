@@ -37,7 +37,7 @@ export default class implements ICreepWithdrawStructureRole {
       !this.creepMemory.energyIncoming[this.jobMemory.targetId]
     )
       return "full";
-      
+
     if (target) {
       if (target.store.getUsedCapacity(resource) === 0) {
         return "done";
