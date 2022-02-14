@@ -6,6 +6,6 @@ interface ControllerMemory {
   structureBuildJobId?: string;
   structureType?: BuildableStructureConstant;
 }
-interface ControllerManager {
+interface ControllerManagerMemory {
   controller?: ControllerMemory;
 }

@@ -1,20 +1,18 @@
-import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
-import ICreepSpawning from "../BaseModels/CreepSpawning/interface";
+import RoomHelper from "../BaseModels/Helper/Room/interface";
+import CreepSpawning from "../BaseModels/CreepSpawning/interface";
 
-interface ISpawnManager {}
+export default class SpawnManager {
+  private updatedMemory = false;
 
-export default class implements ISpawnManager {
-  updatedMemory = false;
+  private executer: string;
 
-  executer: string;
+  private room: Room;
 
-  room: Room;
+  private memory: RoomMemory;
 
-  memory: RoomMemory;
+  private managerMemory: SpawnManagerMemory;
 
-  managerMemory: SpawnManager;
-
-  cache: RoomCache;
+  private cache: RoomCache;
 
   constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
     this.room = Game.rooms[roomName];
@@ -22,11 +20,11 @@ export default class implements ISpawnManager {
     this.cache = roomCache;
     this.managerMemory = this.memory.spawnManager;
 
-    this.executer = IRoomHelper.GetExecuter(this.room.name, "Spawn");
+    this.executer = RoomHelper.GetExecuter(this.room.name, "Spawn");
   }
 
   Run(): void {
-    const resultOwnedCreeps = new ICreepSpawning(this.room.name).SpawnCreeps();
+    const resultOwnedCreeps = new CreepSpawning(this.room.name).SpawnCreeps();
     const capacityEnergy = this.room.energyCapacityAvailable;
     const { energyAvailable } = this.room;
     const energyAvailablePercentage = energyAvailable / capacityEnergy;
@@ -37,7 +35,7 @@ export default class implements ISpawnManager {
       energyAvailablePercentage > 0.5 &&
       energyAvailable > 1000
     ) {
-      new ICreepSpawning(
+      new CreepSpawning(
         this.room.name,
         Object.keys(this.memory.remoteRooms)
       ).SpawnCreeps();

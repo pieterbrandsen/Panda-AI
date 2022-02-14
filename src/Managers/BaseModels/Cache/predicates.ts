@@ -1,6 +1,6 @@
-import IRoomHelper from "../Helper/Room/roomInterface";
+import RoomHelper from "../Helper/Room/interface";
 
-export default class {
+export default class CachePredicates {
   /**
    * Checks if inputted structureType is equal to structure's structureType
    */
@@ -27,13 +27,13 @@ export default class {
 
   static IsRoomName = (roomName: string) => {
     return (cache: CacheObjects): boolean => {
-      return IRoomHelper.GetRoomName(cache.executer) === roomName;
+      return RoomHelper.GetRoomName(cache.executer) === roomName;
     };
   };
 
   static IsInRoomNameArray = (roomNames: string[]) => {
     return (cache: CacheObjects): boolean => {
-      return roomNames.includes(IRoomHelper.GetRoomName(cache.executer));
+      return roomNames.includes(RoomHelper.GetRoomName(cache.executer));
     };
   };
 

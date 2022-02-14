@@ -1,16 +1,14 @@
-import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
+import RoomPosition from "../BaseModels/Helper/Room/position";
 
-interface ISpawnMemory {}
-
-export default class implements ISpawnMemory {
-  static SetupMemory(room: Room): MineralManager {
+export default class MineralManagerMemoryData {
+  static SetupMemory(room: Room): MineralManagerMemory {
     const mineral = room.find(FIND_MINERALS)[0];
     return {
       mineral: mineral
         ? {
             jobId: undefined,
             id: mineral.id,
-            pos: IRoomPosition.FreezeRoomPosition(mineral.pos),
+            pos: RoomPosition.FreezeRoomPosition(mineral.pos),
             type: mineral.mineralType,
           }
         : undefined,

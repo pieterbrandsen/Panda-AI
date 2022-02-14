@@ -1,15 +1,13 @@
 import { forEach } from "lodash";
-import ICreepData from "../../Managers/BaseModels/Helper/Creep/creepMemory";
-import ICreepHeap from "../../Managers/BaseModels/Heap/creepInterface";
-import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
-import ICreepRoleExecuter from "./Roles/interface";
+import CreepData from "../../Managers/BaseModels/Helper/Creep/memory";
+import CreepHeap from "../../Managers/BaseModels/Heap/creep";
+import JobData from "../../Managers/BaseModels/Helper/Job/memory";
+import Jobs from "../../Managers/BaseModels/Jobs/interface";
+import CreepRoleExecuter from "./Roles/interface";
 
-interface ICreepExecuter {}
-
-export default class implements ICreepExecuter {
+export default class CreepExecuter {
   static ExecuteCreep(creep: Creep): void {
-    const creepData = ICreepData.GetMemory(creep.id);
+    const creepData = CreepData.GetMemory(creep.id);
     if (!creepData.success) {
       return;
     }
@@ -18,13 +16,13 @@ export default class implements ICreepExecuter {
 
     creep.say(creepMemory.jobId ?? "none");
     if (creepMemory.jobId) {
-      const jobData = IJobData.GetMemory(creepMemory.jobId);
+      const jobData = JobData.GetMemory(creepMemory.jobId);
       if (!jobData.success) {
         return;
       }
       const jobMemory = jobData.memory as JobMemory;
       const jobCache = jobData.cache as JobCache;
-      new ICreepRoleExecuter(
+      new CreepRoleExecuter(
         creep,
         creepCache,
         creepMemory,
@@ -32,19 +30,19 @@ export default class implements ICreepExecuter {
         jobMemory
       ).run();
     } else {
-      IJobs.FindJobForCreep(creep);
+      Jobs.FindJobForCreep(creep);
     }
   }
 
-  static ExecuterAllCreeps(creeps: StringMap<CreepCache>): void {
-    forEach(Object.keys(creeps), (id: string) => {
-      const creepData = ICreepData.GetMemory(id);
+  static ExecuterAllCreeps(creepIds: string[]): void {
+    forEach(creepIds, (id: string) => {
+      const creepData = CreepData.GetMemory(id);
       if (!creepData.success) {
         return;
       }
-      const creepHeapData = ICreepHeap.Get(id);
+      const creepHeapData = CreepHeap.Get(id);
       if (!creepHeapData.success) {
-        ICreepHeap.Initialize(id);
+        CreepHeap.Initialize(id);
       }
 
       const creepMemory = creepData.memory as CreepMemory;
@@ -53,8 +51,8 @@ export default class implements ICreepExecuter {
       if (creep) {
         this.ExecuteCreep(creep);
       } else if (!Game.creeps[id]) {
-        IJobs.UnassignCreepJob(id, creepMemory, false);
-        ICreepData.DeleteMemory(id, true, true);
+        Jobs.UnassignCreepJob(id, creepMemory, false);
+        CreepData.DeleteMemory(id, true, true);
       }
     });
   }

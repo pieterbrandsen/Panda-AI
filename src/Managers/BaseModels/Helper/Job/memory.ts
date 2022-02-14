@@ -1,10 +1,8 @@
 import { forEach } from "lodash";
-import IJobMemory from "../../Memory/jobInterface";
-import IJobCache from "../../Cache/jobInterface";
+import JobMemoryData from "../../Memory/job";
+import JobCacheData from "../../Cache/job";
 
-interface IJobHelper {}
-
-export default class implements IJobHelper {
+export default class JobDataHelper {
   static GetJobId(type: JobTypes, pos: FreezedRoomPosition): string {
     return `${type}_${pos.x}_${pos.y}_${pos.roomName}`;
   }
@@ -15,12 +13,12 @@ export default class implements IJobHelper {
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = IJobMemory.Get(id);
+    const memoryResult = JobMemoryData.Get(id);
     if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = IJobCache.Get(id);
+    const cacheResult = JobCacheData.Get(id);
     if (cacheResult.success && result.success) {
       result.success = true;
       result.cache = cacheResult.data;
@@ -39,13 +37,13 @@ export default class implements IJobHelper {
       cache: undefined,
     };
 
-    const memoryResult = IJobMemory.Create(id, memory);
+    const memoryResult = JobMemoryData.Create(id, memory);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
       result.success = true;
     }
 
-    const cacheResult = IJobCache.Create(id, cache);
+    const cacheResult = JobCacheData.Create(id, cache);
     if (cacheResult.success && result.success) {
       result.cache = cacheResult.data;
       result.success = true;
@@ -65,14 +63,14 @@ export default class implements IJobHelper {
       cache: undefined,
     };
     if (isMemory) {
-      const deleteResult = IJobMemory.Delete(id);
+      const deleteResult = JobMemoryData.Delete(id);
       if (deleteResult.success) {
         result.success = true;
         result.memory = deleteResult.data;
       }
     }
     if (isCache && result.success) {
-      const deleteResult = IJobCache.Delete(id);
+      const deleteResult = JobCacheData.Delete(id);
       if (deleteResult.success) {
         result.success = true;
         result.cache = deleteResult.data;
@@ -82,7 +80,7 @@ export default class implements IJobHelper {
   }
 
   static DeleteAllData(roomName: string): void {
-    const jobIds = Object.keys(IJobCache.GetAll(false, "", [roomName]));
+    const jobIds = Object.keys(JobCacheData.GetAll("", false, [roomName]));
 
     forEach(jobIds, (id) => {
       this.DeleteMemory(id, true, true);
@@ -101,14 +99,14 @@ export default class implements IJobHelper {
     };
 
     if (memory) {
-      const updateResult = IJobMemory.Update(id, memory);
+      const updateResult = JobMemoryData.Update(id, memory);
       if (updateResult.success) {
         result.success = true;
         result.memory = updateResult.data;
       }
     }
     if (cache && result.success) {
-      const updateResult = IJobCache.Update(id, cache);
+      const updateResult = JobCacheData.Update(id, cache);
       if (updateResult.success) {
         result.success = true;
         result.cache = updateResult.data;
@@ -127,7 +125,7 @@ export default class implements IJobHelper {
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = IJobMemory.Initialize(
+    const memoryResult = JobMemoryData.Initialize(
       id,
       data.targetId,
       data.pos,
@@ -141,11 +139,77 @@ export default class implements IJobHelper {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = IJobCache.Initialize(id, data.executer, data.type);
+    const cacheResult = JobCacheData.Initialize(id, data.executer, data.type);
     if (cacheResult.success && result.success) {
       result.success = true;
       result.cache = cacheResult.data;
     }
     return result;
+  }
+
+  private static GetAll(
+    isMemory: boolean,
+    getOnlyFreeJobs?: boolean,
+    executer?: string,
+    getOnlyExecuterJobs?: boolean,
+    roomsToCheck?: string[],
+    predicateMemory?: Predicate<JobMemory>,
+    predicateCache?: Predicate<JobCache>
+  ): StringMap<DoubleCRUDResult<JobMemory, JobCache>> {
+    const result: StringMap<DoubleCRUDResult<JobMemory, JobCache>> = {};
+    const ids = Object.keys(
+      isMemory
+        ? JobMemoryData.GetAll(getOnlyFreeJobs, predicateMemory)
+        : JobCacheData.GetAll(
+            executer,
+            getOnlyExecuterJobs,
+            roomsToCheck,
+            predicateCache
+          )
+    );
+    forEach(ids, (id) => {
+      const memoryResult = JobMemoryData.Get(id);
+      const cacheResult = JobCacheData.Get(id);
+      if (memoryResult.success && cacheResult.success) {
+        result[id] = {
+          success: true,
+          memory: memoryResult.data,
+          cache: cacheResult.data,
+        };
+      }
+    });
+
+    return result;
+  }
+
+  static GetAllBasedOnMemory(
+    getOnlyFreeJobs = false,
+    predicate?: Predicate<JobMemory>
+  ): StringMap<DoubleCRUDResult<JobMemory, JobCache>> {
+    return this.GetAll(
+      true,
+      getOnlyFreeJobs,
+      undefined,
+      undefined,
+      undefined,
+      predicate
+    );
+  }
+
+  static GetAllBasedOnCache(
+    executer = "",
+    getOnlyExecuterJobs = false,
+    roomsToCheck?: string[],
+    predicate?: Predicate<JobCache>
+  ): StringMap<DoubleCRUDResult<JobMemory, JobCache>> {
+    return this.GetAll(
+      true,
+      undefined,
+      executer,
+      getOnlyExecuterJobs,
+      roomsToCheck,
+      undefined,
+      predicate
+    );
   }
 }

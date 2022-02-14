@@ -1,9 +1,7 @@
 import { clone } from "lodash";
-import BaseMemory from "./interface";
+import BaseCacheData from "./interface";
 
-interface IJobCache {}
-
-export default class extends BaseMemory implements IJobCache {
+export default class JobCacheData extends BaseCacheData {
   private static type: CacheTypes = "Job";
 
   static Validate(data: StringMap<JobCache>): ValidatedData {
@@ -51,8 +49,8 @@ export default class extends BaseMemory implements IJobCache {
   }
 
   static GetAll(
-    getOnlyExecuterJobs = true,
     executer?: string,
+    getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<JobCache>,
     predicate2?: Predicate<JobCache>

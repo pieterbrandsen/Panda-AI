@@ -1,7 +1,5 @@
-interface ISpawnMemory {}
-
-export default class implements ISpawnMemory {
-  static SetupMemory(): SpawnManager {
+export default class SpawnManagerMemoryData {
+  static SetupMemory(): SpawnManagerMemory {
     return {};
   }
 }

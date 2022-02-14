@@ -1,17 +1,15 @@
-import IJobs from "../../../Managers/BaseModels/Jobs/interface";
+import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface ICreepTransferRole {}
+export default class CreepTransferRole {
+  private structure: StructureLink;
 
-export default class implements ICreepTransferRole {
-  structure: StructureLink;
+  private cache: StructureCache;
 
-  cache: StructureCache;
+  private memory: StructureMemory;
 
-  memory: StructureMemory;
+  private jobCache: JobCache;
 
-  jobCache: JobCache;
-
-  jobMemory: JobMemory;
+  private jobMemory: JobMemory;
 
   constructor(
     structure: StructureLink,
@@ -54,7 +52,7 @@ export default class implements ICreepTransferRole {
         case ERR_NOT_ENOUGH_RESOURCES:
           return "empty";
         case OK:
-          IJobs.UpdateAmount(
+          Jobs.UpdateAmount(
             this.memory.jobId as string,
             this.jobMemory,
             this.jobCache,

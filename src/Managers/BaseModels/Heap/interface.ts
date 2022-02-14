@@ -3,9 +3,7 @@
 // TODO: Create object
 // TODO: CRUD
 
-interface IHeap {}
-
-export default class implements IHeap {
+export default class HeapData {
   static ValidateSingle(id: string, type: HeapTypes): boolean {
     switch (type) {
       case "Creep":

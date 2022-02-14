@@ -1,1 +1,1 @@
-interface SpawnManager {}
+interface SpawnManagerMemory {}

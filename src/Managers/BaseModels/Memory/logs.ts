@@ -1,9 +1,7 @@
 import { clone } from "lodash";
-import BaseMemory from "./interface";
+import BaseMemoryData from "./interface";
 
-interface ILogsMemory {}
-
-export default class extends BaseMemory implements ILogsMemory {
+export default class LogsMemoryData extends BaseMemoryData {
   private static type: MemoryTypes = "Log";
 
   static Validate(data: StringMap<LogsMemory>): ValidatedData {

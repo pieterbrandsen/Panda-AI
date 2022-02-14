@@ -1,9 +1,7 @@
 import { clone } from "lodash";
-import BaseHeap from "./interface";
+import BaseHeapData from "./interface";
 
-interface IBaseHeap {}
-
-export default class extends BaseHeap implements IBaseHeap {
+export default class RoomHeapData extends BaseHeapData {
   private static type: HeapTypes = "Room";
 
   static ValidateSingle(id: string): boolean {

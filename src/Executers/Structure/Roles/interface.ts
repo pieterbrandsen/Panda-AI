@@ -1,18 +1,16 @@
-import ILinkRole from "./link";
-import IJobs from "../../../Managers/BaseModels/Jobs/interface";
+import LinkRole from "./link";
+import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface IExecuteCreepRole {}
+export default class ExecuteCreepRole {
+  private structure: Structure;
 
-export default class implements IExecuteCreepRole {
-  structure: Structure;
+  private structureCache: StructureCache;
 
-  structureCache: StructureCache;
+  private structureMemory: StructureMemory;
 
-  structureMemory: StructureMemory;
+  private jobCache: JobCache;
 
-  jobCache: JobCache;
-
-  jobMemory: JobMemory;
+  private jobMemory: JobMemory;
 
   constructor(
     structure: Structure,
@@ -28,11 +26,11 @@ export default class implements IExecuteCreepRole {
     this.jobMemory = jobMemory;
   }
 
-  executeRole(): JobResult {
+  private executeRole(): JobResult {
     switch (this.jobCache.type) {
       case "TransferStructure":
         if (this.structure.structureType !== STRUCTURE_LINK) return "done";
-        return new ILinkRole(
+        return new LinkRole(
           this.structure as StructureLink,
           this.structureCache,
           this.structureMemory,
@@ -44,19 +42,19 @@ export default class implements IExecuteCreepRole {
     }
   }
 
-  run(): void {
+  private run(): void {
     const result = this.executeRole();
     const structureId = this.structure.id;
     switch (result) {
       case "done":
-        IJobs.UnassignStructureJob(structureId, this.structureMemory, false);
-        IJobs.Delete(this.structureMemory.jobId ?? "");
+        Jobs.UnassignStructureJob(structureId, this.structureMemory, false);
+        Jobs.Delete(this.structureMemory.jobId ?? "");
         break;
       case "empty":
-        IJobs.UnassignStructureJob(structureId, this.structureMemory, false);
+        Jobs.UnassignStructureJob(structureId, this.structureMemory, false);
         break;
       case "full":
-        IJobs.UnassignStructureJob(structureId, this.structureMemory, false);
+        Jobs.UnassignStructureJob(structureId, this.structureMemory, false);
         break;
       default:
         break;

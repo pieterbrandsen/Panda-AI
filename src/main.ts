@@ -1,34 +1,34 @@
 import { ErrorMapper } from "./Extra/ErrorMapper";
-import IGlobalMemory from "./Managers/BaseModels/Memory/globalInterface";
-import IGlobalData from "./Managers/BaseModels/Helper/Global/globalMemory";
+import GlobalMemory from "./Managers/BaseModels/Memory/global";
+import GlobalData from "./Managers/BaseModels/Helper/Global/globalMemory";
 import UpdateGlobalStats from "./Managers/BaseModels/Helper/Stats/updateGlobal";
-import IRoomsExecuter from "./Executers/Room/interface";
-import IResetHeap from "./Managers/BaseModels/Helper/Heap/Reset";
-import IHeapMemory from "./Managers/BaseModels/Heap/globalInterface";
+import RoomsExecuter from "./Executers/Room/interface";
+import ResetHeap from "./Managers/BaseModels/Helper/Heap/Reset";
+import HeapMemory from "./Managers/BaseModels/Heap/global";
 import InitializeSpawnedCreeps from "./Extra/InitalizeSpawnedCreeps";
 import HandleAllShardActions from "./Extra/HandleAllShardActions";
 import BuyOrders from "./Extra/BuyOrders";
 
 // eslint-disable-next-line
 export const loop = ErrorMapper.wrapLoop((): void => {
-  if (!IHeapMemory.ValidateSingle()) {
+  if (!HeapMemory.ValidateSingle()) {
     RawMemory.setActiveSegments([1, 98]);
-    IHeapMemory.Initialize();
+    HeapMemory.Initialize();
     return;
   }
 
-  if (!IGlobalMemory.ValidateSingle()) {
-    IGlobalData.Initialize();
+  if (!GlobalMemory.ValidateSingle()) {
+    GlobalData.Initialize();
     return;
   }
 
-  IRoomsExecuter.ExecuteAllRooms();
+  RoomsExecuter.ExecuteAllRooms();
 
   InitializeSpawnedCreeps();
   HandleAllShardActions();
   BuyOrders();
 
   UpdateGlobalStats();
-  IResetHeap.Reset();
+  ResetHeap.Reset();
   RawMemory.segments[98] = JSON.stringify(Memory.stats);
 });

@@ -1,24 +1,22 @@
 import { forEach } from "lodash";
-import IRoomMemory from "../BaseModels/Memory/roomInterface";
-import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
-import IJobData from "../BaseModels/Helper/Job/jobMemory";
-import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
+import RoomHelper from "../BaseModels/Helper/Room/interface";
+import JobData from "../BaseModels/Helper/Job/memory";
+import RoomData from "../BaseModels/Helper/Room/memory";
+import RoomPosition from "../BaseModels/Helper/Room/position";
 import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControllerStructure";
 
-interface ISourceManager {}
+export default class SourceManager {
+  private updatedMemory = false;
 
-export default class implements ISourceManager {
-  updatedMemory = false;
+  private executer: string;
 
-  executer: string;
+  private room: Room;
 
-  room: Room;
+  private memory: RoomMemory;
 
-  memory: RoomMemory;
+  private managerMemory: SourceManagerMemory;
 
-  managerMemory: SourceManager;
-
-  cache: RoomCache;
+  private cache: RoomCache;
 
   constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
     this.room = Game.rooms[roomName];
@@ -26,21 +24,21 @@ export default class implements ISourceManager {
     this.cache = roomCache;
     this.managerMemory = this.memory.sourceManager;
 
-    this.executer = IRoomHelper.GetExecuter(this.room.name, "Source");
+    this.executer = RoomHelper.GetExecuter(this.room.name, "Source");
   }
 
-  UpdateSources(): void {
+  private UpdateSources(): void {
     const { managerMemory } = this;
     const sourceIds = Object.keys(managerMemory.sources);
     forEach(sourceIds, (sourceId) => {
       const source = Game.getObjectById<Source>(sourceId);
       const sourceMemory = managerMemory.sources[sourceId];
       if (!sourceMemory.jobId) {
-        const maxCreepsAround = IRoomPosition.GetNonWallPositionsAround(
+        const maxCreepsAround = RoomPosition.GetNonWallPositionsAround(
           sourceMemory.pos,
           this.room
         ).length;
-        const jobResult = IJobData.Initialize({
+        const jobResult = JobData.Initialize({
           executer: this.executer,
           pos: sourceMemory.pos,
           targetId: sourceId,
@@ -50,7 +48,7 @@ export default class implements ISourceManager {
         });
 
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
-        const jobId = IJobData.GetJobId(
+        const jobId = JobData.GetJobId(
           jobResult.cache.type,
           jobResult.memory.pos
         );
@@ -74,7 +72,7 @@ export default class implements ISourceManager {
   Run(): void {
     this.UpdateSources();
     if (this.updatedMemory) {
-      IRoomMemory.Update(this.room.name, this.memory);
+      RoomData.UpdateMemory(this.room.name, this.memory);
     }
   }
 }

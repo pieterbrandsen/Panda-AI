@@ -1,15 +1,13 @@
-interface ICreepReserveControllerRole {}
+export default class CreepReserveControllerRole {
+  private creep: Creep;
 
-export default class implements ICreepReserveControllerRole {
-  creep: Creep;
+  private creepCache: CreepCache;
 
-  creepCache: CreepCache;
+  private creepMemory: CreepMemory;
 
-  creepMemory: CreepMemory;
+  private jobCache: JobCache;
 
-  jobCache: JobCache;
-
-  jobMemory: JobMemory;
+  private jobMemory: JobMemory;
 
   constructor(
     creep: Creep,

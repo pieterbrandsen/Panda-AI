@@ -2,9 +2,7 @@
 
 import { forEach, pickBy } from "lodash";
 
-export interface IMemory {}
-
-export default abstract class implements IMemory {
+export default abstract class MemoryData {
   /**
    * Returns minimum memory version for type saved in memory
    */

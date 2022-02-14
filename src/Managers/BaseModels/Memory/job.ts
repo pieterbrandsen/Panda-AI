@@ -1,10 +1,8 @@
 import { clone, pickBy } from "lodash";
-import BaseMemory from "./interface";
-import RoomPosition from "../Helper/Room/roomPosition";
+import BaseMemoryData from "./interface";
+import RoomPosition from "../Helper/Room/position";
 
-interface IJobMemory {}
-
-export default class extends BaseMemory implements IJobMemory {
+export default class JobMemoryData extends BaseMemoryData {
   private static type: MemoryTypes = "Job";
 
   static Validate(data: StringMap<JobMemory>): ValidatedData {

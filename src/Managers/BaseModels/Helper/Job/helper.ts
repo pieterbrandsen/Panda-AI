@@ -1,8 +1,6 @@
 import JobConstants from "./constants";
 
-interface IJobHelper {}
-
-export default class implements IJobHelper {
+export default class JobHelper {
   static GetJobStatsType(type: JobTypes): JobTypeTypes {
     if (JobConstants.IncomingJobTypes.includes(type as IncomingJobTypes))
       return "Incoming";

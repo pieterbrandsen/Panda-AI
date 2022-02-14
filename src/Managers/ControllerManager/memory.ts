@@ -1,15 +1,13 @@
-import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
+import RoomPositionHelper from "../BaseModels/Helper/Room/position";
 
-interface ISpawnMemory {}
-
-export default class implements ISpawnMemory {
-  static SetupMemory(room: Room): ControllerManager {
+export default class ControllerManagerMemoryData {
+  static SetupMemory(room: Room): ControllerManagerMemory {
     const { controller } = room;
     return {
       controller: controller
         ? {
             id: controller.id,
-            pos: IRoomPosition.FreezeRoomPosition(controller.pos),
+            pos: RoomPositionHelper.FreezeRoomPosition(controller.pos),
             isOwned: controller.my,
           }
         : undefined,

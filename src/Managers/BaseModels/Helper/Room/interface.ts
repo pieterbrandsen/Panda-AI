@@ -1,6 +1,4 @@
-interface IRoomHelper {}
-
-export default class implements IRoomHelper {
+export default class RoomHelper {
   static GetExecuter(roomName: string, manager: ManagerTypes): string {
     return `${roomName}-${manager}`;
   }

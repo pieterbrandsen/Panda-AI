@@ -1,9 +1,7 @@
 import { clone } from "lodash";
-import BaseMemory from "./interface";
+import BaseMemoryData from "./interface";
 
-interface ICreepMemory {}
-
-export default class extends BaseMemory implements ICreepMemory {
+export default class CreepMemoryData extends BaseMemoryData {
   private static type: MemoryTypes = "Creep";
 
   static Validate(data: StringMap<CreepMemory>): ValidatedData {

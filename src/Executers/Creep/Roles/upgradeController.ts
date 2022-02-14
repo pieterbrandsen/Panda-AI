@@ -1,17 +1,15 @@
-import IJobs from "../../../Managers/BaseModels/Jobs/interface";
+import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface ICreepUpgradeControllerRole {}
+export default class CreepUpgradeControllerRole {
+  private creep: Creep;
 
-export default class implements ICreepUpgradeControllerRole {
-  creep: Creep;
+  private creepCache: CreepCache;
 
-  creepCache: CreepCache;
+  private creepMemory: CreepMemory;
 
-  creepMemory: CreepMemory;
+  private jobCache: JobCache;
 
-  jobCache: JobCache;
-
-  jobMemory: JobMemory;
+  private jobMemory: JobMemory;
 
   constructor(
     creep: Creep,
@@ -52,7 +50,7 @@ export default class implements ICreepUpgradeControllerRole {
           this.creep.moveTo(target);
           break;
         case OK:
-          IJobs.UpdateAmount(
+          Jobs.UpdateAmount(
             this.creepMemory.jobId as string,
             this.jobMemory,
             this.jobCache,

@@ -1,9 +1,7 @@
 import { clone } from "lodash";
-import BaseHeap from "./interface";
+import BaseHeapData from "./interface";
 
-interface ICreepHeap {}
-
-export default class extends BaseHeap implements ICreepHeap {
+export default class CreepHeapData extends BaseHeapData {
   private static type: HeapTypes = "Creep";
 
   static ValidateSingle(id: string): boolean {

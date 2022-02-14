@@ -1,9 +1,8 @@
-import IDroppedResourceMemory from "../../Memory/droppedResourceInterface";
-import IDroppedResourceCache from "../../Cache/droppedResourceInterface";
+import { forEach } from "lodash";
+import DroppedResourceMemoryData from "../../Memory/droppedResource";
+import DroppedResourceCacheData from "../../Cache/droppedResource";
 
-interface IDroppedResourceHelper {}
-
-export default class implements IDroppedResourceHelper {
+export default class DroppedResourceDataHelper {
   static GetDroppedResourceId(id: string): string {
     return id;
   }
@@ -19,12 +18,12 @@ export default class implements IDroppedResourceHelper {
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = IDroppedResourceMemory.Get(id);
+    const memoryResult = DroppedResourceMemoryData.Get(id);
     if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = IDroppedResourceCache.Get(id);
+    const cacheResult = DroppedResourceCacheData.Get(id);
     if (cacheResult.success) {
       result.success = true;
       result.cache = cacheResult.data;
@@ -46,13 +45,13 @@ export default class implements IDroppedResourceHelper {
       cache: undefined,
     };
 
-    const memoryResult = IDroppedResourceMemory.Create(id, memory);
+    const memoryResult = DroppedResourceMemoryData.Create(id, memory);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
       result.success = true;
     }
 
-    const cacheResult = IDroppedResourceCache.Create(id, cache);
+    const cacheResult = DroppedResourceCacheData.Create(id, cache);
     if (cacheResult.success) {
       result.cache = cacheResult.data;
       result.success = true;
@@ -76,14 +75,14 @@ export default class implements IDroppedResourceHelper {
     };
 
     if (isMemory) {
-      const deleteResult = IDroppedResourceMemory.Delete(id);
+      const deleteResult = DroppedResourceMemoryData.Delete(id);
       if (deleteResult.success) {
         result.success = true;
         result.memory = deleteResult.data;
       }
     }
     if (isCache && result.success) {
-      const deleteResult = IDroppedResourceCache.Delete(id);
+      const deleteResult = DroppedResourceCacheData.Delete(id);
       if (deleteResult.success) {
         result.success = true;
         result.cache = deleteResult.data;
@@ -107,14 +106,14 @@ export default class implements IDroppedResourceHelper {
     };
 
     if (memory) {
-      const updateResult = IDroppedResourceMemory.Update(id, memory);
+      const updateResult = DroppedResourceMemoryData.Update(id, memory);
       if (updateResult.success) {
         result.success = true;
         result.memory = updateResult.data;
       }
     }
     if (cache && result.success) {
-      const updateResult = IDroppedResourceCache.Update(id, cache);
+      const updateResult = DroppedResourceCacheData.Update(id, cache);
       if (updateResult.success) {
         result.success = true;
         result.cache = updateResult.data;
@@ -136,12 +135,12 @@ export default class implements IDroppedResourceHelper {
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = IDroppedResourceMemory.Initialize(id);
+    const memoryResult = DroppedResourceMemoryData.Initialize(id);
     if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = IDroppedResourceCache.Initialize(
+    const cacheResult = DroppedResourceCacheData.Initialize(
       id,
       data.executer,
       data.resource.pos,
@@ -152,5 +151,63 @@ export default class implements IDroppedResourceHelper {
       result.cache = cacheResult.data;
     }
     return result;
+  }
+
+  private static GetAll(
+    isMemory: boolean,
+    executer?: string,
+    getOnlyExecuterJobs?: boolean,
+    roomsToCheck?: string[],
+    predicateMemory?: Predicate<DroppedResourceMemory>,
+    predicateCache?: Predicate<DroppedResourceCache>
+  ): StringMap<DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache>> {
+    const result: StringMap<
+      DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache>
+    > = {};
+    const ids = Object.keys(
+      isMemory
+        ? DroppedResourceMemoryData.GetAll(predicateMemory)
+        : DroppedResourceCacheData.GetAll(
+            executer,
+            getOnlyExecuterJobs,
+            roomsToCheck,
+            predicateCache
+          )
+    );
+    forEach(ids, (id) => {
+      const memoryResult = DroppedResourceMemoryData.Get(id);
+      const cacheResult = DroppedResourceCacheData.Get(id);
+      if (memoryResult.success && cacheResult.success) {
+        result[id] = {
+          success: true,
+          memory: memoryResult.data,
+          cache: cacheResult.data,
+        };
+      }
+    });
+
+    return result;
+  }
+
+  static GetAllBasedOnMemory(
+    predicate?: Predicate<DroppedResourceMemory>
+  ): StringMap<DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache>> {
+    return this.GetAll(true, undefined, undefined, undefined, predicate);
+  }
+
+  static GetAllBasedOnCache(
+    executer = "",
+    getOnlyExecuterJobs = false,
+    roomsToCheck?: string[],
+    predicate?: Predicate<DroppedResourceCache>
+  ): StringMap<DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache>> {
+    return this.GetAll(
+      true,
+      executer,
+      getOnlyExecuterJobs,
+      roomsToCheck,
+      undefined,
+      predicate
+    );
   }
 }

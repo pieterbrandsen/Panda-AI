@@ -1,15 +1,13 @@
 import { clone } from "lodash";
-import BaseMemory from "./interface";
-import IControllerMemory from "../../ControllerManager/memory";
-import IMineralMemory from "../../MineralManager/memory";
-import ISourceMemory from "../../SourceManager/memory";
-import ISpawnMemory from "../../SpawnManager/memory";
-import IDroppedResourceManager from "../../DroppedResourceManager/memory";
-import IRoomStatsMemory from "./Stats/roomStats";
+import BaseMemoryData from "./interface";
+import ControllerManagerData from "../../ControllerManager/memory";
+import MineralManagerData from "../../MineralManager/memory";
+import SourceManagerData from "../../SourceManager/memory";
+import SpawnManagerData from "../../SpawnManager/memory";
+import DroppedResourceManagerData from "../../DroppedResourceManager/memory";
+import RoomStatsMemoryData from "./Stats/room";
 
-interface IRoomMemory {}
-
-export default class extends BaseMemory implements IRoomMemory {
+export default class RoomMemoryData extends BaseMemoryData {
   private static type: MemoryTypes = "Room";
 
   static Validate(data: StringMap<RoomMemory>): ValidatedData {
@@ -27,11 +25,11 @@ export default class extends BaseMemory implements IRoomMemory {
     return {
       version: super.MinimumVersion(this.type),
       remoteRooms,
-      controllerManager: IControllerMemory.SetupMemory(room),
-      mineralManager: IMineralMemory.SetupMemory(room),
-      sourceManager: ISourceMemory.SetupMemory(room),
-      spawnManager: ISpawnMemory.SetupMemory(),
-      droppedResourceManager: IDroppedResourceManager.SetupMemory(),
+      controllerManager: ControllerManagerData.SetupMemory(room),
+      mineralManager: MineralManagerData.SetupMemory(room),
+      sourceManager: SourceManagerData.SetupMemory(room),
+      spawnManager: SpawnManagerData.SetupMemory(),
+      droppedResourceManager: DroppedResourceManagerData.SetupMemory(),
     };
   }
 
@@ -75,7 +73,7 @@ export default class extends BaseMemory implements IRoomMemory {
   static Delete(id: string): CRUDResult<RoomMemory> {
     delete Memory.RoomsData.data[id];
 
-    const result = IRoomStatsMemory.Delete(id).success;
+    const result = RoomStatsMemoryData.Delete(id).success;
     return { success: result, data: undefined };
   }
 
@@ -93,7 +91,7 @@ export default class extends BaseMemory implements IRoomMemory {
     const data = this.Generate(room, remoteRooms);
     const result = this.Create(id, data);
     if (result.success) {
-      result.success = IRoomStatsMemory.Initialize(id).success;
+      result.success = RoomStatsMemoryData.Initialize(id).success;
     }
 
     return { success: result.success, data: result.data };

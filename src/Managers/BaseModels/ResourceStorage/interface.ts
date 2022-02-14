@@ -1,12 +1,10 @@
 import { forOwn, sum } from "lodash";
-import ICreepData from "../Helper/Creep/creepMemory";
-import IStructureData from "../Helper/Structure/structureMemory";
-import IStructureCache from "../Cache/structureInterface";
-import IRoomPosition from "../Helper/Room/roomPosition";
+import CreepData from "../Helper/Creep/memory";
+import StructureData from "../Helper/Structure/memory";
+import RoomPositionHelper from "../Helper/Room/position";
 import CachePredicates from "../Cache/predicates";
-import IJobData from "../Helper/Job/jobMemory";
-import IDroppedResourceCache from "../Cache/droppedResourceInterface";
-import IDroppedResourceData from "../Helper/DroppedResource/droppedResourceMemory";
+import JobData from "../Helper/Job/memory";
+import DroppedResourceData from "../Helper/DroppedResource/memory";
 
 interface IResourceStorage {
   object: StructuresWithStorage | Creep;
@@ -33,14 +31,14 @@ interface IResourceStorage {
 }
 
 export default class ResourceStorage implements IResourceStorage {
-  energyWithdrawStructureTypes: StructureConstant[] = [
+  private energyWithdrawStructureTypes: StructureConstant[] = [
     "container",
     "link",
     "storage",
     "terminal",
   ];
 
-  energyTransferStructureTypes: StructureConstant[] = [
+  private energyTransferStructureTypes: StructureConstant[] = [
     "spawn",
     "extension",
     "tower",
@@ -76,11 +74,11 @@ export default class ResourceStorage implements IResourceStorage {
     this.executer = executer;
     this.type = type;
     if (type === "Structure") {
-      const result = IStructureData.GetMemory(object.id);
+      const result = StructureData.GetMemory(object.id);
       this.memory = result.memory as StructureMemory;
       this.cache = result.cache as StructureCache;
     } else {
-      const result = ICreepData.GetMemory((object as Creep).id);
+      const result = CreepData.GetMemory((object as Creep).id);
       this.memory = result.memory as CreepMemory;
       this.cache = result.cache as CreepCache;
     }
@@ -97,13 +95,13 @@ export default class ResourceStorage implements IResourceStorage {
       | CreepMemory
       | null = null;
     if (target === "creep") {
-      const result = ICreepData.GetMemory(id);
+      const result = CreepData.GetMemory(id);
       if (result.success) memory = result.memory as CreepMemory;
     } else if (target === "structure") {
-      const result = IStructureData.GetMemory(id);
+      const result = StructureData.GetMemory(id);
       if (result.success) memory = result.memory as StructureMemory;
     } else if (target === "droppedResource") {
-      const result = IDroppedResourceData.GetMemory(id);
+      const result = DroppedResourceData.GetMemory(id);
       if (result.success) memory = result.memory as DroppedResourceMemory;
     }
 
@@ -156,7 +154,7 @@ export default class ResourceStorage implements IResourceStorage {
     if (type === "structure") {
       const structure = object as StructuresWithStorage;
 
-      const structureMemory = IStructureData.GetMemory(structure.id)
+      const structureMemory = StructureData.GetMemory(structure.id)
         .memory as StructureMemory;
       if (structureMemory && structureMemory.isSourceStructure) {
         if (isFromControllerOrSource) return fillToCapacity;
@@ -230,7 +228,7 @@ export default class ResourceStorage implements IResourceStorage {
     return { result: levels.current >= levels.high, level: levels };
   }
 
-  CanStructureBeFilled(
+  private CanStructureBeFilled(
     object?: StructuresWithStorage | Creep,
     isFromControllerOrSource = false
   ): LevelCheckResult {
@@ -260,7 +258,7 @@ export default class ResourceStorage implements IResourceStorage {
     };
   }
 
-  CanStructureBeEmptied(
+  private CanStructureBeEmptied(
     object?: StructuresWithStorage | Creep,
     isFromControllerOrSource = false
   ): LevelCheckResult {
@@ -303,9 +301,12 @@ export default class ResourceStorage implements IResourceStorage {
     };
   }
 
-  GetStructureScore(structure: BestStructureLoop, isFilling: boolean): number {
+  private GetStructureScore(
+    structure: BestStructureLoop,
+    isFilling: boolean
+  ): number {
     const currentPos = this.object.pos;
-    const pos = IRoomPosition.UnFreezeRoomPosition(structure.cache.pos);
+    const pos = RoomPositionHelper.UnFreezeRoomPosition(structure.cache.pos);
     const distance = currentPos.getRangeTo(pos);
     const amount = isFilling
       ? structure.levels.current - structure.levels.min
@@ -313,15 +314,15 @@ export default class ResourceStorage implements IResourceStorage {
     return (0.4 * amount) / (0.6 * distance);
   }
 
-  GetDroppedResourceScore(resource: BestDroppedResourceLoop): number {
+  private GetDroppedResourceScore(resource: BestDroppedResourceLoop): number {
     const currentPos = this.object.pos;
-    const pos = IRoomPosition.UnFreezeRoomPosition(resource.cache.pos);
+    const pos = RoomPositionHelper.UnFreezeRoomPosition(resource.cache.pos);
     const distance = currentPos.getRangeTo(pos);
     const { amount } = resource;
     return (0.3 * amount) / (0.7 * distance);
   }
 
-  IsBestStructure(
+  private IsBestStructure(
     structure: BestStructureLoop,
     isFilling: boolean,
     bestScore: number
@@ -334,7 +335,7 @@ export default class ResourceStorage implements IResourceStorage {
     return undefined;
   }
 
-  IsBestDroppedResource(
+  private IsBestDroppedResource(
     resource: BestDroppedResourceLoop,
     bestScore: number
   ): number | void {
@@ -358,7 +359,7 @@ export default class ResourceStorage implements IResourceStorage {
       | null = null;
     let bestScore = 0;
     forOwn(
-      IStructureCache.GetAll(
+      StructureData.GetAllBasedOnCache(
         "",
         false,
         [this.object.room.name],
@@ -367,11 +368,11 @@ export default class ResourceStorage implements IResourceStorage {
           true
         ),
         CachePredicates.IsInRangeOf(
-          IRoomPosition.UnFreezeRoomPosition(this.object.pos),
+          RoomPositionHelper.UnFreezeRoomPosition(this.object.pos),
           inRoomRange
         )
       ),
-      (cache: StructureCache, id: string) => {
+      (data, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
         if (structure) {
           const levelCheck = this.CanStructureBeEmptied(
@@ -385,7 +386,7 @@ export default class ResourceStorage implements IResourceStorage {
             levelCheck.level.current > 0
           ) {
             const structureLoop: BestStructureLoop = {
-              cache,
+              cache: data.cache as StructureCache,
               id,
               levels: levelCheck.level,
             };
@@ -402,16 +403,16 @@ export default class ResourceStorage implements IResourceStorage {
 
     if (this.type === "Creep") {
       forOwn(
-        IDroppedResourceCache.GetAll(
+        DroppedResourceData.GetAllBasedOnCache(
           "",
           false,
           [this.object.room.name],
           CachePredicates.IsInRangeOf(
-            IRoomPosition.UnFreezeRoomPosition(this.object.pos),
+            RoomPositionHelper.UnFreezeRoomPosition(this.object.pos),
             inRoomRange
           )
         ),
-        (cache: DroppedResourceCache, id: string) => {
+        (data, id: string) => {
           const resource = Game.getObjectById<Resource | null>(id);
           if (resource) {
             const levelCheck = ResourceStorage.CanDroppedResourceBeEmptied(
@@ -419,7 +420,7 @@ export default class ResourceStorage implements IResourceStorage {
             );
             if (levelCheck.result && levelCheck.level.current > 0) {
               const droppedResourceLoop: BestDroppedResourceLoop = {
-                cache,
+                cache: data.cache as DroppedResourceCache,
                 id,
                 amount: levelCheck.level.current,
               };
@@ -448,7 +449,7 @@ export default class ResourceStorage implements IResourceStorage {
     let bestStructure: BestStructureLoop | null = null;
     let bestScore = 0;
     forOwn(
-      IStructureCache.GetAll(
+      StructureData.GetAllBasedOnCache(
         "",
         false,
         [this.object.room.name],
@@ -457,11 +458,11 @@ export default class ResourceStorage implements IResourceStorage {
           true
         ),
         CachePredicates.IsInRangeOf(
-          IRoomPosition.UnFreezeRoomPosition(this.object.pos),
+          RoomPositionHelper.UnFreezeRoomPosition(this.object.pos),
           inRoomRange
         )
       ),
-      (cache: StructureCache, id: string) => {
+      (data, id: string) => {
         const structure = Game.getObjectById<StructuresWithStorage | null>(id);
         if (structure) {
           const levelCheck = this.CanStructureBeFilled(
@@ -480,7 +481,7 @@ export default class ResourceStorage implements IResourceStorage {
             levelCheck.level.current - levelCheck.level.min >= 0
           ) {
             const structureLoop: BestStructureLoop = {
-              cache,
+              cache: data.cache as StructureCache,
               id,
               levels: levelCheck.level,
             };
@@ -497,7 +498,7 @@ export default class ResourceStorage implements IResourceStorage {
     return bestStructure;
   }
 
-  ManageJob(
+  private ManageJob(
     thisLevel: LevelCheckResult,
     isSpending: boolean,
     targetStructureInformation?: BestStructureLoop,
@@ -505,8 +506,8 @@ export default class ResourceStorage implements IResourceStorage {
   ): string | undefined {
     if (!this.memory || !this.cache) return undefined;
     const targetDataResult = targetStructureInformation
-      ? IStructureData.GetMemory(targetStructureInformation?.id ?? "")
-      : IDroppedResourceData.GetMemory(targetResourceInformation?.id ?? "");
+      ? StructureData.GetMemory(targetStructureInformation?.id ?? "")
+      : DroppedResourceData.GetMemory(targetResourceInformation?.id ?? "");
     if (targetDataResult.success) {
       const targetMemory = targetDataResult.memory as
         | StructureMemory
@@ -556,10 +557,10 @@ export default class ResourceStorage implements IResourceStorage {
       } else if (!isSpending) {
         type = "WithdrawStructure";
       }
-      const jobId = IJobData.GetJobId(type, targetCache.pos);
-      let jobData = IJobData.GetMemory(jobId);
+      const jobId = JobData.GetJobId(type, targetCache.pos);
+      let jobData = JobData.GetMemory(jobId);
       if (!jobData.success) {
-        jobData = IJobData.Initialize({
+        jobData = JobData.Initialize({
           executer: this.executer,
           pos: targetCache.pos,
           targetId: id,
@@ -591,15 +592,15 @@ export default class ResourceStorage implements IResourceStorage {
         }`
       );
       if (targetStructureInformation)
-        IStructureData.UpdateMemory(id, targetMemory);
-      else IDroppedResourceData.UpdateMemory(id, targetMemory);
+        StructureData.UpdateMemory(id, targetMemory);
+      else DroppedResourceData.UpdateMemory(id, targetMemory);
       if (this.type === "Structure") {
-        IStructureData.UpdateMemory(
+        StructureData.UpdateMemory(
           this.object.id,
           this.memory as StructureMemory
         );
       } else if (this.type === "Resource") {
-        IDroppedResourceData.UpdateMemory(
+        DroppedResourceData.UpdateMemory(
           this.object.id,
           this.memory as DroppedResourceMemory
         );

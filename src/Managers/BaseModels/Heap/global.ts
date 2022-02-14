@@ -1,9 +1,7 @@
 import { forEach } from "lodash";
-import BaseHeap from "./interface";
+import BaseHeapData from "./interface";
 
-interface IGlobalHeap {}
-
-export default class extends BaseHeap implements IGlobalHeap {
+export default class GlobalHeapData extends BaseHeapData {
   private static type: HeapTypes = "Global";
 
   static MinimumVersion(): number {

@@ -1,17 +1,15 @@
 import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
-interface ICreepTransferRole {}
+export default class CreepTransferRole {
+  private creep: Creep;
 
-export default class implements ICreepTransferRole {
-  creep: Creep;
+  private creepCache: CreepCache;
 
-  creepCache: CreepCache;
+  private creepMemory: CreepMemory;
 
-  creepMemory: CreepMemory;
+  private jobCache: JobCache;
 
-  jobCache: JobCache;
-
-  jobMemory: JobMemory;
+  private jobMemory: JobMemory;
 
   constructor(
     creep: Creep,

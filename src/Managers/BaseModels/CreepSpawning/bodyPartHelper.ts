@@ -1,33 +1,35 @@
 import { forEach, forOwn } from "lodash";
 
-export default class ICreepBodyPartHelper {
-  creepsCache: StringMapGeneric<CreepCache[], CreepTypes>;
+export default class CreepBodyPartHelper {
+  private creepsData: StringMapGeneric<
+    DoubleCRUDResult<CreepMemory, CreepCache>[],
+    CreepTypes
+  >;
 
-  jobsMemory: StringMap<JobMemory>;
+  private jobsData: StringMap<DoubleCRUDResult<JobMemory, JobCache>>;
 
-  jobsCache: StringMap<JobCache>;
-
-  spawnRoom: Room;
+  private spawnRoom: Room;
 
   missingBodyParts: StringMapGeneric<
     BodyParts,
     CreepTypes
-  > = ICreepBodyPartHelper.GetEmptyBodyPartsPerType();
+  > = CreepBodyPartHelper.GetEmptyBodyPartsPerType();
 
   aliveBodyParts: StringMapGeneric<
     BodyParts,
     CreepTypes
-  > = ICreepBodyPartHelper.GetEmptyBodyPartsPerType();
+  > = CreepBodyPartHelper.GetEmptyBodyPartsPerType();
 
   constructor(
-    creepsCache: StringMapGeneric<CreepCache[], CreepTypes>,
-    jobsMemory: StringMap<JobMemory>,
-    jobsCache: StringMap<JobCache>,
+    creepsData: StringMapGeneric<
+      DoubleCRUDResult<CreepMemory, CreepCache>[],
+      CreepTypes
+    >,
+    jobsData: StringMap<DoubleCRUDResult<JobMemory, JobCache>>,
     spawnRoom: Room
   ) {
-    this.creepsCache = creepsCache;
-    this.jobsMemory = jobsMemory;
-    this.jobsCache = jobsCache;
+    this.creepsData = creepsData;
+    this.jobsData = jobsData;
     this.spawnRoom = spawnRoom;
 
     this.GetMissingBodyParts();
@@ -49,11 +51,11 @@ export default class ICreepBodyPartHelper {
 
   static GetEmptyBodyPartsPerType(): StringMapGeneric<BodyParts, CreepTypes> {
     return {
-      miner: ICreepBodyPartHelper.GetEmptyBodyParts(),
-      worker: ICreepBodyPartHelper.GetEmptyBodyParts(),
-      transferer: ICreepBodyPartHelper.GetEmptyBodyParts(),
-      claimer: ICreepBodyPartHelper.GetEmptyBodyParts(),
-      extractor: ICreepBodyPartHelper.GetEmptyBodyParts(),
+      miner: CreepBodyPartHelper.GetEmptyBodyParts(),
+      worker: CreepBodyPartHelper.GetEmptyBodyParts(),
+      transferer: CreepBodyPartHelper.GetEmptyBodyParts(),
+      claimer: CreepBodyPartHelper.GetEmptyBodyParts(),
+      extractor: CreepBodyPartHelper.GetEmptyBodyParts(),
     };
   }
 
@@ -88,14 +90,17 @@ export default class ICreepBodyPartHelper {
     return body;
   }
 
-  GetRequiredAliveBodyPartsForJobs(): StringMapGeneric<BodyParts, CreepTypes> {
+  private GetRequiredAliveBodyPartsForJobs(): StringMapGeneric<
+    BodyParts,
+    CreepTypes
+  > {
     const parts: StringMapGeneric<
       BodyParts,
       CreepTypes
-    > = ICreepBodyPartHelper.GetEmptyBodyPartsPerType();
+    > = CreepBodyPartHelper.GetEmptyBodyPartsPerType();
 
     forEach(Object.keys(parts), (type) => {
-      const bodies: BodyParts[] = (this.creepsCache[type] ?? []).map(
+      const bodies: BodyParts[] = (this.creepsData[type] ?? []).map(
         (c) => c.body
       );
       forEach(bodies, (body) => {
@@ -109,14 +114,18 @@ export default class ICreepBodyPartHelper {
     return parts;
   }
 
-  GetRequiredBodyPartsForJobs(): StringMapGeneric<BodyParts, CreepTypes> {
+  private GetRequiredBodyPartsForJobs(): StringMapGeneric<
+    BodyParts,
+    CreepTypes
+  > {
     const parts: StringMapGeneric<
       BodyParts,
       CreepTypes
-    > = ICreepBodyPartHelper.GetEmptyBodyPartsPerType();
+    > = CreepBodyPartHelper.GetEmptyBodyPartsPerType();
 
-    forOwn(this.jobsMemory, (memory, id) => {
-      const cache = this.jobsCache[id];
+    forEach(this.jobsData, (data) => {
+      const cache = data.cache as JobCache;
+      const memory = data.memory as JobMemory;
       if (cache) {
         let amount = 0;
         let per1Lifetime = 0;
@@ -124,13 +133,13 @@ export default class ICreepBodyPartHelper {
         let bodyPart: BodyPartConstant = WORK;
         switch (cache.type) {
           case "HarvestSource":
-            bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+            bodyPart = CreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = 15 * 1000;
             per1Lifetime = 2500;
             multiplier = 1;
             break;
           case "HarvestMineral":
-            bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+            bodyPart = CreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             if (
               this.spawnRoom.controller &&
               this.spawnRoom.controller.level > 6 &&
@@ -142,7 +151,7 @@ export default class ICreepBodyPartHelper {
             }
             break;
           case "TransferSpawn":
-            bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+            bodyPart = CreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
             if (
               this.spawnRoom.controller &&
@@ -158,7 +167,7 @@ export default class ICreepBodyPartHelper {
           case "TransferStructure":
           case "WithdrawStructure":
           case "WithdrawResource":
-            bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+            bodyPart = CreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
             per1Lifetime = 125000;
             multiplier = 0.1;
@@ -169,25 +178,25 @@ export default class ICreepBodyPartHelper {
           // multiplier = 0.2;
           // break;
           case "Repair":
-            bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+            bodyPart = CreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
             per1Lifetime = 75000;
             multiplier = 1;
             break;
           case "Build":
-            bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+            bodyPart = CreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
             per1Lifetime = 3750;
             multiplier = 2;
             break;
           case "ReserveController":
-            bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+            bodyPart = CreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
             per1Lifetime = 400;
             multiplier = 1;
             break;
           case "UpgradeController":
-            bodyPart = ICreepBodyPartHelper.GetBodyPartForJobType(cache.type);
+            bodyPart = CreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
             per1Lifetime = 1000;
             multiplier = 2;
@@ -217,7 +226,7 @@ export default class ICreepBodyPartHelper {
             break;
         }
 
-        parts[ICreepBodyPartHelper.GetCreepType(cache.type)][
+        parts[CreepBodyPartHelper.GetCreepType(cache.type)][
           bodyPart
         ] += bodyPartsToBeAdded;
       }
@@ -273,13 +282,13 @@ export default class ICreepBodyPartHelper {
     }
   }
 
-  GetMissingBodyParts(): void {
+  private GetMissingBodyParts(): void {
     const aliveBodyParts = this.GetRequiredAliveBodyPartsForJobs();
     const requiredBodyParts = this.GetRequiredBodyPartsForJobs();
-    const missingBodyPartsPerType = ICreepBodyPartHelper.GetEmptyBodyPartsPerType();
+    const missingBodyPartsPerType = CreepBodyPartHelper.GetEmptyBodyPartsPerType();
 
     forEach(Object.keys(missingBodyPartsPerType), (type) => {
-      const missingBodyParts: BodyParts = ICreepBodyPartHelper.GetEmptyBodyParts();
+      const missingBodyParts: BodyParts = CreepBodyPartHelper.GetEmptyBodyParts();
       forEach(Object.keys(missingBodyParts), (part) => {
         missingBodyParts[part] = Math.ceil(
           requiredBodyParts[type][part] - aliveBodyParts[type][part]

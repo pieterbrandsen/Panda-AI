@@ -1,21 +1,20 @@
-import ICreepMemory from "../../Memory/creepInterface";
-import ICreepCache from "../../Cache/creepInterface";
+import { forEach } from "lodash";
+import CreepMemoryData from "../../Memory/creep";
+import CreepCacheData from "../../Cache/creep";
 
-interface ICreepHelper {}
-
-export default class implements ICreepHelper {
+export default class CreepData {
   static GetMemory(id: string): DoubleCRUDResult<CreepMemory, CreepCache> {
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = ICreepMemory.Get(id);
+    const memoryResult = CreepMemoryData.Get(id);
     if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = ICreepCache.Get(id);
+    const cacheResult = CreepCacheData.Get(id);
     if (cacheResult.success) {
       result.success = true;
       result.cache = cacheResult.data;
@@ -34,13 +33,13 @@ export default class implements ICreepHelper {
       cache: undefined,
     };
 
-    const memoryResult = ICreepMemory.Create(id, memory);
+    const memoryResult = CreepMemoryData.Create(id, memory);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
       result.success = true;
     }
 
-    const cacheResult = ICreepCache.Create(id, cache);
+    const cacheResult = CreepCacheData.Create(id, cache);
     if (cacheResult.success && result.success) {
       result.cache = cacheResult.data;
       result.success = true;
@@ -60,21 +59,21 @@ export default class implements ICreepHelper {
       cache: undefined,
     };
 
-    const memoryData = ICreepMemory.Get(id);
+    const memoryData = CreepMemoryData.Get(id);
     if (memoryData.success) {
       const memory = memoryData.data as CreepMemory;
       delete Memory.creeps[memory.name];
     }
 
     if (isMemory) {
-      const deleteResult = ICreepMemory.Delete(id);
+      const deleteResult = CreepMemoryData.Delete(id);
       if (deleteResult.success) {
         result.success = true;
         result.memory = deleteResult.data;
       }
     }
     if (isCache && result.success) {
-      const deleteResult = ICreepCache.Delete(id);
+      const deleteResult = CreepCacheData.Delete(id);
       if (deleteResult.success) {
         result.success = true;
         result.cache = deleteResult.data;
@@ -95,14 +94,14 @@ export default class implements ICreepHelper {
     };
 
     if (memory) {
-      const updateResult = ICreepMemory.Update(id, memory);
+      const updateResult = CreepMemoryData.Update(id, memory);
       if (updateResult.success) {
         result.success = true;
         result.memory = updateResult.data;
       }
     }
     if (cache && result.success) {
-      const updateResult = ICreepCache.Update(id, cache);
+      const updateResult = CreepCacheData.Update(id, cache);
       if (updateResult.success) {
         result.success = true;
         result.cache = updateResult.data;
@@ -121,7 +120,7 @@ export default class implements ICreepHelper {
       cache: undefined,
     };
 
-    const memoryResult = ICreepMemory.Initialize(
+    const memoryResult = CreepMemoryData.Initialize(
       data.id,
       data.name,
       data.isRemoteCreep
@@ -130,7 +129,7 @@ export default class implements ICreepHelper {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = ICreepCache.Initialize(
+    const cacheResult = CreepCacheData.Initialize(
       data.id,
       data.executer,
       data.body,
@@ -142,5 +141,61 @@ export default class implements ICreepHelper {
       result.cache = cacheResult.data;
     }
     return result;
+  }
+
+  private static GetAll(
+    isMemory: boolean,
+    executer?: string,
+    getOnlyExecuterJobs?: boolean,
+    roomsToCheck?: string[],
+    predicateMemory?: Predicate<CreepMemory>,
+    predicateCache?: Predicate<CreepCache>
+  ): StringMap<DoubleCRUDResult<CreepMemory, CreepCache>> {
+    const result: StringMap<DoubleCRUDResult<CreepMemory, CreepCache>> = {};
+    const ids = Object.keys(
+      isMemory
+        ? CreepMemoryData.GetAll(predicateMemory)
+        : CreepCacheData.GetAll(
+            executer,
+            getOnlyExecuterJobs,
+            roomsToCheck,
+            predicateCache
+          )
+    );
+    forEach(ids, (id) => {
+      const memoryResult = CreepMemoryData.Get(id);
+      const cacheResult = CreepCacheData.Get(id);
+      if (memoryResult.success && cacheResult.success) {
+        result[id] = {
+          success: true,
+          memory: memoryResult.data,
+          cache: cacheResult.data,
+        };
+      }
+    });
+
+    return result;
+  }
+
+  static GetAllBasedOnMemory(
+    predicate?: Predicate<CreepMemory>
+  ): StringMap<DoubleCRUDResult<CreepMemory, CreepCache>> {
+    return this.GetAll(true, undefined, undefined, undefined, predicate);
+  }
+
+  static GetAllBasedOnCache(
+    executer = "",
+    getOnlyExecuterJobs = false,
+    roomsToCheck?: string[],
+    predicate?: Predicate<CreepCache>
+  ): StringMap<DoubleCRUDResult<CreepMemory, CreepCache>> {
+    return this.GetAll(
+      true,
+      executer,
+      getOnlyExecuterJobs,
+      roomsToCheck,
+      undefined,
+      predicate
+    );
   }
 }

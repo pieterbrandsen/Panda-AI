@@ -1,16 +1,14 @@
 import { clone } from "lodash";
-import BaseCache from "./interface";
+import BaseCacheData from "./interface";
 
-interface IDroppedResourceCache {}
+export default class CreepCacheData extends BaseCacheData {
+  private static type: CacheTypes = "Creep";
 
-export default class extends BaseCache implements IDroppedResourceCache {
-  private static type: CacheTypes = "DroppedResource";
-
-  static Validate(data: StringMap<DroppedResourceCache>): ValidatedData {
+  static Validate(data: StringMap<CreepCache>): ValidatedData {
     return super.Validate(data, this.type);
   }
 
-  static ValidateSingle(data: DroppedResourceCache): boolean {
+  static ValidateSingle(data: CreepCache): boolean {
     return super.ValidateSingle(data, this.type);
   }
 
@@ -19,27 +17,26 @@ export default class extends BaseCache implements IDroppedResourceCache {
    */
   static Generate(
     executer: string,
+    body: BodyParts,
     pos: FreezedRoomPosition,
-    type: ResourceConstant
-  ): DroppedResourceCache {
+    type: CreepTypes
+  ): CreepCache {
     return {
       version: super.MinimumVersion(this.type),
       executer,
+      body,
       pos,
       type,
     };
   }
 
-  static Get(id: string): CRUDResult<DroppedResourceCache> {
-    const data = clone(Memory.DroppedResourceData.cache[id]);
+  static Get(id: string): CRUDResult<CreepCache> {
+    const data = clone(Memory.CreepsData.cache[id]);
     if (data === undefined) return { success: false, data: undefined };
     return { success: this.ValidateSingle(data), data };
   }
 
-  static Create(
-    id: string,
-    data: DroppedResourceCache
-  ): CRUDResult<DroppedResourceCache> {
+  static Create(id: string, data: CreepCache): CRUDResult<CreepCache> {
     const dataAtId = this.Get(id);
     if (dataAtId.success) {
       return { success: false, data: dataAtId.data };
@@ -48,26 +45,23 @@ export default class extends BaseCache implements IDroppedResourceCache {
     return { success: result.success, data: clone(result.data) };
   }
 
-  static Update(
-    id: string,
-    data: DroppedResourceCache
-  ): CRUDResult<DroppedResourceCache> {
-    Memory.DroppedResourceData.cache[id] = data;
+  static Update(id: string, data: CreepCache): CRUDResult<CreepCache> {
+    Memory.CreepsData.cache[id] = data;
     return { success: true, data };
   }
 
-  static Delete(id: string): CRUDResult<DroppedResourceCache> {
-    delete Memory.DroppedResourceData.cache[id];
+  static Delete(id: string): CRUDResult<CreepCache> {
+    delete Memory.CreepsData.cache[id];
     return { success: true, data: undefined };
   }
 
   static GetAll(
-    executer: string,
+    executer = "",
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
-    predicate?: Predicate<DroppedResourceCache>
-  ): StringMap<DroppedResourceCache> {
-    let data = Memory.DroppedResourceData.cache;
+    predicate?: Predicate<CreepCache>
+  ): StringMap<CreepCache> {
+    let data = Memory.CreepsData.cache;
     data = super.GetAllData(
       data,
       this.type,
@@ -82,10 +76,11 @@ export default class extends BaseCache implements IDroppedResourceCache {
   static Initialize(
     id: string,
     executer: string,
+    body: BodyParts,
     pos: FreezedRoomPosition,
-    type: ResourceConstant
-  ): CRUDResult<DroppedResourceCache> {
-    const cache = this.Generate(executer, pos, type);
+    type: CreepTypes
+  ): CRUDResult<CreepCache> {
+    const cache = this.Generate(executer, body, pos, type);
     const result = this.Create(id, cache);
     return { data: result.data, success: result.success };
   }

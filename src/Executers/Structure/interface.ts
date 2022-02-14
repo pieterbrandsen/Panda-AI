@@ -1,31 +1,29 @@
 import { forEach } from "lodash";
-import IStructureData from "../../Managers/BaseModels/Helper/Structure/structureMemory";
-import IStructureRepair from "../../Managers/BaseModels/Helper/Structure/structureRepair";
-import IStructureHeap from "../../Managers/BaseModels/Heap/structureInterface";
+import StructureData from "../../Managers/BaseModels/Helper/Structure/memory";
+import StructureRepair from "../../Managers/BaseModels/Helper/Structure/repair";
+import StructureHeap from "../../Managers/BaseModels/Heap/structure";
 
-interface IExecuteStructures {}
-
-export default class implements IExecuteStructures {
+export default class ExecuteStructures {
   static ExecuteStructure(structure: Structure): boolean {
-    const structureData = IStructureData.GetMemory(structure.id);
+    const structureData = StructureData.GetMemory(structure.id);
     if (!structureData.success) return false;
-    const structureHeapData = IStructureHeap.Get(structure.id);
+    const structureHeapData = StructureHeap.Get(structure.id);
     if (!structureHeapData.success) {
-      IStructureHeap.Initialize(structure.id);
+      StructureHeap.Initialize(structure.id);
     }
     const cache = structureData.cache as StructureCache;
 
-    IStructureRepair.RepairStructureIfNeeded(structure, cache);
+    StructureRepair.RepairStructureIfNeeded(structure, cache);
     return true;
   }
 
-  static ExecuterAllStructures(structures: StringMap<StructureCache>): void {
-    forEach(Object.keys(structures), (id: string) => {
+  static ExecuterAllStructures(structureIds: string[]): void {
+    forEach(structureIds, (id: string) => {
       const structure = Game.getObjectById<Structure | null>(id);
       if (structure) {
         this.ExecuteStructure(structure);
       } else {
-        IStructureData.DeleteMemory(id, true, true);
+        StructureData.DeleteMemory(id, true, true);
       }
     });
   }

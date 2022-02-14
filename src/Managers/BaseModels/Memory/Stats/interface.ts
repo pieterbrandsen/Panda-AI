@@ -2,9 +2,7 @@
 
 import { pickBy } from "lodash";
 
-export interface IStatsMemory {}
-
-export default abstract class implements IStatsMemory {
+export default abstract class StatsMemoryData {
   protected static GetAllData<T extends MemoryStatsObjects>(
     data: StringMap<T>,
     predicate?: Predicate<T>

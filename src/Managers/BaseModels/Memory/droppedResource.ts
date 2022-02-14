@@ -1,9 +1,7 @@
 import { clone } from "lodash";
-import BaseMemory from "./interface";
+import BaseMemoryData from "./interface";
 
-interface IDroppedResourcesMemory {}
-
-export default class extends BaseMemory implements IDroppedResourcesMemory {
+export default class DroppedResourcesMemoryData extends BaseMemoryData {
   private static type: MemoryTypes = "DroppedResource";
 
   static Validate(data: StringMap<DroppedResourceMemory>): ValidatedData {

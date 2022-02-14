@@ -6,6 +6,6 @@ interface MineralMemory {
   structureId?: string;
   structureBuildJobId?: string;
 }
-interface MineralManager {
+interface MineralManagerMemory {
   mineral?: MineralMemory;
 }

@@ -1,8 +1,6 @@
-import IJobData from "../Job/jobMemory";
+import JobData from "../Job/memory";
 
-interface IRoomStructure {}
-
-export default class implements IRoomStructure {
+export default class RoomStructure {
   static CreateConstructionSite(
     room: Room,
     pos: FreezedRoomPosition,
@@ -11,7 +9,7 @@ export default class implements IRoomStructure {
   ): string | undefined {
     const result = room.createConstructionSite(pos.x, pos.y, type);
     if (result === OK) {
-      const job = IJobData.Initialize({
+      const job = JobData.Initialize({
         executer,
         pos,
         targetId: "",
@@ -21,14 +19,14 @@ export default class implements IRoomStructure {
         objectType: "Creep",
       });
       if (job.success && job.cache && job.memory) {
-        const jobId = IJobData.GetJobId(job.cache.type, job.memory.pos);
+        const jobId = JobData.GetJobId(job.cache.type, job.memory.pos);
         return jobId;
       }
       return undefined;
     }
     if (result === ERR_INVALID_TARGET) {
-      const jobId = IJobData.GetJobId("Build", pos);
-      const jobData = IJobData.GetMemory(jobId);
+      const jobId = JobData.GetJobId("Build", pos);
+      const jobData = JobData.GetMemory(jobId);
       if (
         jobData.success &&
         (jobData.memory as JobMemory).structureType === type

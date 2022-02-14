@@ -1,34 +1,36 @@
-import { forEach, forOwn } from "lodash";
-import ICreepBodyPartHelper from "./bodyPartHelper";
+import { forEach } from "lodash";
+import CreepBodyPartHelper from "./bodyPartHelper";
 
-export default class ICreepCountHelper {
-  creepsCache: StringMapGeneric<CreepCache[], CreepTypes>;
+export default class CreepCountHelper {
+  private creepsData: StringMapGeneric<
+    DoubleCRUDResult<CreepMemory, CreepCache>[],
+    CreepTypes
+  >;
 
-  jobsMemory: StringMap<JobMemory>;
+  private jobsData: StringMap<DoubleCRUDResult<JobMemory, JobCache>>;
 
-  jobsCache: StringMap<JobCache>;
-
-  spawnRoom: Room;
+  private spawnRoom: Room;
 
   missingCreepCount: StringMapGeneric<
     number,
     CreepTypes
-  > = ICreepCountHelper.GetEmptyCreepCountPerType();
+  > = CreepCountHelper.GetEmptyCreepCountPerType();
 
   aliveCreepCount: StringMapGeneric<
     number,
     CreepTypes
-  > = ICreepCountHelper.GetEmptyCreepCountPerType();
+  > = CreepCountHelper.GetEmptyCreepCountPerType();
 
   constructor(
-    creepsCache: StringMapGeneric<CreepCache[], CreepTypes>,
-    jobsMemory: StringMap<JobMemory>,
-    jobsCache: StringMap<JobCache>,
+    creepsData: StringMapGeneric<
+      DoubleCRUDResult<CreepMemory, CreepCache>[],
+      CreepTypes
+    >,
+    jobsData: StringMap<DoubleCRUDResult<JobMemory, JobCache>>,
     spawnRoom: Room
   ) {
-    this.creepsCache = creepsCache;
-    this.jobsMemory = jobsMemory;
-    this.jobsCache = jobsCache;
+    this.creepsData = creepsData;
+    this.jobsData = jobsData;
     this.spawnRoom = spawnRoom;
 
     this.GetMissingBodyParts();
@@ -45,28 +47,36 @@ export default class ICreepCountHelper {
     };
   }
 
-  GetRequiredAliveCreepCountsForJobs(): StringMapGeneric<number, CreepTypes> {
+  private GetRequiredAliveCreepCountsForJobs(): StringMapGeneric<
+    number,
+    CreepTypes
+  > {
     const creepCounts: StringMapGeneric<
       number,
       CreepTypes
-    > = ICreepCountHelper.GetEmptyCreepCountPerType();
+    > = CreepCountHelper.GetEmptyCreepCountPerType();
 
     forEach(Object.keys(creepCounts), (type) => {
-      creepCounts[type] = Object.keys(this.creepsCache[type] ?? []).length;
+      creepCounts[type] = Object.keys(this.creepsData[type] ?? []).length;
     });
 
     this.aliveCreepCount = creepCounts;
     return creepCounts;
   }
 
-  GetRequiredCreepCountsForJobs(): StringMapGeneric<number, CreepTypes> {
+  private GetRequiredCreepCountsForJobs(): StringMapGeneric<
+    number,
+    CreepTypes
+  > {
     const creepCounts: StringMapGeneric<
       number,
       CreepTypes
-    > = ICreepCountHelper.GetEmptyCreepCountPerType();
+    > = CreepCountHelper.GetEmptyCreepCountPerType();
 
-    forOwn(this.jobsMemory, (memory, id) => {
-      const cache = this.jobsCache[id];
+    forEach(this.jobsData, (data) => {
+      const cache = data.cache as JobCache;
+      const memory = data.memory as JobMemory;
+
       if (cache) {
         let amount = 0;
         switch (cache.type) {
@@ -107,7 +117,7 @@ export default class ICreepCountHelper {
           // skip default case
         }
 
-        creepCounts[ICreepBodyPartHelper.GetCreepType(cache.type)] += amount;
+        creepCounts[CreepBodyPartHelper.GetCreepType(cache.type)] += amount;
       }
     });
 
@@ -122,10 +132,10 @@ export default class ICreepCountHelper {
     return creepCounts;
   }
 
-  GetMissingBodyParts(): void {
+  private GetMissingBodyParts(): void {
     const aliveCreepCount = this.GetRequiredAliveCreepCountsForJobs();
     const requiredCreepCount = this.GetRequiredCreepCountsForJobs();
-    const missingCreepCountPerType = ICreepCountHelper.GetEmptyCreepCountPerType();
+    const missingCreepCountPerType = CreepCountHelper.GetEmptyCreepCountPerType();
 
     forEach(Object.keys(missingCreepCountPerType), (type) => {
       missingCreepCountPerType[type] =

@@ -1,26 +1,24 @@
-import IRoomMemory from "../BaseModels/Memory/roomInterface";
-import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
-import IJobData from "../BaseModels/Helper/Job/jobMemory";
+import RoomHelper from "../BaseModels/Helper/Room/interface";
+import JobDataHelper from "../BaseModels/Helper/Job/memory";
+import RoomDataHelper from "../BaseModels/Helper/Room/memory";
 import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControllerStructure";
 
-interface IControllerManager {}
+export default class ControllerManager {
+  private isRemote: boolean;
 
-export default class implements IControllerManager {
-  isRemote: boolean;
+  private updatedMemory = false;
 
-  updatedMemory = false;
+  private executer: string;
 
-  executer: string;
+  private room: Room;
 
-  room: Room;
+  private memory: RoomMemory;
 
-  memory: RoomMemory;
+  private managerMemory: ControllerManagerMemory;
 
-  managerMemory: ControllerManager;
+  private cache: RoomCache;
 
-  cache: RoomCache;
-
-  controller: StructureController;
+  private controller: StructureController;
 
   constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
     this.room = Game.rooms[roomName];
@@ -30,10 +28,10 @@ export default class implements IControllerManager {
     this.managerMemory = this.memory.controllerManager;
 
     this.isRemote = this.memory.remoteOriginRoom !== undefined;
-    this.executer = IRoomHelper.GetExecuter(this.room.name, "Controller");
+    this.executer = RoomHelper.GetExecuter(this.room.name, "Controller");
   }
 
-  UpdateController(): void {
+  private UpdateController(): void {
     const { managerMemory } = this;
     const controllerMemory = managerMemory.controller;
 
@@ -42,7 +40,7 @@ export default class implements IControllerManager {
         ? "UpgradeController"
         : "ReserveController";
       if (controllerMemory.isOwned) {
-        IJobData.Initialize({
+        JobDataHelper.Initialize({
           executer: this.executer,
           pos: controllerMemory.pos,
           targetId: controllerMemory.id,
@@ -73,7 +71,7 @@ export default class implements IControllerManager {
 
     this.UpdateController();
     if (this.updatedMemory) {
-      IRoomMemory.Update(this.room.name, this.memory);
+      RoomDataHelper.UpdateMemory(this.room.name, this.memory);
     }
   }
 }

@@ -1,17 +1,15 @@
 import { forEach } from "lodash";
-import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
+import RoomPosition from "../BaseModels/Helper/Room/position";
 
-interface ISpawnMemory {}
-
-export default class implements ISpawnMemory {
-  static SetupMemory(room: Room): SourceManager {
+export default class SourceManagerMemoryData {
+  static SetupMemory(room: Room): SourceManagerMemory {
     const sources = room.find(FIND_SOURCES);
-    const sourceManagerMemory: SourceManager = { sources: {} };
+    const sourceManagerMemory: SourceManagerMemory = { sources: {} };
     forEach(sources, (source) => {
       sourceManagerMemory.sources[source.id] = {
         jobId: undefined,
         maxEnergy: source.energyCapacity,
-        pos: IRoomPosition.FreezeRoomPosition(source.pos),
+        pos: RoomPosition.FreezeRoomPosition(source.pos),
       };
     });
     return sourceManagerMemory;

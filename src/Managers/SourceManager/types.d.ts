@@ -6,6 +6,6 @@ interface SourceMemory {
   structureType?: BuildableStructureConstant;
   structureBuildJobId?: string;
 }
-interface SourceManager {
+interface SourceManagerMemory {
   sources: StringMap<SourceMemory>;
 }

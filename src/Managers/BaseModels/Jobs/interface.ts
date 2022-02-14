@@ -1,28 +1,22 @@
 import { forEach, forOwn, remove } from "lodash";
-import IJobMemory from "../Memory/jobInterface";
-import ICreepData from "../Helper/Creep/creepMemory";
-import ICreepMemory from "../Memory/creepInterface";
-import IJobCache from "../Cache/jobInterface";
-import IJobData from "../Helper/Job/jobMemory";
-import IRoomMemory from "../Memory/roomInterface";
+import CreepData from "../Helper/Creep/memory";
+import JobData from "../Helper/Job/memory";
+import RoomData from "../Helper/Room/memory";
 import Predicates from "./predicates";
 import MemoryPredicates from "../Memory/predicates";
-import IStructureMemory from "../Memory/structureInterface";
-import IResourceStorage from "../ResourceStorage/interface";
-import IStructureData from "../Helper/Structure/structureMemory";
-import IDroppedResourceData from "../Helper/DroppedResource/droppedResourceMemory";
-import IRoomConstruction from "../Helper/Room/roomConstruction";
-import IRoomHelper from "../Helper/Room/roomInterface";
-import IJobHelper from "../Helper/Job/helper";
-import IRoomHeap from "../Heap/roomInterface";
+import ResourceStorage from "../ResourceStorage/interface";
+import StructureData from "../Helper/Structure/memory";
+import DroppedResourceData from "../Helper/DroppedResource/memory";
+import RoomConstruction from "../Helper/Room/construction";
+import RoomHelper from "../Helper/Room/interface";
+import JobHelper from "../Helper/Job/helper";
+import RoomHeapData from "../Heap/room";
 
 // TODO: Update (all/single)
 // TODO: GenerateObject (update whenever something needs to be added, assign in this function the missing data that is optional?)
 // *^ LATER
 
-interface IJobs {}
-
-export default class implements IJobs {
+export default class Jobs {
   static RemoveAssignedCreepOutOfArray(array: string[], key: string): string[] {
     remove(array, (e) => e === key);
     return array;
@@ -34,17 +28,17 @@ export default class implements IJobs {
     saveJob: boolean
   ): boolean {
     if (memory && memory.jobId) {
-      const jobData = IJobMemory.Get(memory.jobId);
+      const jobData = JobData.GetMemory(memory.jobId);
       if (jobData.success) {
-        const job = jobData.data as JobMemory;
-        const targetStructureData = IStructureData.GetMemory(job.targetId);
+        const job = jobData.memory as JobMemory;
+        const targetStructureData = StructureData.GetMemory(job.targetId);
         if (targetStructureData.success) {
           const targetMemory = targetStructureData.memory as StructureMemory;
           if (targetMemory && job.fromTargetId) {
             delete targetMemory.energyOutgoing[job.fromTargetId];
             delete targetMemory.energyIncoming[job.fromTargetId];
 
-            IStructureMemory.Update(job.targetId, memory);
+            StructureData.UpdateMemory(job.targetId, memory);
           }
         }
 
@@ -59,7 +53,7 @@ export default class implements IJobs {
       memory.permJobId = memory.jobId;
     }
     delete memory.jobId;
-    return IStructureData.UpdateMemory(structureId, memory).success;
+    return StructureData.UpdateMemory(structureId, memory).success;
   }
 
   static UnassignCreepJob(
@@ -68,19 +62,19 @@ export default class implements IJobs {
     saveJob: boolean
   ): boolean {
     if (memory && memory.jobId) {
-      const jobData = IJobMemory.Get(memory.jobId);
+      const jobData = JobData.GetMemory(memory.jobId);
       if (jobData.success) {
-        const job = jobData.data as JobMemory;
+        const job = jobData.memory as JobMemory;
         this.RemoveAssignedCreepOutOfArray(job.assignedCreeps, creepId);
 
         let type: JobObjectExecuter = "Structure";
         let targetMemory: StructureMemory | DroppedResourceMemory | null = null;
-        const targetStructureData = IStructureData.GetMemory(job.targetId);
+        const targetStructureData = StructureData.GetMemory(job.targetId);
         if (targetStructureData.success) {
           targetMemory = targetStructureData.memory as StructureMemory;
           type = "Structure";
         } else {
-          const targetDroppedResourceData = IDroppedResourceData.GetMemory(
+          const targetDroppedResourceData = DroppedResourceData.GetMemory(
             job.targetId
           );
           if (targetDroppedResourceData.success) {
@@ -103,9 +97,9 @@ export default class implements IJobs {
           delete targetMemory.energyIncoming[job.fromTargetId];
 
           if (type === "Structure") {
-            IStructureMemory.Update(job.targetId, targetMemory);
+            StructureData.UpdateMemory(job.targetId, targetMemory);
           } else {
-            IDroppedResourceData.UpdateMemory(job.targetId, targetMemory);
+            DroppedResourceData.UpdateMemory(job.targetId, targetMemory);
           }
         }
 
@@ -120,7 +114,7 @@ export default class implements IJobs {
     }
     delete memory.jobId;
 
-    return ICreepData.UpdateMemory(creepId, memory).success;
+    return CreepData.UpdateMemory(creepId, memory).success;
   }
 
   static AssignCreepJob(
@@ -130,11 +124,11 @@ export default class implements IJobs {
     jobId: string,
     jobCache: JobCache
   ): boolean {
-    const jobMemory = IJobMemory.Get(jobId);
+    const jobMemory = JobData.GetMemory(jobId);
     if (!jobMemory.success) {
       return false;
     }
-    const job = jobMemory.data as JobMemory;
+    const job = jobMemory.memory as JobMemory;
     if (jobId === creepMemory.permJobId) {
       delete creepMemory.permJobId;
     }
@@ -143,7 +137,7 @@ export default class implements IJobs {
     creepCache.executer = jobCache.executer;
     job.fromTargetId = creepId;
     job.lastAssigned = Game.time;
-    if (!IJobMemory.Update(jobId, job).success) {
+    if (!JobData.UpdateMemory(jobId, job).success) {
       return false;
     }
     if (
@@ -151,7 +145,7 @@ export default class implements IJobs {
       jobCache.type.includes("Withdraw")
     )
       console.log("Assign", jobId, creepId);
-    return ICreepData.UpdateMemory(creepId, creepMemory, creepCache).success;
+    return CreepData.UpdateMemory(creepId, creepMemory, creepCache).success;
   }
 
   static UpdateAmount(
@@ -165,13 +159,13 @@ export default class implements IJobs {
       memory.amountToTransfer -= amount;
     }
 
-    if (!sendStats) return IJobData.UpdateMemory(jobId, memory).success;
+    if (!sendStats) return JobData.UpdateMemory(jobId, memory).success;
 
-    const roomName = IRoomHelper.GetRoomName(cache.executer);
-    const globalRoomData = IRoomHeap.Get(roomName);
+    const roomName = RoomHelper.GetRoomName(cache.executer);
+    const globalRoomData = RoomHeapData.Get(roomName);
     if (globalRoomData.success) {
       const globalRoom = globalRoomData.data as RoomHeap;
-      const jobStatsType = IJobHelper.GetJobStatsType(cache.type);
+      const jobStatsType = JobHelper.GetJobStatsType(cache.type);
       if (jobStatsType === "Incoming") {
         globalRoom.stats.energyIncoming[cache.type] += amount;
       } else if (jobStatsType === "Outgoing") {
@@ -181,27 +175,27 @@ export default class implements IJobs {
         globalRoom.stats.energyOutgoing[cache.type] += amountExpense;
       }
     }
-    return IJobData.UpdateMemory(jobId, memory).success;
+    return JobData.UpdateMemory(jobId, memory).success;
   }
 
   static MoveJob(
     id: string,
     type: "Room" | "Manager",
     newExecuter: string
-  ): CRUDResult<JobCache> {
-    const cacheJob = IJobCache.Get(id);
-    if (!cacheJob.success) {
-      return { success: false, data: undefined };
+  ): DoubleCRUDResult<JobMemory, JobCache> {
+    const jobData = JobData.GetMemory(id);
+    if (!jobData.success) {
+      return { success: false, memory: undefined, cache: undefined };
     }
-    const job = cacheJob.data as JobCache;
+    const job = jobData.cache as JobCache;
     const room =
-      type === "Room" ? newExecuter : IRoomHelper.GetRoomName(job.executer);
+      type === "Room" ? newExecuter : RoomHelper.GetRoomName(job.executer);
     const manager =
       type === "Manager"
         ? newExecuter
-        : IRoomHelper.GetManagerName(job.executer);
-    job.executer = IRoomHelper.GetExecuter(room, manager as ManagerTypes);
-    return IJobCache.Update(id, job);
+        : RoomHelper.GetManagerName(job.executer);
+    job.executer = RoomHelper.GetExecuter(room, manager as ManagerTypes);
+    return JobData.UpdateMemory(id, undefined, job);
   }
 
   static GetJobScore(memory: JobMemory): number {
@@ -220,9 +214,9 @@ export default class implements IJobs {
     let bestJobId: string | undefined;
     let bestScore = 0;
     forEach(jobIds, (jobId: string) => {
-      const jobMemoryResult = IJobMemory.Get(jobId);
-      if (jobMemoryResult.success) {
-        const jobMemory = jobMemoryResult.data as JobMemory;
+      const jobData = JobData.GetMemory(jobId);
+      if (jobData.success) {
+        const jobMemory = jobData.memory as JobMemory;
         const score = this.GetJobScore(jobMemory);
         if (score > 0 && score > bestScore) {
           bestScore = score;
@@ -239,26 +233,26 @@ export default class implements IJobs {
     jobTypes: JobTypes[],
     roomNames: string[]
   ): { id: string; cache: JobCache } | undefined {
-    let jobs = IJobCache.GetAll(
-      true,
+    let jobs = JobData.GetAllBasedOnCache(
       executer,
+      true,
       roomNames,
       Predicates.IsJobTypes(jobTypes)
     );
     let jobId = this.FindBestJob(Object.keys(jobs));
     if (jobId !== undefined) {
-      return { id: jobId, cache: jobs[jobId] };
+      return { id: jobId, cache: jobs[jobId].cache as JobCache };
     }
 
-    jobs = IJobCache.GetAll(
-      false,
+    jobs = JobData.GetAllBasedOnCache(
       "",
+      false,
       roomNames,
       Predicates.IsJobTypes(jobTypes)
     );
     jobId = this.FindBestJob(Object.keys(jobs));
     if (jobId !== undefined) {
-      return { id: jobId, cache: jobs[jobId] };
+      return { id: jobId, cache: jobs[jobId].cache as JobCache };
     }
     return undefined;
   }
@@ -276,7 +270,7 @@ export default class implements IJobs {
     if (creep.store.getUsedCapacity() > 0) {
       switch (creepType) {
         case "miner": {
-          const result = new IResourceStorage(creep, "Creep", executer).Manage(
+          const result = new ResourceStorage(creep, "Creep", executer).Manage(
             false,
             true,
             false,
@@ -292,7 +286,7 @@ export default class implements IJobs {
         case "worker":
           return ["Build", "UpgradeController", "Repair"];
         case "transferer":
-          return new IResourceStorage(creep, "Creep", executer).Manage(
+          return new ResourceStorage(creep, "Creep", executer).Manage(
             false,
             true
           );
@@ -305,7 +299,7 @@ export default class implements IJobs {
         case "worker":
         case "transferer":
           if (permJobId?.includes("Upgrade")) {
-            return new IResourceStorage(creep, "Creep", executer).Manage(
+            return new ResourceStorage(creep, "Creep", executer).Manage(
               true,
               false,
               false,
@@ -313,7 +307,7 @@ export default class implements IJobs {
               3
             );
           }
-          return new IResourceStorage(creep, "Creep", executer).Manage(
+          return new ResourceStorage(creep, "Creep", executer).Manage(
             true,
             false
           );
@@ -326,7 +320,7 @@ export default class implements IJobs {
   }
 
   static FindJobForCreep(creep: Creep): boolean {
-    const memoryResult = ICreepData.GetMemory(creep.id);
+    const memoryResult = CreepData.GetMemory(creep.id);
     if (!memoryResult.success) {
       return false;
     }
@@ -335,7 +329,8 @@ export default class implements IJobs {
 
     let roomNames = [creep.room.name];
     if (creepMemory.isRemoteCreep) {
-      const roomMemory = IRoomMemory.Get(creep.room.name).data as RoomMemory;
+      const roomMemory = RoomData.GetMemory(creep.room.name)
+        .memory as RoomMemory;
       roomNames = Object.keys(roomMemory.remoteRooms ?? {});
     }
 
@@ -357,7 +352,7 @@ export default class implements IJobs {
         | { jobId?: string; memory: CreepMemory | StructureMemory }
         | undefined;
       const jobId = newJobData ? (newJobData.jobId as string) : "";
-      const jobData = IJobData.GetMemory(jobId);
+      const jobData = JobData.GetMemory(jobId);
       if (!jobData.success) {
         return false;
       }
@@ -371,7 +366,7 @@ export default class implements IJobs {
     }
 
     if (creepMemory.permJobId) {
-      const permJobData = IJobData.GetMemory(creepMemory.permJobId);
+      const permJobData = JobData.GetMemory(creepMemory.permJobId);
       if (permJobData.success) {
         const permJobCache = permJobData.cache as JobCache;
         if (jobTypes.includes(permJobCache.type)) {
@@ -399,14 +394,16 @@ export default class implements IJobs {
   }
 
   static UpdateAllData(room: Room): void {
-    const jobIds = Object.keys(IJobCache.GetAll(false, "", [room.name]));
+    const jobIds = Object.keys(
+      JobData.GetAllBasedOnCache("", false, [room.name])
+    );
     forEach(jobIds, (id) => {
       this.UpdateData(room, id);
     });
   }
 
   static UpdateData(room: Room, id: string): boolean {
-    const job = IJobData.GetMemory(id);
+    const job = JobData.GetMemory(id);
     if (!job.success) {
       return false;
     }
@@ -421,7 +418,7 @@ export default class implements IJobs {
             jobMemory.targetId
           );
           if (!csSite || (jobMemory.amountToTransfer ?? 0) <= 0) {
-            const csSiteAtLocation = IRoomConstruction.GetCsSiteAtLocation(
+            const csSiteAtLocation = RoomConstruction.GetCsSiteAtLocation(
               room,
               jobMemory.pos
             );
@@ -429,13 +426,13 @@ export default class implements IJobs {
               jobMemory.targetId = csSiteAtLocation.id;
               updatedMemory = true;
             } else {
-              const structureAtLocation = IRoomHelper.GetStructureAtLocation(
+              const structureAtLocation = RoomHelper.GetStructureAtLocation(
                 room,
                 jobMemory.pos,
                 jobMemory.structureType as StructureConstant
               );
               if (structureAtLocation) {
-                IStructureData.Initialize({
+                StructureData.Initialize({
                   executer: jobCache.executer,
                   structure: structureAtLocation,
                 });
@@ -494,19 +491,24 @@ export default class implements IJobs {
     }
 
     if (updatedMemory) {
-      IJobData.UpdateMemory(id, jobMemory, jobCache);
+      JobData.UpdateMemory(id, jobMemory, jobCache);
       return true;
     }
     return false;
   }
 
   public static Delete(id: string): boolean {
-    const creeps = ICreepMemory.GetAll(MemoryPredicates.HasJobId(id));
-    forOwn(creeps, (memory: CreepMemory, creepId: string) => {
-      this.UnassignCreepJob(creepId, memory, false);
-    });
+    const creepsData = CreepData.GetAllBasedOnMemory(
+      MemoryPredicates.HasJobId(id)
+    );
+    forOwn(
+      creepsData,
+      (data: DoubleCRUDResult<CreepMemory, CreepCache>, creepId: string) => {
+        this.UnassignCreepJob(creepId, data.memory as CreepMemory, false);
+      }
+    );
 
-    return IJobData.DeleteMemory(id, true, true).success;
+    return JobData.DeleteMemory(id, true, true).success;
   }
 }
 

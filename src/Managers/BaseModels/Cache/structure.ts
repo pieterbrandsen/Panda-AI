@@ -1,10 +1,8 @@
 import { clone } from "lodash";
-import BaseMemory from "./interface";
-import IRoomPosition from "../Helper/Room/roomPosition";
+import BaseCacheData from "./interface";
+import RoomPosition from "../Helper/Room/position";
 
-interface IStructureCache {}
-
-export default class extends BaseMemory implements IStructureCache {
+export default class StructureCacheData extends BaseCacheData {
   private static type: CacheTypes = "Structure";
 
   static Validate(data: StringMap<StructureCache>): ValidatedData {
@@ -23,7 +21,7 @@ export default class extends BaseMemory implements IStructureCache {
       type: structure.structureType,
       version: super.MinimumVersion(this.type),
       executer,
-      pos: IRoomPosition.FreezeRoomPosition(structure.pos),
+      pos: RoomPosition.FreezeRoomPosition(structure.pos),
     };
   }
 
@@ -53,7 +51,7 @@ export default class extends BaseMemory implements IStructureCache {
   }
 
   static GetAll(
-    executer: string,
+    executer = "",
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<StructureCache>,

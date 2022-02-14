@@ -1,6 +1,4 @@
-interface IDroppedResourceManagerMemory {}
-
-export default class implements IDroppedResourceManagerMemory {
+export default class DroppedResourceManagerMemoryData {
   static SetupMemory(): DroppedResourceManager {
     return {};
   }

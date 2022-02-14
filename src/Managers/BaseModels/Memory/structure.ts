@@ -1,9 +1,7 @@
 import { clone } from "lodash";
-import BaseMemory from "./interface";
+import BaseMemoryData from "./interface";
 
-interface IStructureMemory {}
-
-export default class extends BaseMemory implements IStructureMemory {
+export default class StructureMemoryData extends BaseMemoryData {
   private static type: MemoryTypes = "Structure";
 
   static Validate(data: StringMap<StructureMemory>): ValidatedData {

@@ -43,10 +43,10 @@ interface RoomMemory extends BaseMemory {
   remoteRooms?: StringMap<RemoteRoom>;
   remoteOriginRoom?: string;
 
-  sourceManager: SourceManager;
-  controllerManager: ControllerManager;
-  mineralManager: MineralManager;
-  spawnManager: SpawnManager;
+  sourceManager: SourceManagerMemory;
+  controllerManager: ControllerManagerMemory;
+  mineralManager: MineralManagerMemory;
+  spawnManager: SpawnManagerMemory;
   droppedResourceManager: DroppedResourceManager;
 }
 interface Memory extends BaseMemory {

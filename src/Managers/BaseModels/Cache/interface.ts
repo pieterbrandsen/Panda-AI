@@ -4,9 +4,7 @@
 import { forEach, pickBy } from "lodash";
 import Predicates from "./predicates";
 
-interface ICache {}
-
-export default class implements ICache {
+export default class CacheData {
   /**
    * Returns minimum cache version for type saved in cache
    */

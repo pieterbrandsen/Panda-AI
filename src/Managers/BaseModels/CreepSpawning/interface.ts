@@ -1,39 +1,36 @@
 import { findKey, forEach, groupBy, reduce } from "lodash";
-import IJobMemory from "../Memory/jobInterface";
-import IJobCache from "../Cache/jobInterface";
 import CachePredicates from "../Cache/predicates";
-import ICreepCache from "../Cache/creepInterface";
-import IStructureCache from "../Cache/structureInterface";
-import ICreepData from "../Helper/Creep/creepMemory";
-import IRoomData from "../Helper/Room/roomMemory";
-import bodyIteratee from "./bodyConstants";
-import ICreepBodyPartHelper from "./bodyPartHelper";
-import ICreepCountHelper from "./creepCountHelper";
+import JobData from "../Helper/Job/memory";
+import CreepData from "../Helper/Creep/memory";
+import StructureData from "../Helper/Structure/memory";
+import RoomData from "../Helper/Room/memory";
+import BodyIterateeConstant from "./bodyConstants";
+import CreepBodyPartHelper from "./bodyPartHelper";
+import CreepCountHelper from "./creepCountHelper";
 
-interface ICreepSpawning {}
+export default class CreepSpawning {
+  private isRemoteCreep = false;
 
-export default class CreepSpawning implements ICreepSpawning {
-  isRemoteCreep = false;
+  private roomNames: string[];
 
-  roomNames: string[];
+  private spawnRoom: Room;
 
-  spawnRoom: Room;
+  private jobsData: StringMap<DoubleCRUDResult<JobMemory, JobCache>>;
 
-  jobsMemory: StringMap<JobMemory>;
+  private creepsData: StringMapGeneric<
+    DoubleCRUDResult<CreepMemory, CreepCache>[],
+    CreepTypes
+  >;
 
-  jobsCache: StringMap<JobCache>;
+  private spawns: StructureSpawn[] = [];
 
-  creepsCache: StringMapGeneric<CreepCache[], CreepTypes>;
+  private missingBodyParts: StringMapGeneric<BodyParts, CreepTypes>;
 
-  spawns: StructureSpawn[] = [];
+  private aliveBodyParts: StringMapGeneric<BodyParts, CreepTypes>;
 
-  missingBodyParts: StringMapGeneric<BodyParts, CreepTypes>;
+  private missingCreepCount: StringMapGeneric<number, CreepTypes>;
 
-  aliveBodyParts: StringMapGeneric<BodyParts, CreepTypes>;
-
-  missingCreepCount: StringMapGeneric<number, CreepTypes>;
-
-  aliveCreepCount: StringMapGeneric<number, CreepTypes>;
+  private aliveCreepCount: StringMapGeneric<number, CreepTypes>;
 
   constructor(spawnRoom: string, remoteRooms?: string[]) {
     if (remoteRooms) {
@@ -42,7 +39,7 @@ export default class CreepSpawning implements ICreepSpawning {
     this.spawnRoom = Game.rooms[spawnRoom];
     const roomsToCheck = !remoteRooms ? [spawnRoom] : remoteRooms;
     this.roomNames = roomsToCheck;
-    const spawnsCache = IStructureCache.GetAll(
+    const spawnsCache = StructureData.GetAllBasedOnCache(
       "",
       false,
       [spawnRoom],
@@ -53,42 +50,36 @@ export default class CreepSpawning implements ICreepSpawning {
       if (spawn) this.spawns.push(spawn);
     });
 
-    const jobsCache = IJobCache.GetAll(false, "", roomsToCheck);
-    this.jobsCache = jobsCache;
+    const jobsData = JobData.GetAllBasedOnCache("", false, roomsToCheck);
+    this.jobsData = jobsData;
 
-    const jobIds = Object.keys(jobsCache);
-    const jobsMemory = IJobMemory.GetAll();
-    this.jobsMemory = Object.keys(jobsMemory)
-      .filter((key) => jobIds.includes(key))
-      // eslint-disable-next-line
-      .reduce((res, key) => ((res[key] = jobsMemory[key]), res), {});
+    this.creepsData = groupBy(
+      Object.values(CreepData.GetAllBasedOnCache("", false, roomsToCheck)),
+      (creepData) => (creepData.cache as CreepCache).type
+    ) as StringMapGeneric<
+      DoubleCRUDResult<CreepMemory, CreepCache>[],
+      CreepTypes
+    >;
 
-    this.creepsCache = groupBy(
-      Object.values(ICreepCache.GetAll("", false, roomsToCheck)),
-      (creep) => creep.type
-    ) as StringMapGeneric<CreepCache[], CreepTypes>;
-
-    const bodyData = new ICreepBodyPartHelper(
-      this.creepsCache,
-      this.jobsMemory,
-      this.jobsCache,
+    const bodyData = new CreepBodyPartHelper(
+      this.creepsData,
+      this.jobsData,
       this.spawnRoom
     );
     this.missingBodyParts = bodyData.missingBodyParts;
     this.aliveBodyParts = bodyData.aliveBodyParts;
-    const countData = new ICreepCountHelper(
-      this.creepsCache,
-      this.jobsMemory,
-      this.jobsCache,
+    const countData = new CreepCountHelper(
+      this.creepsData,
+      this.jobsData,
       this.spawnRoom
     );
     this.missingCreepCount = countData.missingCreepCount;
     this.aliveCreepCount = countData.aliveCreepCount;
   }
 
-  SetupCreepMemory(creep: SpawningObject, executer: string): boolean {
+  private SetupCreepMemory(creep: SpawningObject, executer: string): boolean {
     const data: CreepInitializationData = {
-      body: ICreepBodyPartHelper.ConvertBodyToStringMap(creep.body),
+      body: CreepBodyPartHelper.ConvertBodyToStringMap(creep.body),
       executer,
       isRemoteCreep: this.isRemoteCreep,
       id: creep.name,
@@ -96,10 +87,10 @@ export default class CreepSpawning implements ICreepSpawning {
       type: creep.type,
       name: creep.name,
     };
-    return ICreepData.Initialize(data).success;
+    return CreepData.Initialize(data).success;
   }
 
-  RequestCreep(type: CreepTypes): SpawningObject | undefined {
+  private RequestCreep(type: CreepTypes): SpawningObject | undefined {
     const creep = this.CreateCreep(type);
     const spawned = this.SpawnCreep(creep);
     if (spawned) {
@@ -108,11 +99,11 @@ export default class CreepSpawning implements ICreepSpawning {
     return undefined;
   }
 
-  GetBodyLoop(type: CreepTypes): BodyCostRoomTypes | undefined {
+  private GetBodyLoop(type: CreepTypes): BodyCostRoomTypes | undefined {
     if (type === "miner") {
       const { controller } = this.spawnRoom;
       if (controller && controller.level < 6 && !this.isRemoteCreep) {
-        const roomData = IRoomData.GetMemory(this.spawnRoom.name);
+        const roomData = RoomData.GetMemory(this.spawnRoom.name);
         if (roomData.success) {
           const roomMemory = roomData.memory as RoomMemory;
           if (
@@ -120,18 +111,18 @@ export default class CreepSpawning implements ICreepSpawning {
               .map((s) => s.structureId === undefined)
               .filter((s) => s).length > 0
           ) {
-            return bodyIteratee[type].starter;
+            return BodyIterateeConstant[type].starter;
           }
         }
       }
     }
 
     return !this.isRemoteCreep
-      ? bodyIteratee[type].owned
-      : bodyIteratee[type].remote;
+      ? BodyIterateeConstant[type].owned
+      : BodyIterateeConstant[type].remote;
   }
 
-  GenerateBody(type: CreepTypes): BodyPartConstant[] {
+  private GenerateBody(type: CreepTypes): BodyPartConstant[] {
     const maxCost =
       this.spawnRoom.energyCapacityAvailable / 2 > 300
         ? this.spawnRoom.energyCapacityAvailable / 2
@@ -161,11 +152,11 @@ export default class CreepSpawning implements ICreepSpawning {
     return body;
   }
 
-  GetCreepName(type: string): string {
+  private GetCreepName(type: string): string {
     return `${type}-${this.spawnRoom.name}-${Game.time}`;
   }
 
-  CreateCreep(type: CreepTypes): SpawningObject {
+  private CreateCreep(type: CreepTypes): SpawningObject {
     const name = this.GetCreepName(type);
     const creep: SpawningObject = {
       name,
@@ -175,7 +166,7 @@ export default class CreepSpawning implements ICreepSpawning {
     return creep;
   }
 
-  GetNextCreepTypeToSpawn(): CreepTypes | undefined {
+  private GetNextCreepTypeToSpawn(): CreepTypes | undefined {
     const scores: StringMapGeneric<number, CreepTypes> = {
       miner: 0,
       worker: 0,
@@ -186,7 +177,7 @@ export default class CreepSpawning implements ICreepSpawning {
 
     forEach(Object.keys(scores), (key) => {
       const creepType = key as CreepTypes;
-      const bodyPart = ICreepBodyPartHelper.GetBodyPartForCreepType(creepType);
+      const bodyPart = CreepBodyPartHelper.GetBodyPartForCreepType(creepType);
       const aliveBodyPartCount = this.aliveBodyParts[creepType][bodyPart];
       const missingBodyPartCount = this.missingBodyParts[creepType][bodyPart];
       const aliveCreepCount = this.aliveCreepCount[creepType];
@@ -228,7 +219,10 @@ export default class CreepSpawning implements ICreepSpawning {
     return type;
   }
 
-  UpdateMissingBodyParts(type: CreepTypes, body: BodyPartConstant[]): void {
+  private UpdateMissingBodyParts(
+    type: CreepTypes,
+    body: BodyPartConstant[]
+  ): void {
     switch (type) {
       case "miner":
       case "extractor":
@@ -269,11 +263,11 @@ export default class CreepSpawning implements ICreepSpawning {
     return cost;
   }
 
-  SpawnCreep(creep: SpawningObject): boolean {
+  private SpawnCreep(creep: SpawningObject): boolean {
     if (creep.body.length === 0) return false;
     const spawn = this.spawns[0];
     creep.body = CreepSpawning.SortBody(creep.body);
-    const { executer } = Object.values(this.jobsCache)[0];
+    const { executer } = Object.values(this.jobsData)[0].cache as JobCache;
     const result = spawn.spawnCreep(creep.body, creep.name);
     if (result === OK) {
       this.SetupCreepMemory(creep, executer);

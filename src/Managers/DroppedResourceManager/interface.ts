@@ -1,24 +1,21 @@
 import { forEach } from "lodash";
-import IRoomMemory from "../BaseModels/Memory/roomInterface";
-import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
-import IDroppedResourceData from "../BaseModels/Helper/DroppedResource/droppedResourceMemory";
-import IDroppedResourceCache from "../BaseModels/Cache/droppedResourceInterface";
-import IJobs from "../BaseModels/Jobs/interface";
+import RoomHelper from "../BaseModels/Helper/Room/interface";
+import RoomData from "../BaseModels/Helper/Room/memory";
+import DroppedResourceData from "../BaseModels/Helper/DroppedResource/memory";
+import Jobs from "../BaseModels/Jobs/interface";
 
-interface ISourceManager {}
+export default class SourceManager {
+  private updatedMemory = false;
 
-export default class implements ISourceManager {
-  updatedMemory = false;
+  private executer: string;
 
-  executer: string;
+  private room: Room;
 
-  room: Room;
+  private memory: RoomMemory;
 
-  memory: RoomMemory;
+  private managerMemory: DroppedResourceManager;
 
-  managerMemory: DroppedResourceManager;
-
-  cache: RoomCache;
+  private cache: RoomCache;
 
   constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
     this.room = Game.rooms[roomName];
@@ -26,28 +23,28 @@ export default class implements ISourceManager {
     this.cache = roomCache;
     this.managerMemory = this.memory.droppedResourceManager;
 
-    this.executer = IRoomHelper.GetExecuter(this.room.name, "Source");
+    this.executer = RoomHelper.GetExecuter(this.room.name, "Source");
   }
 
-  UpdateDroppedResources(): void {
+  private UpdateDroppedResources(): void {
     const droppedResourceMemoryIds = Object.keys(
-      IDroppedResourceCache.GetAll("", false, [this.room.name])
+      DroppedResourceData.GetAllBasedOnCache("", false, [this.room.name])
     );
     forEach(droppedResourceMemoryIds, (id) => {
       const resource = Game.getObjectById<Resource | null>(id);
       if (!resource) {
-        IJobs.Delete(id);
-        IDroppedResourceData.DeleteMemory(id, true, true);
+        Jobs.Delete(id);
+        DroppedResourceData.DeleteMemory(id, true, true);
       }
     });
 
     const droppedResources = this.room.find(FIND_DROPPED_RESOURCES);
     forEach(droppedResources, (droppedResource) => {
-      let droppedResourceData = IDroppedResourceData.GetMemory(
+      let droppedResourceData = DroppedResourceData.GetMemory(
         droppedResource.id
       );
       if (!droppedResourceData.success) {
-        droppedResourceData = IDroppedResourceData.Initialize({
+        droppedResourceData = DroppedResourceData.Initialize({
           executer: this.executer,
           resource: droppedResource,
         });
@@ -86,7 +83,7 @@ export default class implements ISourceManager {
   Run(): void {
     this.UpdateDroppedResources();
     if (this.updatedMemory) {
-      IRoomMemory.Update(this.room.name, this.memory);
+      RoomData.UpdateMemory(this.room.name, this.memory);
     }
   }
 }

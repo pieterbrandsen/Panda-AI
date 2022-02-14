@@ -1,12 +1,10 @@
 import { forOwn, sum } from "lodash";
 import AverageValue from "../Functions/average";
-import IStatsMemory from "../../Memory/Stats/globalStats";
+import StatsMemoryData from "../../Memory/Stats/global";
 
-interface IResetHeap {}
-
-export default class implements IResetHeap {
+export default class ResetHeap {
   static Reset(): boolean {
-    const statsData = IStatsMemory.Get();
+    const statsData = StatsMemoryData.Get();
     if (!statsData.success) return false;
     const statsMemory = statsData.data as StatsMemory;
 
@@ -67,6 +65,6 @@ export default class implements IResetHeap {
       }
     });
 
-    return IStatsMemory.Update(statsMemory).success;
+    return StatsMemoryData.Update(statsMemory).success;
   }
 }

@@ -1,8 +1,6 @@
 import { forEach, reduce } from "lodash";
 
-interface IRoomPosition {}
-
-export default class implements IRoomPosition {
+export default class RoomPositionHelper {
   static FreezeRoomPosition(pos: RoomPosition): FreezedRoomPosition {
     return {
       x: pos.x,

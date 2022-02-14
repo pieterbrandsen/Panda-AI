@@ -1,6 +1,6 @@
-import IJobData from "../Job/jobMemory";
+import JobData from "../Job/memory";
 
-export default class {
+export default class StructureRepair {
   static GetMissingHits(structure: Structure): number {
     return structure.hitsMax - structure.hits;
   }
@@ -11,11 +11,9 @@ export default class {
   ): boolean {
     const missingHits = this.GetMissingHits(structure);
     if (missingHits > 0) {
-      const jobData = IJobData.GetMemory(
-        IJobData.GetJobId("Repair", cache.pos)
-      );
+      const jobData = JobData.GetMemory(JobData.GetJobId("Repair", cache.pos));
       if (jobData.success) return true;
-      return IJobData.Initialize({
+      return JobData.Initialize({
         executer: cache.executer,
         pos: cache.pos,
         objectType: "Structure",

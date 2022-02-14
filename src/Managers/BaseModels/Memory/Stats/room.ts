@@ -1,9 +1,7 @@
 import { clone, pickBy } from "lodash";
-import BaseStatsMemory from "./interface";
+import BaseStatsMemoryData from "./interface";
 
-interface IRoomStatsMemory {}
-
-export default class extends BaseStatsMemory implements IRoomStatsMemory {
+export default class RoomStatsMemoryData extends BaseStatsMemoryData {
   static Get(id: string): CRUDResult<RoomStatsMemory> {
     const data = clone(Memory.stats.rooms[id]);
     if (data === undefined) return { success: false, data: undefined };

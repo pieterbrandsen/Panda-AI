@@ -1,23 +1,21 @@
-import IRoomMemory from "../BaseModels/Memory/roomInterface";
-import IRoomHelper from "../BaseModels/Helper/Room/roomInterface";
-import IJobMemory from "../BaseModels/Helper/Job/jobMemory";
-import IRoomConstruction from "../BaseModels/Helper/Room/roomConstruction";
-import IRoomPosition from "../BaseModels/Helper/Room/roomPosition";
+import RoomHelper from "../BaseModels/Helper/Room/interface";
+import JobData from "../BaseModels/Helper/Job/memory";
+import RoomData from "../BaseModels/Helper/Room/memory";
+import RoomConstruction from "../BaseModels/Helper/Room/construction";
+import RoomPositionHelper from "../BaseModels/Helper/Room/position";
 
-interface IMineralManager {}
+export default class MineralManager {
+  private updatedMemory = false;
 
-export default class implements IMineralManager {
-  updatedMemory = false;
+  private executer: string;
 
-  executer: string;
+  private room: Room;
 
-  room: Room;
+  private memory: RoomMemory;
 
-  memory: RoomMemory;
+  private managerMemory: MineralManagerMemory;
 
-  managerMemory: MineralManager;
-
-  cache: RoomCache;
+  private cache: RoomCache;
 
   constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
     this.room = Game.rooms[roomName];
@@ -25,16 +23,16 @@ export default class implements IMineralManager {
     this.cache = roomCache;
     this.managerMemory = this.memory.mineralManager;
 
-    this.executer = IRoomHelper.GetExecuter(this.room.name, "Controller");
+    this.executer = RoomHelper.GetExecuter(this.room.name, "Controller");
   }
 
-  UpdateMineral(): void {
+  private UpdateMineral(): void {
     const { managerMemory } = this;
 
     const mineralMemory = managerMemory.mineral;
     if (mineralMemory) {
       if (!mineralMemory.structureId && !mineralMemory.structureBuildJobId) {
-        const createdSite = IRoomConstruction.CreateConstructionSite(
+        const createdSite = RoomConstruction.CreateConstructionSite(
           this.room,
           mineralMemory.pos,
           STRUCTURE_EXTRACTOR,
@@ -44,7 +42,7 @@ export default class implements IMineralManager {
           mineralMemory.structureBuildJobId = createdSite;
           this.updatedMemory = true;
         } else {
-          const structure = IRoomHelper.GetStructureAtLocation(
+          const structure = RoomHelper.GetStructureAtLocation(
             this.room,
             mineralMemory.pos,
             STRUCTURE_EXTRACTOR
@@ -58,7 +56,7 @@ export default class implements IMineralManager {
       }
       if (mineralMemory.structureBuildJobId) {
         if (Game.time % 100) {
-          const createdSite = IRoomConstruction.CreateConstructionSite(
+          const createdSite = RoomConstruction.CreateConstructionSite(
             this.room,
             mineralMemory.pos,
             STRUCTURE_EXTRACTOR,
@@ -77,11 +75,11 @@ export default class implements IMineralManager {
 
       if (!mineralMemory.jobId) {
         const mineral = Game.getObjectById<Mineral>(mineralMemory.id);
-        const maxCreepsAround = IRoomPosition.GetNonWallPositionsAround(
+        const maxCreepsAround = RoomPositionHelper.GetNonWallPositionsAround(
           mineralMemory.pos,
           this.room
         ).length;
-        const jobResult = IJobMemory.Initialize({
+        const jobResult = JobData.Initialize({
           executer: this.executer,
           pos: mineralMemory.pos,
           targetId: mineralMemory.id,
@@ -91,7 +89,7 @@ export default class implements IMineralManager {
           maxCreepsCount: maxCreepsAround,
         });
         if (!jobResult.success || !jobResult.cache || !jobResult.memory) return;
-        const jobId = IJobMemory.GetJobId(
+        const jobId = JobData.GetJobId(
           jobResult.cache.type,
           jobResult.memory.pos
         );
@@ -122,7 +120,7 @@ export default class implements IMineralManager {
 
     this.UpdateMineral();
     if (this.updatedMemory) {
-      IRoomMemory.Update(this.room.name, this.memory);
+      RoomData.UpdateMemory(this.room.name, this.memory);
     }
   }
 }

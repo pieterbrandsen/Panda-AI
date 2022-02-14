@@ -1,31 +1,27 @@
 import { forEach, union } from "lodash";
-import IRoomData from "../../Managers/BaseModels/Helper/Room/roomMemory";
-import IRoomCache from "../../Managers/BaseModels/Cache/roomInterface";
-import IControllerManager from "../../Managers/ControllerManager/interface";
-import IMineralManager from "../../Managers/MineralManager/interface";
-import ISourceManager from "../../Managers/SourceManager/interface";
-import IDroppedResourceManager from "../../Managers/DroppedResourceManager/interface";
-import ISpawnManager from "../../Managers/SpawnManager/interface";
-import ICreepCache from "../../Managers/BaseModels/Cache/creepInterface";
-import IStructuresCache from "../../Managers/BaseModels/Cache/structureInterface";
-import ICreepExecuter from "../Creep/interface";
-import IStructureExecuter from "../Structure/interface";
-import IJobs from "../../Managers/BaseModels/Jobs/interface";
-import IJobData from "../../Managers/BaseModels/Helper/Job/jobMemory";
-import ISetupRoom from "../../Managers/BaseModels/Helper/Room/setupRoom";
-import IRoomHeap from "../../Managers/BaseModels/Heap/roomInterface";
+import RoomData from "../../Managers/BaseModels/Helper/Room/memory";
+import StructureData from "../../Managers/BaseModels/Helper/Structure/memory";
+import ControllerManager from "../../Managers/ControllerManager/interface";
+import MineralManager from "../../Managers/MineralManager/interface";
+import SourceManager from "../../Managers/SourceManager/interface";
+import DroppedResourceManager from "../../Managers/DroppedResourceManager/interface";
+import SpawnManager from "../../Managers/SpawnManager/interface";
+import CreepExecuter from "../Creep/interface";
+import StructureExecuter from "../Structure/interface";
+import Jobs from "../../Managers/BaseModels/Jobs/interface";
+import JobData from "../../Managers/BaseModels/Helper/Job/memory";
+import SetupRoom from "../../Managers/BaseModels/Helper/Room/setup";
+import RoomHeap from "../../Managers/BaseModels/Heap/room";
 import UpdateRoomStats from "../../Managers/BaseModels/Helper/Stats/updateRoom";
 
-interface IRoomExecuter {}
-
-export default class implements IRoomExecuter {
+export default class RoomExecuter {
   static ExecuteAllRooms(): boolean {
-    const roomsCache = IRoomCache.GetAll("", false);
+    const roomsCache = RoomData.GetAllBasedOnCache("", false);
     const roomNamesWithVision = Object.keys(Game.rooms);
     forEach(roomNamesWithVision, (roomName) => {
       const room = Game.rooms[roomName];
       if (!roomsCache[roomName]) {
-        new ISetupRoom(room).Initialize();
+        new SetupRoom(room).Initialize();
       }
     });
 
@@ -33,43 +29,45 @@ export default class implements IRoomExecuter {
     forEach(union(roomNames, roomNamesWithVision), (roomName) => {
       this.ExecuteRoom(roomName);
       if (!roomNamesWithVision.includes(roomName)) {
-        IJobData.DeleteAllData(roomName);
-        IRoomData.DeleteMemory(roomName, true, true);
+        JobData.DeleteAllData(roomName);
+        RoomData.DeleteMemory(roomName, true, true);
       }
     });
     return true;
   }
 
   static ExecuteRoom(roomName: string): boolean {
-    const structuresCache = IStructuresCache.GetAll("", false, [roomName]);
-    const creepsCache = ICreepCache.GetAll("", false, [roomName]);
-    IStructureExecuter.ExecuterAllStructures(structuresCache);
-    ICreepExecuter.ExecuterAllCreeps(creepsCache);
+    const structuresData = StructureData.GetAllBasedOnCache("", false, [
+      roomName,
+    ]);
+    const creepsCache = RoomData.GetAllBasedOnCache("", false, [roomName]);
+    StructureExecuter.ExecuterAllStructures(Object.keys(structuresData));
+    CreepExecuter.ExecuterAllCreeps(Object.keys(creepsCache));
 
     const room = Game.rooms[roomName];
     if (!room) return false;
-    const roomData = IRoomData.GetMemory(room.name);
+    const roomData = RoomData.GetMemory(room.name);
     if (!roomData.success) return false;
-    const roomHeapData = IRoomHeap.Get(room.name);
+    const roomHeapData = RoomHeap.Get(room.name);
     if (!roomHeapData.success) {
-      IRoomHeap.Initialize(room.name);
+      RoomHeap.Initialize(room.name);
     }
 
     const roomMemory = roomData.memory as RoomMemory;
     const roomCache = roomData.cache as RoomCache;
 
     UpdateRoomStats(room);
-    IJobs.UpdateAllData(room);
+    Jobs.UpdateAllData(room);
 
     const { controller } = room;
-    new ISourceManager(room.name, roomMemory, roomCache).Run();
-    new IDroppedResourceManager(room.name, roomMemory, roomCache).Run();
+    new SourceManager(room.name, roomMemory, roomCache).Run();
+    new DroppedResourceManager(room.name, roomMemory, roomCache).Run();
 
     if (controller) {
-      new IControllerManager(room.name, roomMemory, roomCache).Run();
+      new ControllerManager(room.name, roomMemory, roomCache).Run();
       if (controller.my) {
-        new IMineralManager(room.name, roomMemory, roomCache).Run();
-        new ISpawnManager(room.name, roomMemory, roomCache).Run();
+        new MineralManager(room.name, roomMemory, roomCache).Run();
+        new SpawnManager(room.name, roomMemory, roomCache).Run();
       }
     }
 
