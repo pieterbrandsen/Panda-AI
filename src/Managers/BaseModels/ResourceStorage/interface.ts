@@ -6,31 +6,7 @@ import CachePredicates from "../Cache/predicates";
 import JobData from "../Helper/Job/memory";
 import DroppedResourceData from "../Helper/DroppedResource/memory";
 
-interface IResourceStorage {
-  object: StructuresWithStorage | Creep;
-  requiredStorageLevel: StorageLevels;
-  executer: string;
-  type: JobObjectExecuter;
-  memory: StructureMemory | CreepMemory | undefined;
-  cache: StructureCache | CreepCache | undefined;
-  IsObjectEmptyEnough(structure?: StructuresWithStorage): LevelCheckResult;
-  IsObjectFullEnough(structure?: StructuresWithStorage): LevelCheckResult;
-  FindStructureToFillFrom(
-    inRoomRange: number,
-    onlyLinks: boolean,
-    isFromControllerOrSource: boolean
-  ): BestStructureLoop | BestDroppedResourceLoop | null;
-  FindStructureToEmptyTo(
-    inRoomRange: number,
-    onlyLinks: boolean,
-    isFromControllerOrSource: boolean
-  ): BestStructureLoop | null;
-  Manage():
-    | { jobId?: string; memory: CreepMemory | StructureMemory }
-    | undefined;
-}
-
-export default class ResourceStorage implements IResourceStorage {
+export default class ResourceStorage {
   private energyWithdrawStructureTypes: StructureConstant[] = [
     "container",
     "link",
@@ -469,13 +445,6 @@ export default class ResourceStorage implements IResourceStorage {
             structure,
             isFromControllerOrSource
           );
-          console.log(
-            this.object,
-            levelCheck.result,
-            levelCheck.level.current,
-            levelCheck.level.min,
-            structure
-          );
           if (
             levelCheck.result &&
             levelCheck.level.current - levelCheck.level.min >= 0
@@ -498,127 +467,14 @@ export default class ResourceStorage implements IResourceStorage {
     return bestStructure;
   }
 
-  private ManageJob(
-    thisLevel: LevelCheckResult,
-    isSpending: boolean,
-    targetStructureInformation?: BestStructureLoop,
-    targetResourceInformation?: BestDroppedResourceLoop
-  ): string | undefined {
-    if (!this.memory || !this.cache) return undefined;
-    const targetDataResult = targetStructureInformation
-      ? StructureData.GetMemory(targetStructureInformation?.id ?? "")
-      : DroppedResourceData.GetMemory(targetResourceInformation?.id ?? "");
-    if (targetDataResult.success) {
-      const targetMemory = targetDataResult.memory as
-        | StructureMemory
-        | DroppedResourceMemory;
-      const targetCache = targetDataResult.cache as
-        | StructureCache
-        | DroppedResourceCache;
-      let amountRequired = 0;
-      let amountTransferring = 0;
-      let id = "";
-
-      if (targetStructureInformation) {
-        id = targetStructureInformation.id;
-        amountRequired = isSpending
-          ? targetStructureInformation.levels.max -
-            targetStructureInformation.levels.current
-          : targetStructureInformation.levels.current -
-            targetStructureInformation.levels.min;
-
-        amountTransferring = isSpending
-          ? Math.min(
-              targetStructureInformation.levels.max -
-                targetStructureInformation.levels.current,
-              thisLevel.level.current
-            )
-          : Math.min(
-              targetStructureInformation.levels.current -
-                targetStructureInformation.levels.min,
-              thisLevel.level.max - thisLevel.level.current
-            );
-      } else if (targetResourceInformation) {
-        id = targetResourceInformation.id;
-        amountRequired = targetResourceInformation.amount;
-        amountTransferring = thisLevel.level.max - thisLevel.level.current;
-      }
-
-      const isTypeSpawning = targetStructureInformation
-        ? (["spawn", "extension"] as StructureConstant[]).includes(
-            targetStructureInformation.cache.type
-          )
-        : false;
-      let type: JobTypes = isTypeSpawning
-        ? "TransferSpawn"
-        : "TransferStructure";
-      if (targetResourceInformation) {
-        type = "WithdrawResource";
-      } else if (!isSpending) {
-        type = "WithdrawStructure";
-      }
-      const jobId = JobData.GetJobId(type, targetCache.pos);
-      let jobData = JobData.GetMemory(jobId);
-      if (!jobData.success) {
-        jobData = JobData.Initialize({
-          executer: this.executer,
-          pos: targetCache.pos,
-          targetId: id,
-          type,
-          amountToTransfer: amountRequired,
-          fromTargetId: this.object.id,
-          objectType: this.type,
-        });
-
-        if (!jobData.success) {
-          return undefined;
-        }
-      }
-
-      if (isSpending) {
-        targetMemory.energyIncoming[this.object.id] = amountTransferring;
-        this.memory.energyOutgoing[id] = amountTransferring;
-      } else {
-        targetMemory.energyOutgoing[this.object.id] = amountTransferring;
-        this.memory.energyIncoming[id] = amountTransferring;
-      }
-
-      console.log(
-        "Add",
-        jobId,
-        this.object.id,
-        `${targetMemory.energyIncoming[this.object.id]} - ${
-          targetMemory.energyOutgoing[this.object.id]
-        }`
-      );
-      if (targetStructureInformation)
-        StructureData.UpdateMemory(id, targetMemory);
-      else DroppedResourceData.UpdateMemory(id, targetMemory);
-      if (this.type === "Structure") {
-        StructureData.UpdateMemory(
-          this.object.id,
-          this.memory as StructureMemory
-        );
-      } else if (this.type === "Resource") {
-        DroppedResourceData.UpdateMemory(
-          this.object.id,
-          this.memory as DroppedResourceMemory
-        );
-      } else {
-        return jobId;
-      }
-    }
-    return undefined;
-  }
-
-  Manage(
+  FindTarget(
     fillFrom = true,
     emptyTo = true,
     onlyLinks = false,
     isFromControllerOrSource = false,
     inRoomRange = 999
-  ): { jobId?: string; memory: CreepMemory | StructureMemory } | undefined {
-    if (!this.memory || !this.cache) return undefined;
+  ): BestDroppedResourceLoop | BestStructureLoop | null {
+    if (!this.memory || !this.cache) return null;
 
     const levelFullCheck = this.IsObjectFullEnough();
     const levelEmptyCheck = this.IsObjectEmptyEnough();
@@ -629,41 +485,22 @@ export default class ResourceStorage implements IResourceStorage {
         isFromControllerOrSource
       );
       if (targetInformation) {
-        const targetStructureInformation = targetInformation as BestStructureLoop;
-        const targetDroppedResourceInformation = targetInformation as BestDroppedResourceLoop;
-        return {
-          jobId: this.ManageJob(
-            levelEmptyCheck,
-            false,
-            targetStructureInformation.levels
-              ? targetStructureInformation
-              : undefined,
-            targetDroppedResourceInformation.amount
-              ? targetDroppedResourceInformation
-              : undefined
-          ),
-          memory: this.memory,
-        };
+        targetInformation.originLevels = levelEmptyCheck.level;
+        return targetInformation;
       }
     }
 
     if (emptyTo) {
-      const targetStructureInformation = this.FindStructureToEmptyTo(
+      const targetInformation = this.FindStructureToEmptyTo(
         inRoomRange,
         onlyLinks,
         isFromControllerOrSource
       );
-      if (targetStructureInformation) {
-        return {
-          jobId: this.ManageJob(
-            levelFullCheck,
-            true,
-            targetStructureInformation
-          ),
-          memory: this.memory,
-        };
+      if (targetInformation) {
+        targetInformation.originLevels = levelFullCheck.level;
+        return targetInformation;
       }
     }
-    return undefined;
+    return null;
   }
 }

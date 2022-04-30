@@ -84,15 +84,6 @@ export default class Jobs {
         }
 
         if (targetMemory && job.fromTargetId) {
-          console.log(
-            "Delete",
-            memory.jobId,
-            creepId,
-            `${targetMemory.energyIncoming[job.fromTargetId]} - ${
-              targetMemory.energyOutgoing[job.fromTargetId]
-            }`
-          );
-
           delete targetMemory.energyOutgoing[job.fromTargetId];
           delete targetMemory.energyIncoming[job.fromTargetId];
 
@@ -124,28 +115,146 @@ export default class Jobs {
     jobId: string,
     jobCache: JobCache
   ): boolean {
-    const jobMemory = JobData.GetMemory(jobId);
-    if (!jobMemory.success) {
+    const jobMemoryResult = JobData.GetMemory(jobId);
+    if (!jobMemoryResult.success) {
       return false;
     }
-    const job = jobMemory.memory as JobMemory;
+    const jobMemory = jobMemoryResult.memory as JobMemory;
     if (jobId === creepMemory.permJobId) {
       delete creepMemory.permJobId;
     }
-    if (!job.assignedCreeps.includes(creepId)) job.assignedCreeps.push(creepId);
+    if (!jobMemory.assignedCreeps.includes(creepId)) jobMemory.assignedCreeps.push(creepId);
     creepMemory.jobId = jobId;
     creepCache.executer = jobCache.executer;
-    job.fromTargetId = creepId;
-    job.lastAssigned = Game.time;
-    if (!JobData.UpdateMemory(jobId, job).success) {
+    jobMemory.fromTargetId = creepId;
+    jobMemory.lastAssigned = Game.time;
+    if (!JobData.UpdateMemory(jobId, jobMemory).success) {
       return false;
     }
-    if (
-      jobCache.type.includes("Transfer") ||
-      jobCache.type.includes("Withdraw")
-    )
-      console.log("Assign", jobId, creepId);
+
     return CreepData.UpdateMemory(creepId, creepMemory, creepCache).success;
+  }
+  static AssignStructureJob(): void {}
+  static AssignResourceJob(
+    executer: string,
+    objectId: string,
+    isSpending: boolean,
+    targetInformation: BestStructureLoop | BestDroppedResourceLoop,
+    memory: CreepMemory | StructureMemory,
+    cache: CreepCache | StructureCache,
+    type: JobObjectExecuter
+  ): boolean {
+    let targetDataResult:
+      | DoubleCRUDResult<StructureMemory, StructureCache>
+      | DoubleCRUDResult<
+          DroppedResourceMemory,
+          DroppedResourceCache
+        > = StructureData.GetMemory(targetInformation.id);
+    let targetType: JobObjectExecuter = "Structure";
+    if (!targetDataResult.success) {
+      targetDataResult = DroppedResourceData.GetMemory(targetInformation.id);
+      targetType = "Resource";
+    }
+    if (targetDataResult.success && targetInformation.originLevels) {
+      const thisLevel = targetInformation.originLevels as   StorageLevels;
+      const targetMemory = targetDataResult.memory as
+        | StructureMemory
+        | DroppedResourceMemory;
+      const targetCache = targetDataResult.cache as
+        | StructureCache
+        | DroppedResourceCache;
+      let amountRequired = 0;
+      let amountTransferring = 0;
+      let id = targetInformation.id;
+
+      const targetStructureInformation = targetInformation as BestStructureLoop;
+      const targetResourceInformation = targetInformation as BestDroppedResourceLoop;
+      if (targetType === "Structure") {
+        amountRequired = isSpending
+          ? targetStructureInformation.levels.max -
+            targetStructureInformation.levels.current
+          : targetStructureInformation.levels.current -
+            targetStructureInformation.levels.min;
+
+        amountTransferring = isSpending
+          ? Math.min(
+              targetStructureInformation.levels.max -
+                targetStructureInformation.levels.current,
+              thisLevel.current
+            )
+          : Math.min(
+              targetStructureInformation.levels.current -
+                targetStructureInformation.levels.min,
+              thisLevel.max - thisLevel.current
+            );
+      } else if (targetType === "Resource") {
+        amountRequired = targetResourceInformation.amount;
+        amountTransferring = thisLevel.max - thisLevel.current;
+      }
+
+      const isTypeSpawning =
+        targetType === "Structure" && targetStructureInformation
+          ? (["spawn", "extension"] as StructureConstant[]).includes(
+              targetStructureInformation.cache.type
+            )
+          : false;
+      let jobType: JobTypes = isTypeSpawning
+        ? "TransferSpawn"
+        : "TransferStructure";
+      if (targetType === "Resource") {
+        jobType = "WithdrawResource";
+      } else if (!isSpending) {
+        jobType = "WithdrawStructure";
+      }
+      const jobId = JobData.GetJobId(jobType, targetCache.pos);
+      let jobData = JobData.GetMemory(jobId);
+      if (!jobData.success) {
+        jobData = JobData.Initialize({
+          executer: executer,
+          pos: targetCache.pos,
+          targetId: id,
+          type: jobType,
+          amountToTransfer: amountRequired,
+          fromTargetId: objectId,
+          objectType: targetType,
+        });
+
+        if (!jobData.success) {
+          return false;
+        }
+      }
+
+      if (isSpending) {
+        targetMemory.energyIncoming[objectId] = amountTransferring;
+        memory.energyOutgoing[id] = amountTransferring;
+      } else {
+        targetMemory.energyOutgoing[objectId] = amountTransferring;
+        memory.energyIncoming[id] = amountTransferring;
+      }
+
+      if (targetStructureInformation)
+        StructureData.UpdateMemory(id, targetMemory);
+      else DroppedResourceData.UpdateMemory(id, targetMemory);
+      if (type === "Structure") {
+        return StructureData.UpdateMemory(objectId, memory as StructureMemory).success;
+      } else if (type === "Resource") {
+        return DroppedResourceData.UpdateMemory(
+          objectId,
+          memory as DroppedResourceMemory
+        ).success;
+      }
+      else {
+        return this.AssignCreepJob(
+          objectId,
+          memory as CreepMemory,
+          cache as CreepCache,
+          jobId,
+          jobData.cache as JobCache
+        );
+      }
+    }
+
+    return true;
   }
 
   static UpdateAmount(
@@ -260,36 +369,16 @@ export default class Jobs {
   static GetJobTypesToExecute(
     creep: Creep,
     creepType: CreepTypes,
-    executer: string,
-    permJobId?: string
-  ):
-    | JobTypes[]
-    | { jobId?: string; memory: CreepMemory | StructureMemory }
-    | undefined
-    | undefined {
+  ): JobTypes[] {
     if (creep.store.getUsedCapacity() > 0) {
       switch (creepType) {
         case "miner": {
-          const result = new ResourceStorage(creep, "Creep", executer).Manage(
-            false,
-            true,
-            false,
-            true,
-            3
-          );
-          if (!result) {
-            creep.drop(RESOURCE_ENERGY);
-            return undefined;
-          }
-          return result;
+          return ["TransferStructure"];
         }
         case "worker":
           return ["Build", "UpgradeController", "Repair"];
         case "transferer":
-          return new ResourceStorage(creep, "Creep", executer).Manage(
-            false,
-            true
-          );
+          return ["TransferStructure", "TransferSpawn"];
         // skip default case
       }
     } else {
@@ -298,25 +387,13 @@ export default class Jobs {
           return ["HarvestMineral", "HarvestSource"];
         case "worker":
         case "transferer":
-          if (permJobId?.includes("Upgrade")) {
-            return new ResourceStorage(creep, "Creep", executer).Manage(
-              true,
-              false,
-              false,
-              true,
-              3
-            );
-          }
-          return new ResourceStorage(creep, "Creep", executer).Manage(
-            true,
-            false
-          );
+          return ["TransferStructure"];
         case "claimer":
           return ["ReserveController"];
         // skip default case
       }
     }
-    return undefined;
+    return [];
   }
 
   static FindJobForCreep(creep: Creep): boolean {
@@ -334,35 +411,15 @@ export default class Jobs {
       roomNames = Object.keys(roomMemory.remoteRooms ?? {});
     }
 
-    const jobTypesOrJobId = this.GetJobTypesToExecute(
+    const jobTypes = this.GetJobTypesToExecute(
       creep,
       creepCache.type,
-      creepCache.executer,
-      creepMemory.permJobId
     );
-    if (jobTypesOrJobId === undefined) {
+    if (jobTypes.length === 0) {
       return false;
     }
-
-    let jobTypes: JobTypes[] = [];
-    if (Array.isArray(jobTypesOrJobId)) {
-      jobTypes = jobTypesOrJobId;
-    } else {
-      const newJobData = jobTypesOrJobId as
-        | { jobId?: string; memory: CreepMemory | StructureMemory }
-        | undefined;
-      const jobId = newJobData ? (newJobData.jobId as string) : "";
-      const jobData = JobData.GetMemory(jobId);
-      if (!jobData.success) {
-        return false;
-      }
-      return this.AssignCreepJob(
-        creep.id,
-        newJobData ? (newJobData.memory as CreepMemory) : creepMemory,
-        creepCache,
-        jobId,
-        jobData.cache as JobCache
-      );
+    else if (jobTypes.includes("TransferStructure")|| jobTypes.includes("TransferSpawn")) {
+      return this.FindResourceJob("Creep",creep, creepMemory, creepCache, jobTypes, roomNames,creepCache.executer,false);
     }
 
     if (creepMemory.permJobId) {
@@ -391,6 +448,17 @@ export default class Jobs {
       );
     }
     return false;
+  }
+
+  static FindJobForStructure(structure: Structure): boolean {
+    return false;
+  }
+  static FindResourceJob(type:JobObjectExecuter, fromTarget: Creep | StructuresWithStorage,memory:CreepMemory|StructureMemory, cache:CreepCache|StructureCache, jobTypes:JobTypes[], roomNames:string[],executer:string,onlyLinks:boolean): boolean {
+    const isFromControllerOrSource = (memory.permJobId !== undefined && memory.permJobId.startsWith("Controller")) || (cache.type === "miner");
+    const targetInformation = new ResourceStorage(fromTarget,type,executer).FindTarget(true,true,onlyLinks,isFromControllerOrSource,isFromControllerOrSource? 3 : undefined);
+    if (targetInformation === null) return false;
+    const isSpending = fromTarget.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
+    return this.AssignResourceJob(executer,targetInformation.id,isSpending,targetInformation,memory,cache,type)
   }
 
   static UpdateAllData(room: Room): void {
@@ -497,7 +565,7 @@ export default class Jobs {
     return false;
   }
 
-  public static Delete(id: string): boolean {
+  static Delete(id: string): boolean {
     const creepsData = CreepData.GetAllBasedOnMemory(
       MemoryPredicates.HasJobId(id)
     );
@@ -511,10 +579,3 @@ export default class Jobs {
     return JobData.DeleteMemory(id, true, true).success;
   }
 }
-
-// Game.market.createOrder({
-//   type: ORDER_BUY,
-//   resourceType: PIXEL,
-//   price: 7630,
-//   totalAmount: 98400,
-// });

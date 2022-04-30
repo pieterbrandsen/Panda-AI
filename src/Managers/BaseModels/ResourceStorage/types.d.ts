@@ -18,12 +18,14 @@ interface BestStructureLoop {
   id: string;
   cache: StructureCache;
   levels: StorageLevels;
+  originLevels?: StorageLevels;
 }
 
 interface BestDroppedResourceLoop {
   id: string;
   cache: DroppedResourceCache;
   amount: number;
+  originLevels?: StorageLevels;
 }
 
 interface LevelCheckResult {

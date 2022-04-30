@@ -101,8 +101,9 @@ export default class CreepBodyPartHelper {
 
     forEach(Object.keys(parts), (type) => {
       const bodies: BodyParts[] = (this.creepsData[type] ?? []).map(
-        (c) => c.body
+        (c) => c.cache.body
       );
+
       forEach(bodies, (body) => {
         forEach(Object.keys(body), (part) => {
           parts[type][part] += body[part];

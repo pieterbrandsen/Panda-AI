@@ -197,7 +197,7 @@ export default class RoomDataHelper {
     predicate?: Predicate<RoomCache>
   ): StringMap<DoubleCRUDResult<RoomMemory, RoomCache>> {
     return this.GetAll(
-      true,
+      false,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,

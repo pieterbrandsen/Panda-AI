@@ -2,27 +2,22 @@ import GlobalMemoryData from "../../Memory/global";
 
 export default class GlobalDataHelper {
   static GetMemory(): CRUDResult<Memory> {
-    const result = GlobalMemoryData.Get();
-    return result;
+    return GlobalMemoryData.Get();
   }
 
   static CreateMemory(memory: Memory): CRUDResult<Memory> {
-    const result = GlobalMemoryData.Update(memory);
-    return result;
+    return GlobalMemoryData.Update(memory);
   }
 
   static DeleteMemory(): CRUDResult<Memory> {
-    const result = GlobalMemoryData.Delete();
-    return result;
+    return GlobalMemoryData.Delete();
   }
 
   static UpdateMemory(memory: Memory): CRUDResult<Memory> {
-    const result = GlobalMemoryData.Update(memory);
-    return result;
+    return GlobalMemoryData.Update(memory);
   }
 
   static Initialize(): CRUDResult<Memory> {
-    const result = GlobalMemoryData.Initialize();
-    return result;
+    return GlobalMemoryData.Initialize();
   }
 }

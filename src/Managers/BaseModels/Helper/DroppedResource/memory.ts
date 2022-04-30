@@ -202,7 +202,7 @@ export default class DroppedResourceDataHelper {
     predicate?: Predicate<DroppedResourceCache>
   ): StringMap<DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache>> {
     return this.GetAll(
-      true,
+      false,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,

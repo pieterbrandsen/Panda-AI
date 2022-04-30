@@ -184,7 +184,7 @@ export default class StructureDataHelper {
     predicate2?: Predicate<StructureCache>
   ): StringMap<DoubleCRUDResult<StructureMemory, StructureCache>> {
     return this.GetAll(
-      true,
+      false,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,

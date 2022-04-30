@@ -190,7 +190,7 @@ export default class CreepData {
     predicate?: Predicate<CreepCache>
   ): StringMap<DoubleCRUDResult<CreepMemory, CreepCache>> {
     return this.GetAll(
-      true,
+      false,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,

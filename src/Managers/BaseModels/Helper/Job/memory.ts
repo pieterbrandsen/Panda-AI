@@ -203,7 +203,7 @@ export default class JobDataHelper {
     predicate?: Predicate<JobCache>
   ): StringMap<DoubleCRUDResult<JobMemory, JobCache>> {
     return this.GetAll(
-      true,
+      false,
       undefined,
       executer,
       getOnlyExecuterJobs,

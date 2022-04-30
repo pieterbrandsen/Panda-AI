@@ -1,5 +1,6 @@
 import { forEach, union } from "lodash";
 import RoomData from "../../Managers/BaseModels/Helper/Room/memory";
+import CreepData from "../../Managers/BaseModels/Helper/Creep/memory";
 import StructureData from "../../Managers/BaseModels/Helper/Structure/memory";
 import ControllerManager from "../../Managers/ControllerManager/interface";
 import MineralManager from "../../Managers/MineralManager/interface";
@@ -40,7 +41,7 @@ export default class RoomExecuter {
     const structuresData = StructureData.GetAllBasedOnCache("", false, [
       roomName,
     ]);
-    const creepsCache = RoomData.GetAllBasedOnCache("", false, [roomName]);
+    const creepsCache = CreepData.GetAllBasedOnCache("", false, [roomName]);
     StructureExecuter.ExecuterAllStructures(Object.keys(structuresData));
     CreepExecuter.ExecuterAllCreeps(Object.keys(creepsCache));
 
