@@ -24,7 +24,7 @@ export const loop = ErrorMapper.wrapLoop((): void => {
 
   RoomsExecuter.ExecuteAllRooms();
 
-  InitializeSpawnedCreeps();
+  new InitializeSpawnedCreeps().Handle();
   new ShardVision().Handle();
   new Market().HandleOrderEveryTick();
 

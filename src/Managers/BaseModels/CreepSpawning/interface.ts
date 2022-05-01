@@ -46,7 +46,7 @@ export default class CreepSpawning {
       CachePredicates.IsStructureType(STRUCTURE_SPAWN)
     );
     forEach(Object.keys(spawnsCache), (id) => {
-        const spawn = Game.getObjectById<StructureSpawn | null>(id);
+      const spawn = Game.getObjectById<StructureSpawn | null>(id);
       if (spawn) this.spawns.push(spawn);
     });
 

@@ -123,7 +123,8 @@ export default class Jobs {
     if (jobId === creepMemory.permJobId) {
       delete creepMemory.permJobId;
     }
-    if (!jobMemory.assignedCreeps.includes(creepId)) jobMemory.assignedCreeps.push(creepId);
+    if (!jobMemory.assignedCreeps.includes(creepId))
+      jobMemory.assignedCreeps.push(creepId);
     creepMemory.jobId = jobId;
     creepCache.executer = jobCache.executer;
     jobMemory.fromTargetId = creepId;
@@ -134,7 +135,9 @@ export default class Jobs {
 
     return CreepData.UpdateMemory(creepId, creepMemory, creepCache).success;
   }
+
   static AssignStructureJob(): void {}
+
   static AssignResourceJob(
     executer: string,
     objectId: string,
@@ -156,7 +159,7 @@ export default class Jobs {
       targetType = "Resource";
     }
     if (targetDataResult.success && targetInformation.originLevels) {
-      const thisLevel = targetInformation.originLevels as   StorageLevels;
+      const thisLevel = targetInformation.originLevels as StorageLevels;
       const targetMemory = targetDataResult.memory as
         | StructureMemory
         | DroppedResourceMemory;
@@ -165,7 +168,7 @@ export default class Jobs {
         | DroppedResourceCache;
       let amountRequired = 0;
       let amountTransferring = 0;
-      let id = targetInformation.id;
+      const { id } = targetInformation;
 
       const targetStructureInformation = targetInformation as BestStructureLoop;
       const targetResourceInformation = targetInformation as BestDroppedResourceLoop;
@@ -210,7 +213,7 @@ export default class Jobs {
       let jobData = JobData.GetMemory(jobId);
       if (!jobData.success) {
         jobData = JobData.Initialize({
-          executer: executer,
+          executer,
           pos: targetCache.pos,
           targetId: id,
           type: jobType,
@@ -236,22 +239,23 @@ export default class Jobs {
         StructureData.UpdateMemory(id, targetMemory);
       else DroppedResourceData.UpdateMemory(id, targetMemory);
       if (type === "Structure") {
-        return StructureData.UpdateMemory(objectId, memory as StructureMemory).success;
-      } else if (type === "Resource") {
+        return StructureData.UpdateMemory(objectId, memory as StructureMemory)
+          .success;
+      }
+      if (type === "Resource") {
         return DroppedResourceData.UpdateMemory(
           objectId,
           memory as DroppedResourceMemory
         ).success;
       }
-      else {
-        return this.AssignCreepJob(
-          objectId,
-          memory as CreepMemory,
-          cache as CreepCache,
-          jobId,
-          jobData.cache as JobCache
-        );
-      }
+
+      return this.AssignCreepJob(
+        objectId,
+        memory as CreepMemory,
+        cache as CreepCache,
+        jobId,
+        jobData.cache as JobCache
+      );
     }
 
     return true;
@@ -366,10 +370,7 @@ export default class Jobs {
     return undefined;
   }
 
-  static GetJobTypesToExecute(
-    creep: Creep,
-    creepType: CreepTypes,
-  ): JobTypes[] {
+  static GetJobTypesToExecute(creep: Creep, creepType: CreepTypes): JobTypes[] {
     if (creep.store.getUsedCapacity() > 0) {
       switch (creepType) {
         case "miner": {
@@ -411,15 +412,24 @@ export default class Jobs {
       roomNames = Object.keys(roomMemory.remoteRooms ?? {});
     }
 
-    const jobTypes = this.GetJobTypesToExecute(
-      creep,
-      creepCache.type,
-    );
+    const jobTypes = this.GetJobTypesToExecute(creep, creepCache.type);
     if (jobTypes.length === 0) {
       return false;
     }
-    else if (jobTypes.includes("TransferStructure")|| jobTypes.includes("TransferSpawn")) {
-      return this.FindResourceJob("Creep",creep, creepMemory, creepCache, jobTypes, roomNames,creepCache.executer,false);
+    if (
+      jobTypes.includes("TransferStructure") ||
+      jobTypes.includes("TransferSpawn")
+    ) {
+      return this.FindResourceJob(
+        "Creep",
+        creep,
+        creepMemory,
+        creepCache,
+        jobTypes,
+        roomNames,
+        creepCache.executer,
+        false
+      );
     }
 
     if (creepMemory.permJobId) {
@@ -453,12 +463,43 @@ export default class Jobs {
   static FindJobForStructure(structure: Structure): boolean {
     return false;
   }
-  static FindResourceJob(type:JobObjectExecuter, fromTarget: Creep | StructuresWithStorage,memory:CreepMemory|StructureMemory, cache:CreepCache|StructureCache, jobTypes:JobTypes[], roomNames:string[],executer:string,onlyLinks:boolean): boolean {
-    const isFromControllerOrSource = (memory.permJobId !== undefined && memory.permJobId.startsWith("Controller")) || (cache.type === "miner");
-    const targetInformation = new ResourceStorage(fromTarget,type,executer).FindTarget(true,true,onlyLinks,isFromControllerOrSource,isFromControllerOrSource? 3 : undefined);
+
+  static FindResourceJob(
+    type: JobObjectExecuter,
+    fromTarget: Creep | StructuresWithStorage,
+    memory: CreepMemory | StructureMemory,
+    cache: CreepCache | StructureCache,
+    jobTypes: JobTypes[],
+    roomNames: string[],
+    executer: string,
+    onlyLinks: boolean
+  ): boolean {
+    const isFromControllerOrSource =
+      (memory.permJobId !== undefined &&
+        memory.permJobId.startsWith("Controller")) ||
+      cache.type === "miner";
+    const targetInformation = new ResourceStorage(
+      fromTarget,
+      type,
+      executer
+    ).FindTarget(
+      true,
+      true,
+      onlyLinks,
+      isFromControllerOrSource,
+      isFromControllerOrSource ? 3 : undefined
+    );
     if (targetInformation === null) return false;
     const isSpending = fromTarget.store.getUsedCapacity(RESOURCE_ENERGY) > 0;
-    return this.AssignResourceJob(executer,targetInformation.id,isSpending,targetInformation,memory,cache,type)
+    return this.AssignResourceJob(
+      executer,
+      targetInformation.id,
+      isSpending,
+      targetInformation,
+      memory,
+      cache,
+      type
+    );
   }
 
   static UpdateAllData(room: Room): void {
