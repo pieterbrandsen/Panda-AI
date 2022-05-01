@@ -7,7 +7,7 @@ import ResetHeap from "./Managers/BaseModels/Helper/Heap/Reset";
 import HeapMemory from "./Managers/BaseModels/Heap/global";
 import InitializeSpawnedCreeps from "./Extra/InitalizeSpawnedCreeps";
 import HandleAllShardActions from "./Extra/HandleAllShardActions";
-import BuyOrders from "./Extra/BuyOrders";
+import Market from "./Extra/Market";
 
 // eslint-disable-next-line
 export const loop = ErrorMapper.wrapLoop((): void => {
@@ -26,7 +26,7 @@ export const loop = ErrorMapper.wrapLoop((): void => {
 
   InitializeSpawnedCreeps();
   HandleAllShardActions();
-  BuyOrders();
+  new Market().HandleEveryTickOrders();
 
   UpdateGlobalStats();
   ResetHeap.Reset();
