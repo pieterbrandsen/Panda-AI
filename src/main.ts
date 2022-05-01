@@ -6,7 +6,7 @@ import RoomsExecuter from "./Executers/Room/interface";
 import ResetHeap from "./Managers/BaseModels/Helper/Heap/Reset";
 import HeapMemory from "./Managers/BaseModels/Heap/global";
 import InitializeSpawnedCreeps from "./Extra/InitalizeSpawnedCreeps";
-import HandleAllShardActions from "./Extra/HandleAllShardActions";
+import ShardVision from "./Extra/ShardVision";
 import Market from "./Extra/Market";
 
 // eslint-disable-next-line
@@ -25,8 +25,8 @@ export const loop = ErrorMapper.wrapLoop((): void => {
   RoomsExecuter.ExecuteAllRooms();
 
   InitializeSpawnedCreeps();
-  HandleAllShardActions();
-  new Market().HandleEveryTickOrders();
+  new ShardVision().Handle();
+  new Market().HandleOrderEveryTick();
 
   UpdateGlobalStats();
   ResetHeap.Reset();

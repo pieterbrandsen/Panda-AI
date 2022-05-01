@@ -43,7 +43,7 @@ export default class Market {
       }
     }
   }
-  public HandleEveryTickOrders():void {
+  public HandleOrderEveryTick():void {
     if (Game.shard.name === this._mainShard) {
       this.SellCpuUnlock();
       this.BuyPixels();
