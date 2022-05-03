@@ -1,42 +1,24 @@
 import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
-export default class CreepTransferRole {
-  private structure: StructureLink;
-
-  private cache: StructureCache;
-
-  private memory: StructureMemory;
-
-  private jobCache: JobCache;
-
-  private jobMemory: JobMemory;
-
-  constructor(
-    structure: StructureLink,
-    cache: StructureCache,
-    memory: StructureMemory,
-    jobCache: JobCache,
-    jobMemory: JobMemory
-  ) {
-    this.structure = structure;
-    this.cache = cache;
-    this.memory = memory;
-    this.jobCache = jobCache;
-    this.jobMemory = jobMemory;
+export default class CreepTransferRoles<S extends Structure>  {
+  protected _structureInformation: StructureInformation<S>;
+  constructor(structureInformation: StructureInformation<S>) {
+    this._structureInformation = structureInformation;
   }
-
-  run(): JobResult {
+  
+  protected ExecuteLink(): JobResult {
+    const structure = this._structureInformation.structure as unknown as StructureLink;
     const target: StructureLink | null = Game.getObjectById(
-      this.jobMemory.targetId
+      this._structureInformation.jobMemory!.targetId
     );
     const from: StructureLink | null = Game.getObjectById(
-      this.jobMemory.fromTargetId ?? ""
+      this._structureInformation.jobMemory!.fromTargetId ?? ""
     );
     if (from && target) {
       const resource = RESOURCE_ENERGY;
       const amountToTransfer = Math.min(
         target.store.getFreeCapacity(resource),
-        this.structure.store.energy
+        structure.store.energy
       );
       if (
         target.store.getUsedCapacity(resource) === 0 ||
@@ -45,7 +27,7 @@ export default class CreepTransferRole {
         return "done";
       }
 
-      const result = this.structure.transferEnergy(target, amountToTransfer);
+      const result = structure.transferEnergy(target, amountToTransfer);
       switch (result) {
         case ERR_FULL:
           return "done";
@@ -53,9 +35,9 @@ export default class CreepTransferRole {
           return "empty";
         case OK:
           Jobs.UpdateAmount(
-            this.memory.jobId as string,
-            this.jobMemory,
-            this.jobCache,
+            this._structureInformation.memory!.jobId as string,
+            this._structureInformation.jobMemory!,
+            this._structureInformation.jobCache!,
             amountToTransfer
           );
           break;

@@ -2,46 +2,52 @@ import { clone } from "lodash";
 import BaseHeapData from "./interface";
 
 export default class StructureHeapData extends BaseHeapData {
-  private static type: HeapTypes = "Structure";
+    private _id: string;
+    constructor(id: string) {
+      super();
+      this._id = id;
+    }
 
-  static ValidateSingle(id: string): boolean {
-    return super.ValidateSingle(id, this.type);
+  private type: HeapTypes = "Structure";
+
+  protected ValidateSingleHeap(): boolean {
+    return super.ValidateSingle(this._id, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  static Generate(): StructureHeap {
+   protected GenerateHeap(): StructureHeap {
     return {};
   }
 
-  static Get(id: string): CRUDResult<StructureHeap> {
-    const data = clone(global.StructuresData[id]);
+  protected GetHeap(): CRUDResult<StructureHeap> {
+    const data = clone(global.StructuresData[this._id]);
     return { success: !!data, data };
   }
 
-  static Create(id: string, data: StructureHeap): CRUDResult<StructureHeap> {
-    const dataAtId = this.Get(id);
+  protected CreateHeap(data: StructureHeap): CRUDResult<StructureHeap> {
+    const dataAtId = this.GetHeap();
     if (dataAtId.success) {
       return { success: false, data: dataAtId.data };
     }
-    const result = this.Update(id, data);
+    const result = this.UpdateHeap(data);
     return { success: result.success, data: clone(result.data) };
   }
 
-  static Update(id: string, data: StructureHeap): CRUDResult<StructureHeap> {
-    global.StructuresData[id] = data;
+  protected UpdateHeap(data: StructureHeap): CRUDResult<StructureHeap> {
+    global.StructuresData[this._id] = data;
     return { success: true, data };
   }
 
-  static Delete(id: string): CRUDResult<StructureHeap> {
-    delete global.StructuresData[id];
+  protected DeleteHeap(): CRUDResult<StructureHeap> {
+    delete global.StructuresData[this._id];
     return { success: true, data: undefined };
   }
 
-  static Initialize(id: string): CRUDResult<StructureHeap> {
-    const data = this.Generate();
-    const result = this.Create(id, data);
+  protected InitializeHeap(): CRUDResult<StructureHeap> {
+    const data = this.GenerateHeap();
+    const result = this.CreateHeap(data);
     return { success: result.success, data: result.data };
   }
 }

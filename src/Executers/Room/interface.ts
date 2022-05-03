@@ -42,7 +42,7 @@ export default class RoomExecuter {
       roomName,
     ]);
     const creepsCache = CreepData.GetAllBasedOnCache("", false, [roomName]);
-    StructureExecuter.ExecuterAllStructures(Object.keys(structuresData));
+    new StructureExecuter().ExecuteAllStructures(Object.keys(structuresData));
     CreepExecuter.ExecuterAllCreeps(Object.keys(creepsCache));
 
     const room = Game.rooms[roomName];
