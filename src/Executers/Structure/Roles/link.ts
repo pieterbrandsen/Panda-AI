@@ -1,13 +1,15 @@
 import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
-export default class CreepTransferRoles<S extends Structure>  {
+export default class CreepTransferRoles<S extends Structure> {
   protected _structureInformation: StructureInformation<S>;
+
   constructor(structureInformation: StructureInformation<S>) {
     this._structureInformation = structureInformation;
   }
-  
-  protected ExecuteLink(): JobResult {
-    const structure = this._structureInformation.structure as unknown as StructureLink;
+
+  public ExecuteLink(): JobResult {
+    const structure = (this._structureInformation
+      .structure as unknown) as StructureLink;
     const target: StructureLink | null = Game.getObjectById(
       this._structureInformation.jobMemory!.targetId
     );

@@ -2,15 +2,17 @@ import JobData from "../../Managers/BaseModels/Helper/Job/memory";
 
 export default class StructureRepair<S extends Structure> {
   protected _structureInformation: StructureInformation<S>;
-    constructor(structureInformation: StructureInformation<S>) {
-      this._structureInformation = structureInformation;
-    }
+
+  constructor(structureInformation: StructureInformation<S>) {
+    this._structureInformation = structureInformation;
+  }
+
   private GetMissingHits(): number {
     const structure = this._structureInformation.structure!;
     return structure.hitsMax - structure.hits;
   }
 
-  protected CreateRepairJobIfNeeded(): boolean {
+  public CreateRepairJobIfNeeded(): boolean {
     const structure = this._structureInformation.structure!;
     const cache = this._structureInformation.cache!;
     const missingHits = this.GetMissingHits();

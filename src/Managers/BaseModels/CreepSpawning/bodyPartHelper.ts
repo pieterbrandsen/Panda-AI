@@ -166,7 +166,7 @@ export default class CreepBodyPartHelper {
             }
             break;
           case "TransferStructure":
-          case "WithdrawStructure":
+          case "PickupResource":
           case "WithdrawResource":
             bodyPart = CreepBodyPartHelper.GetBodyPartForJobType(cache.type);
             amount = memory.amountToTransfer ?? 0;
@@ -261,7 +261,7 @@ export default class CreepBodyPartHelper {
       case "TransferSpawn":
       case "TransferStructure":
       case "WithdrawResource":
-      case "WithdrawStructure":
+      case "PickupResource":
         return CARRY;
       case "ReserveController":
         return CLAIM;
@@ -310,7 +310,7 @@ export default class CreepBodyPartHelper {
       case "HarvestSource":
       case "HarvestMineral":
         return "miner";
-      case "WithdrawStructure":
+      case "PickupResource":
       case "WithdrawResource":
       case "TransferSpawn":
       case "TransferStructure":

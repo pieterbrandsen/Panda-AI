@@ -2,22 +2,23 @@ import { clone } from "lodash";
 import BaseHeapData from "./interface";
 
 export default class StructureHeapData extends BaseHeapData {
-    private _id: string;
-    constructor(id: string) {
-      super();
-      this._id = id;
-    }
+  private _id: string;
+
+  constructor(id: string) {
+    super();
+    this._id = id;
+  }
 
   private type: HeapTypes = "Structure";
 
   protected ValidateSingleHeap(): boolean {
-    return super.ValidateSingle(this._id, this.type);
+    return super.ValidateSingleHeap(this._id, this.type);
   }
 
   /**
    * Create an new object of this type
    */
-   protected GenerateHeap(): StructureHeap {
+  protected GenerateHeap(): StructureHeap {
     return {};
   }
 

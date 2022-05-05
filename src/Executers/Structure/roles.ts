@@ -1,11 +1,14 @@
+import { Mixin } from "ts-mixer";
 import LinkRole from "./Roles/link";
 import Jobs from "../../Managers/BaseModels/Jobs/interface";
 import StructureHandler from "../../Managers/BaseModels/Heap/structure";
 import { StructuresWithRole } from "./constants";
-import { Mixin } from 'ts-mixer';
 
-export default class StructureRoles<S extends Structure> extends Mixin(LinkRole) {
+export default class StructureRoles<S extends Structure> extends Mixin(
+  LinkRole
+) {
   protected _structureInformation: StructureInformation<S>;
+
   constructor(structureInformation: StructureInformation<S>) {
     super(structureInformation);
     this._structureInformation = structureInformation;
@@ -14,8 +17,11 @@ export default class StructureRoles<S extends Structure> extends Mixin(LinkRole)
   private HandleRole(): JobResult {
     switch (this._structureInformation.jobCache!.type) {
       case "TransferStructure":
-        if (this._structureInformation.structure!.structureType !== STRUCTURE_LINK) return "done";
-        return super.ExecuteLink();
+        if (
+          this._structureInformation.structure!.structureType !== STRUCTURE_LINK
+        )
+          return "done";
+        return this.ExecuteLink();
       default:
         return "done";
     }
@@ -27,7 +33,7 @@ export default class StructureRoles<S extends Structure> extends Mixin(LinkRole)
     if (StructuresWithRole.includes(structure.structureType)) {
       const result = this.HandleRole();
       const structureId = structure.id;
-      const structureMemory =this._structureInformation.memory!;
+      const structureMemory = this._structureInformation.memory!;
       switch (result) {
         case "done":
           Jobs.UnassignStructureJob(structureId, structureMemory, false);
@@ -42,6 +48,6 @@ export default class StructureRoles<S extends Structure> extends Mixin(LinkRole)
         default:
           break;
       }
-  }
+    }
   }
 }

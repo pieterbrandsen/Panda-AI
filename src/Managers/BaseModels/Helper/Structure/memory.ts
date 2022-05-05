@@ -3,16 +3,18 @@ import StructureMemoryData from "../../Memory/structure";
 import StructureCacheData from "../../Cache/structure";
 import StructureHeapData from "../../Heap/structure";
 
-export default class StructureDataHelper<S extends Structure> extends StructureHeapData {
+export default class StructureDataHelper<
+  S extends Structure
+> extends StructureHeapData {
   protected _structureInformation: StructureInformation<S>;
+
   constructor(structureInformation: StructureInformation<S>) {
     super(structureInformation.structure!.id);
     this._structureInformation = structureInformation;
   }
 
-  protected GetData(
-  ): DoubleCRUDResult<StructureMemory, StructureCache> {
-    const id = this._structureInformation.structure!.id;
+  protected GetData(): DoubleCRUDResult<StructureMemory, StructureCache> {
+    const { id } = this._structureInformation;
     const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
@@ -35,7 +37,7 @@ export default class StructureDataHelper<S extends Structure> extends StructureH
     memory: StructureMemory,
     cache: StructureCache
   ): DoubleCRUDResult<StructureMemory, StructureCache> {
-    const id = this._structureInformation.structure!.id;
+    const { id } = this._structureInformation;
     const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
@@ -61,7 +63,7 @@ export default class StructureDataHelper<S extends Structure> extends StructureH
     isMemory: boolean,
     isCache: boolean
   ): DoubleCRUDResult<StructureMemory, StructureCache> {
-    const id = this._structureInformation.structure!.id;
+    const { id } = this._structureInformation;
     const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
@@ -88,7 +90,7 @@ export default class StructureDataHelper<S extends Structure> extends StructureH
     memory?: StructureMemory,
     cache?: StructureCache
   ): DoubleCRUDResult<StructureMemory, StructureCache> {
-    const id = this._structureInformation.structure!.id;
+    const { id } = this._structureInformation;
     const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
@@ -139,7 +141,7 @@ export default class StructureDataHelper<S extends Structure> extends StructureH
     return result;
   }
 
-  private GetAllData(
+  public static GetAllData(
     isMemory: boolean,
     executer?: string,
     getOnlyExecuterJobs?: boolean,
@@ -177,13 +179,13 @@ export default class StructureDataHelper<S extends Structure> extends StructureH
     return result;
   }
 
-  protected GetAllDataBasedOnMemory(
+  public static GetAllDataBasedOnMemory(
     predicate?: Predicate<StructureMemory>
   ): StringMap<DoubleCRUDResult<StructureMemory, StructureCache>> {
     return this.GetAllData(true, undefined, undefined, undefined, predicate);
   }
 
-  protected GetAllDataBasedOnCache(
+  public static GetAllDataBasedOnCache(
     executer = "",
     getOnlyExecuterJobs = false,
     roomsToCheck?: string[],

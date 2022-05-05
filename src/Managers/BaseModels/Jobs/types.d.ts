@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-interface, @typescript-eslint/no-unused-vars */
 type IncomingJobTypes =
   | "HarvestSource"
-  | "WithdrawStructure"
+  | "PickupResource"
   | "WithdrawResource"
   | "HarvestMineral";
 type OutgoingJobTypes =
@@ -17,6 +17,7 @@ type JobTypeTypes = "Incoming" | "Outgoing" | "Other";
 type JobTypes = IncomingJobTypes | OutgoingJobTypes | OtherJobTypes;
 
 type JobObjectExecuter = "Creep" | "Structure" | "Resource";
+type JobResult = "continue" | "done" | "empty" | "full";
 
 interface JobMemory extends BaseMemory {
   pos: FreezedRoomPosition;

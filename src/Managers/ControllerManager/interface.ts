@@ -1,6 +1,6 @@
 import RoomHelper from "../BaseModels/Helper/Room/interface";
 import JobDataHelper from "../BaseModels/Helper/Job/memory";
-import RoomDataHelper from "../BaseModels/Helper/Room/memory";
+import RoomData from "../BaseModels/Helper/Room/memory";
 import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControllerStructure";
 
 export default class ControllerManager {
@@ -70,8 +70,5 @@ export default class ControllerManager {
       return;
 
     this.UpdateController();
-    if (this.updatedMemory) {
-      RoomDataHelper.UpdateMemory(this.room.name, this.memory);
-    }
   }
 }

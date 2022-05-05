@@ -205,9 +205,9 @@ export default class Jobs {
         ? "TransferSpawn"
         : "TransferStructure";
       if (targetType === "Resource") {
-        jobType = "WithdrawResource";
+        jobType = "PickupResource";
       } else if (!isSpending) {
-        jobType = "WithdrawStructure";
+        jobType = "WithdrawResource";
       }
       const jobId = JobData.GetJobId(jobType, targetCache.pos);
       let jobData = JobData.GetMemory(jobId);
@@ -575,7 +575,7 @@ export default class Jobs {
       // break;
       case "TransferSpawn":
       case "TransferStructure":
-      case "WithdrawStructure":
+      case "PickupResource":
       case "WithdrawResource":
         {
           const target = Game.getObjectById<Structure | null>(

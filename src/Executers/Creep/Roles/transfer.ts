@@ -1,39 +1,26 @@
 import IJobs from "../../../Managers/BaseModels/Jobs/interface";
 
-export default class CreepTransferRole {
-  private creep: Creep;
+export default class CreepTransferResourceRole {
+  protected _creepInformation: CreepInformation;
 
-  private creepCache: CreepCache;
-
-  private creepMemory: CreepMemory;
-
-  private jobCache: JobCache;
-
-  private jobMemory: JobMemory;
-
-  constructor(
-    creep: Creep,
-    creepCache: CreepCache,
-    creepMemory: CreepMemory,
-    jobCache: JobCache,
-    jobMemory: JobMemory
-  ) {
-    this.creep = creep;
-    this.creepCache = creepCache;
-    this.creepMemory = creepMemory;
-    this.jobCache = jobCache;
-    this.jobMemory = jobMemory;
+  constructor(creepInformation: CreepInformation) {
+    this._creepInformation = creepInformation;
   }
 
-  run(): JobResult {
+  ExecuteTransferResourceRole(): JobResult {
+    const creep = this._creepInformation.creep!;
     const resource: ResourceConstant = RESOURCE_ENERGY;
-    const target: StructuresWithStorage | null = Game.getObjectById(
-      this.jobMemory.targetId
-    );
+    const target = Game.getObjectById(
+      this._creepInformation.jobMemory!.targetId
+    ) as StructuresWithStorage | null;
 
     if (
-      this.creepMemory.energyOutgoing[this.jobMemory.targetId] === 0 ||
-      !this.creepMemory.energyOutgoing[this.jobMemory.targetId]
+      this._creepInformation.memory!.energyOutgoing[
+        this._creepInformation.jobMemory!.targetId
+      ] === 0 ||
+      !this._creepInformation.memory!.energyOutgoing[
+        this._creepInformation.jobMemory!.targetId
+      ]
     )
       return "empty";
 
@@ -44,12 +31,12 @@ export default class CreepTransferRole {
 
       const amountToTransfer = Math.min(
         target.store.getFreeCapacity(resource),
-        this.creep.store.energy
+        creep.store.energy
       );
-      const result = this.creep.transfer(target, resource, amountToTransfer);
+      const result = creep.transfer(target, resource, amountToTransfer);
       switch (result) {
         case ERR_NOT_IN_RANGE:
-          this.creep.moveTo(target);
+          creep.moveTo(target);
           break;
         case ERR_FULL:
           return "done";
@@ -57,9 +44,9 @@ export default class CreepTransferRole {
           return "empty";
         case OK:
           IJobs.UpdateAmount(
-            this.creepMemory.jobId as string,
-            this.jobMemory,
-            this.jobCache,
+            this._creepInformation.memory!.jobId as string,
+            this._creepInformation.jobMemory!,
+            this._creepInformation.jobCache!,
             amountToTransfer
           );
           break;

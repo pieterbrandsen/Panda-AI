@@ -3,7 +3,7 @@ export default class JobConstants {
     "HarvestMineral",
     "HarvestSource",
     "WithdrawResource",
-    "WithdrawStructure",
+    "PickupResource",
   ];
 
   static OutgoingJobTypes: OutgoingJobTypes[] = [

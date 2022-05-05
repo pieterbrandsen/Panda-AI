@@ -1,7 +1,8 @@
-interface StructureInformation<S extends Structure> { 
-    structure?: S;
-    memory?: StructureMemory;
-    cache?: StructureCache;
-    jobCache?: JobCache;
-    jobMemory?: JobMemory;
+interface StructureInformation<S extends Structure> {
+  id: string;
+  structure: S | null;
+  memory?: StructureMemory;
+  cache?: StructureCache;
+  jobCache?: JobCache;
+  jobMemory?: JobMemory;
 }

@@ -50,7 +50,7 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
         HarvestMineral: 0,
         HarvestSource: 0,
         WithdrawResource: 0,
-        WithdrawStructure: 0,
+        PickupResource: 0,
       },
       energyOutgoing: {
         Build: 0,

@@ -4,7 +4,7 @@
 // TODO: CRUD
 
 export default class HeapData {
-  protected ValidateSingle(id: string, type: HeapTypes): boolean {
+  protected ValidateSingleHeap(id: string, type: HeapTypes): boolean {
     switch (type) {
       case "Creep":
         return global.CreepsData[id] !== undefined;

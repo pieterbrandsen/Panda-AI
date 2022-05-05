@@ -1,1 +1,1 @@
-export const StructuresWithRole:StructureConstant[] = [STRUCTURE_LINK];
+export const StructuresWithRole: StructureConstant[] = [STRUCTURE_LINK];

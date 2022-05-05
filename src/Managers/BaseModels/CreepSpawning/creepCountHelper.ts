@@ -97,7 +97,7 @@ export default class CreepCountHelper {
             }
             break;
           case "TransferStructure":
-          case "WithdrawStructure":
+          case "PickupResource":
           case "WithdrawResource":
             amount = memory.maxCreepsCount ?? 1;
             break;

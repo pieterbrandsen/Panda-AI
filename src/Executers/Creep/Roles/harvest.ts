@@ -1,65 +1,50 @@
 import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
 export default class CreepHarvestRole {
-  private creep: Creep;
+  protected _creepInformation: CreepInformation;
 
-  private creepCache: CreepCache;
-
-  private creepMemory: CreepMemory;
-
-  private jobCache: JobCache;
-
-  private jobMemory: JobMemory;
-
-  constructor(
-    creep: Creep,
-    creepCache: CreepCache,
-    creepMemory: CreepMemory,
-    jobCache: JobCache,
-    jobMemory: JobMemory
-  ) {
-    this.creep = creep;
-    this.creepCache = creepCache;
-    this.creepMemory = creepMemory;
-    this.jobCache = jobCache;
-    this.jobMemory = jobMemory;
+  constructor(creepInformation: CreepInformation) {
+    this._creepInformation = creepInformation;
   }
 
-  run(): JobResult {
+  ExecuteHarvestRole(): JobResult {
+    const creep = this._creepInformation.creep!;
     if (
-      this.creepCache.body.carry > 0 &&
-      this.creep.store.getFreeCapacity() === 0
+      this._creepInformation.cache!.body.carry > 0 &&
+      creep.store.getFreeCapacity() === 0
     ) {
-      if (this.jobCache.type === "HarvestSource") {
-        // if (
-        //   !new IResourceStorage(
-        //     this.creep,
-        //     "Creep",
-        //     this.creepCache.executer
-        //   ).Manage(false, true, false, true, 3)
-        // ) {
-        //   this.creep.drop(RESOURCE_ENERGY);
-        // }
-        // return "continue";
-      }
+      // if (this.jobCache.type === "HarvestSource") {
+      // if (
+      //   !new IResourceStorage(
+      //     this.creep,
+      //     "Creep",
+      //     this.creepCache.executer
+      //   ).Manage(false, true, false, true, 3)
+      // ) {
+      //   this.creep.drop(RESOURCE_ENERGY);
+      // }
+      // return "continue";
+      // }
       return "full";
     }
 
-    const target: Source | null = Game.getObjectById(this.jobMemory.targetId);
+    const target = Game.getObjectById(
+      this._creepInformation.jobMemory!.targetId
+    ) as Source | null;
     if (target) {
-      const result = this.creep.harvest(target);
+      const result = creep.harvest(target);
       switch (result) {
         case ERR_NOT_IN_RANGE:
-          this.creep.moveTo(target);
+          creep.moveTo(target);
           break;
         case OK:
           Jobs.UpdateAmount(
-            this.creepMemory.jobId as string,
-            this.jobMemory,
-            this.jobCache,
-            this.jobCache.type === "HarvestMineral"
-              ? this.creepCache.body.work
-              : this.creepCache.body.work * 2
+            this._creepInformation.memory!.jobId as string,
+            this._creepInformation.jobMemory!,
+            this._creepInformation.jobCache!,
+            this._creepInformation.jobCache!.type === "HarvestMineral"
+              ? this._creepInformation.cache!.body.work
+              : this._creepInformation.cache!.body.work * 2
           );
           break;
         // skip default case

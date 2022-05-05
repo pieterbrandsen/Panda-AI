@@ -1,24 +1,29 @@
 import { forEach } from "lodash";
 import RoomMemoryData from "../../Memory/room";
 import RoomCacheData from "../../Cache/room";
+import RoomHeapData from "../../Heap/room";
 
-export default class RoomDataHelper {
-  static GetId(name: string): string {
-    return name;
+export default class RoomData extends RoomHeapData {
+  protected _roomInformation: RoomInformation;
+
+  constructor(roomInformation: RoomInformation) {
+    super(roomInformation.name);
+    this._roomInformation = roomInformation;
   }
 
-  static GetMemory(id: string): DoubleCRUDResult<RoomMemory, RoomCache> {
+  protected GetData(): DoubleCRUDResult<RoomMemory, RoomCache> {
+    const { name } = this._roomInformation;
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = RoomMemoryData.Get(id);
+    const memoryResult = RoomMemoryData.Get(name);
     if (memoryResult.success) {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = RoomCacheData.Get(id);
+    const cacheResult = RoomCacheData.Get(name);
     if (cacheResult.success) {
       result.success = true;
       result.cache = cacheResult.data;
@@ -26,24 +31,24 @@ export default class RoomDataHelper {
     return result;
   }
 
-  static CreateMemory(
-    id: string,
+  protected CreateData(
     memory: RoomMemory,
     cache: RoomCache
   ): DoubleCRUDResult<RoomMemory, RoomCache> {
+    const { name } = this._roomInformation;
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
-    const memoryResult = RoomMemoryData.Create(id, memory);
+    const memoryResult = RoomMemoryData.Create(name, memory);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
       result.success = true;
     }
 
-    const cacheResult = RoomCacheData.Create(id, cache);
+    const cacheResult = RoomCacheData.Create(name, cache);
     if (cacheResult.success && result.success) {
       result.cache = cacheResult.data;
       result.success = true;
@@ -52,25 +57,25 @@ export default class RoomDataHelper {
     return result;
   }
 
-  static DeleteMemory(
-    id: string,
+  protected DeleteData(
     isMemory: boolean,
     isCache: boolean
   ): DoubleCRUDResult<RoomMemory, RoomCache> {
+    const { name } = this._roomInformation;
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
     if (isMemory) {
-      const deleteResult = RoomMemoryData.Delete(id);
+      const deleteResult = RoomMemoryData.Delete(name);
       if (deleteResult.success) {
         result.success = true;
         result.memory = deleteResult.data;
       }
     }
     if (isCache && result.success) {
-      const deleteResult = RoomCacheData.Delete(id);
+      const deleteResult = RoomCacheData.Delete(name);
       if (deleteResult.success) {
         result.success = true;
         result.cache = deleteResult.data;
@@ -79,11 +84,11 @@ export default class RoomDataHelper {
     return result;
   }
 
-  static UpdateMemory(
-    id: string,
+  protected UpdateData(
     memory?: RoomMemory,
     cache?: RoomCache
   ): DoubleCRUDResult<RoomMemory, RoomCache> {
+    const { name } = this._roomInformation;
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
@@ -91,14 +96,14 @@ export default class RoomDataHelper {
     };
 
     if (memory) {
-      const updateResult = RoomMemoryData.Update(id, memory);
+      const updateResult = RoomMemoryData.Update(name, memory);
       if (updateResult.success) {
         result.success = true;
         result.memory = updateResult.data;
       }
     }
     if (cache && result.success) {
-      const updateResult = RoomCacheData.Update(id, cache);
+      const updateResult = RoomCacheData.Update(name, cache);
       if (updateResult.success) {
         result.success = true;
         result.cache = updateResult.data;
@@ -108,32 +113,32 @@ export default class RoomDataHelper {
     return result;
   }
 
-  static UpdateControllerMemory(
-    id: string,
+  protected UpdateControllerMemory(
     data: ControllerMemory
   ): CRUDResult<ControllerMemory> {
-    return RoomMemoryData.UpdateControllerMemory(id, data);
+    const { name } = this._roomInformation;
+    return RoomMemoryData.UpdateControllerMemory(name, data);
   }
 
-  static UpdateSourceMemory(
-    roomId: string,
-    sourceId: string,
+  protected UpdateSourceMemory(
+    sourceName: string,
     data: SourceMemory
   ): CRUDResult<SourceMemory> {
-    return RoomMemoryData.UpdateSourceMemory(roomId, sourceId, data);
+    const { name } = this._roomInformation;
+    return RoomMemoryData.UpdateSourceMemory(name, sourceName, data);
   }
 
-  static Initialize(
+  protected InitializeData(
     data: RoomInitializationData
   ): DoubleCRUDResult<RoomMemory, RoomCache> {
-    const id = this.GetId(data.room.name);
+    const { name } = this._roomInformation;
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
     const memoryResult = RoomMemoryData.Initialize(
-      id,
+      name,
       data.room,
       data.remoteRooms
     );
@@ -141,7 +146,7 @@ export default class RoomDataHelper {
       result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = RoomCacheData.Initialize(id);
+    const cacheResult = RoomCacheData.Initialize(name);
     if (cacheResult.success && result.success) {
       result.success = true;
       result.cache = cacheResult.data;
@@ -150,7 +155,7 @@ export default class RoomDataHelper {
     return result;
   }
 
-  private static GetAll(
+  public static GetAllData(
     isMemory: boolean,
     executer?: string,
     getOnlyExecuterJobs?: boolean,
@@ -159,7 +164,7 @@ export default class RoomDataHelper {
     predicateCache?: Predicate<RoomCache>
   ): StringMap<DoubleCRUDResult<RoomMemory, RoomCache>> {
     const result: StringMap<DoubleCRUDResult<RoomMemory, RoomCache>> = {};
-    const ids = Object.keys(
+    const names = Object.keys(
       isMemory
         ? RoomMemoryData.GetAll(predicateMemory)
         : RoomCacheData.GetAll(
@@ -169,11 +174,11 @@ export default class RoomDataHelper {
             predicateCache
           )
     );
-    forEach(ids, (id) => {
-      const memoryResult = RoomMemoryData.Get(id);
-      const cacheResult = RoomCacheData.Get(id);
+    forEach(names, (name) => {
+      const memoryResult = RoomMemoryData.Get(name);
+      const cacheResult = RoomCacheData.Get(name);
       if (memoryResult.success && cacheResult.success) {
-        result[id] = {
+        result[name] = {
           success: true,
           memory: memoryResult.data,
           cache: cacheResult.data,
@@ -184,19 +189,19 @@ export default class RoomDataHelper {
     return result;
   }
 
-  static GetAllBasedOnMemory(
+  public static GetAllDataBasedOnMemory(
     predicate?: Predicate<RoomMemory>
   ): StringMap<DoubleCRUDResult<RoomMemory, RoomCache>> {
-    return this.GetAll(true, undefined, undefined, undefined, predicate);
+    return this.GetAllData(true, undefined, undefined, undefined, predicate);
   }
 
-  static GetAllBasedOnCache(
+  static GetAllDataBasedOnCache(
     executer = "",
     getOnlyExecuterJobs = false,
     roomsToCheck?: string[],
     predicate?: Predicate<RoomCache>
   ): StringMap<DoubleCRUDResult<RoomMemory, RoomCache>> {
-    return this.GetAll(
+    return this.GetAllData(
       false,
       executer,
       getOnlyExecuterJobs,

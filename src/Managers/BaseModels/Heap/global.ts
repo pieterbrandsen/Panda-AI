@@ -2,20 +2,20 @@ import { forEach } from "lodash";
 import BaseHeapData from "./interface";
 
 export default class GlobalHeapData extends BaseHeapData {
-  private static type: HeapTypes = "Global";
+  private type: HeapTypes = "Global";
 
-  static MinimumVersion(): number {
+  protected MinimumVersion(): number {
     return 0;
   }
 
-  static ValidateSingle(): boolean {
-    return super.ValidateSingle("", this.type);
+  protected ValidateSingle(): boolean {
+    return super.ValidateSingleHeap("", this.type);
   }
 
   /**
    * Create an new object of this type
    */
-  static Generate(): GlobalData {
+  protected Generate(): GlobalData {
     return {
       Version: 0,
       CreepsData: {},
@@ -24,7 +24,7 @@ export default class GlobalHeapData extends BaseHeapData {
     };
   }
 
-  static Get(): CRUDResult<GlobalData> {
+  protected Get(): CRUDResult<GlobalData> {
     const data: GlobalData = {
       CreepsData: global.CreepsData,
       RoomsData: global.RoomsData,
@@ -34,14 +34,14 @@ export default class GlobalHeapData extends BaseHeapData {
     return { success: !!data, data };
   }
 
-  static Update(data: GlobalData): CRUDResult<GlobalData> {
+  protected Update(data: GlobalData): CRUDResult<GlobalData> {
     forEach(data, (value: unknown, key: string) => {
       global[key] = value;
     });
     return { success: true, data };
   }
 
-  static Initialize(): boolean {
+  protected Initialize(): boolean {
     return this.Update(this.Generate()).success;
   }
 }

@@ -1,54 +1,37 @@
 import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
 export default class CreepRepairRole {
-  private creep: Creep;
+  protected _creepInformation: CreepInformation;
 
-  private creepCache: CreepCache;
-
-  private creepMemory: CreepMemory;
-
-  private jobCache: JobCache;
-
-  private jobMemory: JobMemory;
-
-  constructor(
-    creep: Creep,
-    creepCache: CreepCache,
-    creepMemory: CreepMemory,
-    jobCache: JobCache,
-    jobMemory: JobMemory
-  ) {
-    this.creep = creep;
-    this.creepCache = creepCache;
-    this.creepMemory = creepMemory;
-    this.jobCache = jobCache;
-    this.jobMemory = jobMemory;
+  constructor(creepInformation: CreepInformation) {
+    this._creepInformation = creepInformation;
   }
 
-  run(): JobResult {
-    if (this.creep.store.getUsedCapacity() === 0) {
+  ExecuteRepairRole(): JobResult {
+    const creep = this._creepInformation.creep!;
+    if (creep.store.getUsedCapacity() === 0) {
       return "empty";
     }
-    const target: Structure | null = Game.getObjectById(
-      this.jobMemory.targetId
-    );
+    const target = Game.getObjectById(
+      this._creepInformation.jobMemory!.targetId
+    ) as Structure | null;
 
-    if ((this.jobMemory.amountToTransfer ?? 0) <= 0) {
+    if ((this._creepInformation.jobMemory!.amountToTransfer ?? 0) <= 0) {
       return "done";
     }
 
     if (target) {
-      const result = this.creep.repair(target);
+      const result = creep.repair(target);
       switch (result) {
         case ERR_NOT_IN_RANGE:
-          this.creep.moveTo(target);
+          creep.moveTo(target);
           break;
         case OK:
           Jobs.UpdateAmount(
-            this.creepMemory.jobId as string,
-            this.jobMemory,
-            this.jobCache,
-            this.creepCache.body.work * 100
+            this._creepInformation.memory!.jobId ?? "",
+            this._creepInformation.jobMemory!,
+            this._creepInformation.jobCache!,
+            this._creepInformation.cache!.body.work * 100
           );
           break;
         // skip default case

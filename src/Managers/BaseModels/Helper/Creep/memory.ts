@@ -1,9 +1,18 @@
 import { forEach } from "lodash";
 import CreepMemoryData from "../../Memory/creep";
 import CreepCacheData from "../../Cache/creep";
+import CreepHeapData from "../../Heap/creep";
 
-export default class CreepData {
-  static GetMemory(id: string): DoubleCRUDResult<CreepMemory, CreepCache> {
+export default class CreepData extends CreepHeapData {
+  protected _creepInformation: CreepInformation;
+
+  constructor(creepInformation: CreepInformation) {
+    super(creepInformation.id);
+    this._creepInformation = creepInformation;
+  }
+
+  protected GetData(): DoubleCRUDResult<CreepMemory, CreepCache> {
+    const { id } = this._creepInformation;
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
@@ -22,11 +31,11 @@ export default class CreepData {
     return result;
   }
 
-  static CreateMemory(
-    id: string,
+  protected CreateData(
     memory: CreepMemory,
     cache: CreepCache
   ): DoubleCRUDResult<CreepMemory, CreepCache> {
+    const { id } = this._creepInformation;
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
@@ -48,11 +57,11 @@ export default class CreepData {
     return result;
   }
 
-  static DeleteMemory(
-    id: string,
+  protected DeleteData(
     isMemory: boolean,
     isCache: boolean
   ): DoubleCRUDResult<CreepMemory, CreepCache> {
+    const { id } = this._creepInformation;
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
@@ -82,11 +91,11 @@ export default class CreepData {
     return result;
   }
 
-  static UpdateMemory(
-    id: string,
+  protected UpdateData(
     memory?: CreepMemory,
     cache?: CreepCache
   ): DoubleCRUDResult<CreepMemory, CreepCache> {
+    const { id } = this._creepInformation;
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
@@ -111,7 +120,7 @@ export default class CreepData {
     return result;
   }
 
-  static Initialize(
+  protected InitializeData(
     data: CreepInitializationData
   ): DoubleCRUDResult<CreepMemory, CreepCache> {
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
@@ -143,7 +152,7 @@ export default class CreepData {
     return result;
   }
 
-  private static GetAll(
+  public static GetAllData(
     isMemory: boolean,
     executer?: string,
     getOnlyExecuterJobs?: boolean,
@@ -177,19 +186,19 @@ export default class CreepData {
     return result;
   }
 
-  static GetAllBasedOnMemory(
+  public static GetAllDataBasedOnMemory(
     predicate?: Predicate<CreepMemory>
   ): StringMap<DoubleCRUDResult<CreepMemory, CreepCache>> {
-    return this.GetAll(true, undefined, undefined, undefined, predicate);
+    return this.GetAllData(true, undefined, undefined, undefined, predicate);
   }
 
-  static GetAllBasedOnCache(
+  public static GetAllDataBasedOnCache(
     executer = "",
     getOnlyExecuterJobs = false,
     roomsToCheck?: string[],
     predicate?: Predicate<CreepCache>
   ): StringMap<DoubleCRUDResult<CreepMemory, CreepCache>> {
-    return this.GetAll(
+    return this.GetAllData(
       false,
       executer,
       getOnlyExecuterJobs,
