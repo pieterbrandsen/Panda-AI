@@ -4,31 +4,19 @@ import RoomData from "../BaseModels/Helper/Room/memory";
 import DroppedResourceData from "../BaseModels/Helper/DroppedResource/memory";
 import Jobs from "../BaseModels/Jobs/interface";
 
-export default class SourceManager {
-  private updatedMemory = false;
+export default class RoomDroppedResourceManager {
+  protected _executer: string;
+  protected _roomInformation: RoomInformation;
 
-  private executer: string;
-
-  private room: Room;
-
-  private memory: RoomMemory;
-
-  private managerMemory: DroppedResourceManager;
-
-  private cache: RoomCache;
-
-  constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
-    this.room = Game.rooms[roomName];
-    this.memory = roomMemory;
-    this.cache = roomCache;
-    this.managerMemory = this.memory.droppedResourceManager;
-
-    this.executer = RoomHelper.GetExecuter(this.room.name, "Source");
+  constructor(roomInformation: RoomInformation) {
+    this._roomInformation = roomInformation;
+    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "DroppedResource");
   }
 
   private UpdateDroppedResources(): void {
+    const room = this._roomInformation.room!;
     const droppedResourceMemoryIds = Object.keys(
-      DroppedResourceData.GetAllBasedOnCache("", false, [this.room.name])
+      DroppedResourceData.GetAllBasedOnCache("", false, [room.name])
     );
     forEach(droppedResourceMemoryIds, (id) => {
       const resource = Game.getObjectById<Resource | null>(id);
@@ -38,20 +26,20 @@ export default class SourceManager {
       }
     });
 
-    const droppedResources = this.room.find(FIND_DROPPED_RESOURCES);
+    const droppedResources = room.find(FIND_DROPPED_RESOURCES);
     forEach(droppedResources, (droppedResource) => {
       let droppedResourceData = DroppedResourceData.GetMemory(
         droppedResource.id
       );
       if (!droppedResourceData.success) {
         droppedResourceData = DroppedResourceData.Initialize({
-          executer: this.executer,
+          executer: this._executer,
           resource: droppedResource,
         });
       }
 
       global.RoomsData[
-        this.room.name
+        room.name
       ].stats.energyOutgoing.DroppedEnergyDecay += 1;
       // const droppedResourceMemory = droppedResourceData.memory as DroppedResourceMemory;
 
@@ -80,10 +68,7 @@ export default class SourceManager {
     });
   }
 
-  Run(): void {
+  protected ExecuteRoomDroppedResourceManager(): void {
     this.UpdateDroppedResources();
-    if (this.updatedMemory) {
-      RoomData.UpdateMemory(this.room.name, this.memory);
-    }
   }
 }

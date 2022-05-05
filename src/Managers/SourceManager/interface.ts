@@ -5,41 +5,29 @@ import RoomData from "../BaseModels/Helper/Room/memory";
 import RoomPosition from "../BaseModels/Helper/Room/position";
 import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControllerStructure";
 
-export default class SourceManager {
-  private updatedMemory = false;
+export default class RoomSourceManager {
+  protected _executer: string;
+  protected _roomInformation: RoomInformation;
 
-  private executer: string;
-
-  private room: Room;
-
-  private memory: RoomMemory;
-
-  private managerMemory: SourceManagerMemory;
-
-  private cache: RoomCache;
-
-  constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
-    this.room = Game.rooms[roomName];
-    this.memory = roomMemory;
-    this.cache = roomCache;
-    this.managerMemory = this.memory.sourceManager;
-
-    this.executer = RoomHelper.GetExecuter(this.room.name, "Source");
+  constructor(roomInformation: RoomInformation) {
+    this._roomInformation = roomInformation;
+    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "Source");
   }
 
   private UpdateSources(): void {
-    const { managerMemory } = this;
+    const managerMemory = this._roomInformation.memory!.sourceManager;
     const sourceIds = Object.keys(managerMemory.sources);
+    const room = this._roomInformation.room!;
     forEach(sourceIds, (sourceId) => {
       const source = Game.getObjectById<Source>(sourceId);
       const sourceMemory = managerMemory.sources[sourceId];
       if (!sourceMemory.jobId) {
         const maxCreepsAround = RoomPosition.GetNonWallPositionsAround(
           sourceMemory.pos,
-          this.room
+          room
         ).length;
         const jobResult = JobData.Initialize({
-          executer: this.executer,
+          executer: this._executer,
           pos: sourceMemory.pos,
           targetId: sourceId,
           type: "HarvestSource",
@@ -54,7 +42,6 @@ export default class SourceManager {
         );
         if (jobId) {
           sourceMemory.jobId = jobId;
-          this.updatedMemory = true;
         }
       }
 
@@ -63,16 +50,13 @@ export default class SourceManager {
           source,
           sourceMemory,
           "source",
-          this.executer,
-          this.room.controller
+          this._executer,
+          room.controller
         );
     });
   }
 
-  Run(): void {
+  protected ExecuteRoomSourceManager(): void {
     this.UpdateSources();
-    if (this.updatedMemory) {
-      RoomData.UpdateMemory(this.room.name, this.memory);
-    }
   }
 }

@@ -8,7 +8,7 @@ export default class ControllerManagerMemoryData {
         ? {
             id: controller.id,
             pos: RoomPositionHelper.FreezeRoomPosition(controller.pos),
-            isOwned: controller.my,
+            isOwned: controller.my || controller.reservation?.username === "PandaMaster",
           }
         : undefined,
     };

@@ -4,52 +4,38 @@ import RoomData from "../BaseModels/Helper/Room/memory";
 import RoomConstruction from "../BaseModels/Helper/Room/construction";
 import RoomPositionHelper from "../BaseModels/Helper/Room/position";
 
-export default class MineralManager {
-  private updatedMemory = false;
+export default class RoomMineralManager {
+  protected _roomInformation: RoomInformation;
+  protected _executer: string;
 
-  private executer: string;
-
-  private room: Room;
-
-  private memory: RoomMemory;
-
-  private managerMemory: MineralManagerMemory;
-
-  private cache: RoomCache;
-
-  constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
-    this.room = Game.rooms[roomName];
-    this.memory = roomMemory;
-    this.cache = roomCache;
-    this.managerMemory = this.memory.mineralManager;
-
-    this.executer = RoomHelper.GetExecuter(this.room.name, "Controller");
+  constructor(roomInformation: RoomInformation) {
+    this._roomInformation = roomInformation;
+    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "Mineral");
   }
 
   private UpdateMineral(): void {
-    const { managerMemory } = this;
+    const managerMemory = this._roomInformation.memory!.mineralManager;
+    const room = this._roomInformation.room!;
 
     const mineralMemory = managerMemory.mineral;
     if (mineralMemory) {
       if (!mineralMemory.structureId && !mineralMemory.structureBuildJobId) {
         const createdSite = RoomConstruction.CreateConstructionSite(
-          this.room,
+          room,
           mineralMemory.pos,
           STRUCTURE_EXTRACTOR,
-          this.executer
+          this._executer
         );
         if (createdSite) {
           mineralMemory.structureBuildJobId = createdSite;
-          this.updatedMemory = true;
         } else {
           const structure = RoomHelper.GetStructureAtLocation(
-            this.room,
+            room,
             mineralMemory.pos,
             STRUCTURE_EXTRACTOR
           );
           if (structure) {
             mineralMemory.structureId = structure.id;
-            this.updatedMemory = true;
           }
         }
         return;
@@ -57,17 +43,15 @@ export default class MineralManager {
       if (mineralMemory.structureBuildJobId) {
         if (Game.time % 100) {
           const createdSite = RoomConstruction.CreateConstructionSite(
-            this.room,
+            room,
             mineralMemory.pos,
             STRUCTURE_EXTRACTOR,
-            this.executer
+            this._executer
           );
           if (!createdSite) {
             delete mineralMemory.structureBuildJobId;
-            this.updatedMemory = true;
           } else {
             mineralMemory.structureBuildJobId = createdSite;
-            this.updatedMemory = true;
           }
         }
         return;
@@ -77,10 +61,10 @@ export default class MineralManager {
         const mineral = Game.getObjectById<Mineral>(mineralMemory.id);
         const maxCreepsAround = RoomPositionHelper.GetNonWallPositionsAround(
           mineralMemory.pos,
-          this.room
+          room
         ).length;
         const jobResult = JobData.Initialize({
-          executer: this.executer,
+          executer: this._executer,
           pos: mineralMemory.pos,
           targetId: mineralMemory.id,
           type: "HarvestMineral",
@@ -95,7 +79,6 @@ export default class MineralManager {
         );
         if (jobId) {
           mineralMemory.jobId = jobId;
-          this.updatedMemory = true;
         }
       }
 
@@ -105,22 +88,19 @@ export default class MineralManager {
         );
         if (!extractor) {
           delete mineralMemory.structureId;
-          this.updatedMemory = true;
         }
       }
     }
   }
 
-  Run(): void {
+  protected ExecuteRoomMineralManager(): void {
+    const room = this._roomInformation.room!;
     if (
-      (this.room.controller ? this.room.controller.level < 6 : true) ||
-      !this.room.storage
+      (room.controller ? room.controller.level < 6 : true) ||
+      !room.storage
     )
       return;
 
     this.UpdateMineral();
-    if (this.updatedMemory) {
-      RoomData.UpdateMemory(this.room.name, this.memory);
-    }
   }
 }

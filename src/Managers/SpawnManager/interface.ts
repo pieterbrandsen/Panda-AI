@@ -1,44 +1,37 @@
 import RoomHelper from "../BaseModels/Helper/Room/interface";
 import CreepSpawning from "../BaseModels/CreepSpawning/interface";
 
-export default class SpawnManager {
-  private updatedMemory = false;
+export default class RoomSpawnManager {
+  protected _roomInformation: RoomInformation;
+  protected _executer: string;
 
-  private executer: string;
-
-  private room: Room;
-
-  private memory: RoomMemory;
-
-  private managerMemory: SpawnManagerMemory;
-
-  private cache: RoomCache;
-
-  constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
-    this.room = Game.rooms[roomName];
-    this.memory = roomMemory;
-    this.cache = roomCache;
-    this.managerMemory = this.memory.spawnManager;
-
-    this.executer = RoomHelper.GetExecuter(this.room.name, "Spawn");
+  constructor(roomInformation: RoomInformation) {
+    this._roomInformation = roomInformation;
+    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "Mineral");
   }
 
-  Run(): void {
-    const resultOwnedCreeps = new CreepSpawning(this.room.name).SpawnCreeps();
-    const capacityEnergy = this.room.energyCapacityAvailable;
-    const { energyAvailable } = this.room;
+  private SpawnCreeps() {
+    const room = this._roomInformation.room!;
+    const roomMemory = this._roomInformation.memory!;
+    const resultOwnedCreeps = new CreepSpawning(room.name).SpawnCreeps();
+    const capacityEnergy = room.energyCapacityAvailable;
+    const { energyAvailable } = room;
     const energyAvailablePercentage = energyAvailable / capacityEnergy;
 
     if (
       resultOwnedCreeps &&
-      this.memory.remoteRooms &&
+      roomMemory.remoteRooms &&
       energyAvailablePercentage > 0.5 &&
       energyAvailable > 1000
     ) {
       new CreepSpawning(
-        this.room.name,
-        Object.keys(this.memory.remoteRooms)
+        room.name,
+        Object.keys(roomMemory.remoteRooms)
       ).SpawnCreeps();
     }
+  }
+
+  protected ExecuteRoomSpawnManager(): void {
+    this.SpawnCreeps();
   }
 }

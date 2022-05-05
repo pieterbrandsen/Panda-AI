@@ -3,69 +3,55 @@ import JobDataHelper from "../BaseModels/Helper/Job/memory";
 import RoomData from "../BaseModels/Helper/Room/memory";
 import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControllerStructure";
 
-export default class ControllerManager {
-  private isRemote: boolean;
+export default class RoomControllerManager {
+  protected _roomInformation: RoomInformation;
+  protected _executer: string;
+  protected _isRemote: boolean;
 
-  private updatedMemory = false;
-
-  private executer: string;
-
-  private room: Room;
-
-  private memory: RoomMemory;
-
-  private managerMemory: ControllerManagerMemory;
-
-  private cache: RoomCache;
-
-  private controller: StructureController;
-
-  constructor(roomName: string, roomMemory: RoomMemory, roomCache: RoomCache) {
-    this.room = Game.rooms[roomName];
-    this.controller = this.room.controller as StructureController;
-    this.memory = roomMemory;
-    this.cache = roomCache;
-    this.managerMemory = this.memory.controllerManager;
-
-    this.isRemote = this.memory.remoteOriginRoom !== undefined;
-    this.executer = RoomHelper.GetExecuter(this.room.name, "Controller");
+  constructor(roomInformation: RoomInformation) {
+    this._roomInformation = roomInformation;
+    this._isRemote = roomInformation.memory!.remoteOriginRoom !== undefined;
+    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "Controller");
   }
 
   private UpdateController(): void {
-    const { managerMemory } = this;
+    const controller = this._roomInformation.room!.controller!;
+    const managerMemory = this._roomInformation.memory!.controllerManager;
     const controllerMemory = managerMemory.controller;
 
     if (controllerMemory) {
-      const jobType: JobTypes = !this.isRemote
+      const jobType: JobTypes = !this._isRemote
         ? "UpgradeController"
         : "ReserveController";
       if (controllerMemory.isOwned) {
         JobDataHelper.Initialize({
-          executer: this.executer,
+          executer: this._executer,
           pos: controllerMemory.pos,
           targetId: controllerMemory.id,
           type: jobType,
-          amountToTransfer: 10 * 1000 + 5000 * this.controller.level,
+          amountToTransfer: 10 * 1000 + 5000 * controller.level,
           objectType: "Creep",
         });
       }
 
       HandleSourceAndControllerStructure(
-        this.controller,
+        controller,
         controllerMemory,
         "controller",
-        this.executer,
-        this.controller
+        this._executer,
+        controller
       );
     }
   }
 
-  Run(): void {
+  protected ExecuteRoomControllerManager(): void {
+    const controller = this._roomInformation.room!.controller;
+    const managerMemory = this._roomInformation.memory!.controllerManager;
     if (
-      !this.controller &&
-      !this.isRemote &&
-      this.managerMemory.controller &&
-      !this.managerMemory.controller.isOwned
+      !controller &&
+      !this._isRemote &&
+      managerMemory.controller &&
+      !managerMemory.controller.isOwned
     )
       return;
 

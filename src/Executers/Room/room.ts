@@ -15,28 +15,13 @@ import JobData from "../../Managers/BaseModels/Helper/Job/memory";
 import SetupRoom from "../../Managers/BaseModels/Helper/Room/setup";
 import RoomHeap from "../../Managers/BaseModels/Heap/room";
 import UpdateRoomStats from "../../Managers/BaseModels/Helper/Stats/updateRoom";
+import RoomSourceManager from "../../Managers/SourceManager/interface";
+import RoomDroppedResourceManager from "../../Managers/DroppedResourceManager/interface";
+import RoomControllerManager from "../../Managers/ControllerManager/interface";
+import RoomSpawnManager from "../../Managers/SpawnManager/interface";
+import RoomMineralManager from "../../Managers/MineralManager/interface";
 
-export default class RoomHandler extends Mixin(RoomData) {
-  //   static ExecuteAllRooms(): boolean {
-  //     const roomsCache = RoomData.GetAllBasedOnCache("", false);
-  //     const roomNamesWithVision = Object.keys(Game.rooms);
-  //     forEach(roomNamesWithVision, (roomName) => {
-  //       const room = Game.rooms[roomName];
-  //       if (!roomsCache[roomName]) {
-  //         new SetupRoom(room).Initialize();
-  //       }
-  //     });
-
-  //     const roomNames = Object.keys(roomsCache);
-  //     forEach(union(roomNames, roomNamesWithVision), (roomName) => {
-  //       this.ExecuteRoom(roomName);
-  //       if (!roomNamesWithVision.includes(roomName)) {
-  //         JobData.DeleteAllData(roomName);
-  //         RoomData.DeleteMemory(roomName, true, true);
-  //       }
-  //     });
-  //     return true;
-  //   }
+export default class RoomHandler extends Mixin(RoomData,RoomSourceManager,RoomDroppedResourceManager,RoomControllerManager,RoomMineralManager,RoomSpawnManager) {
   public _roomInformation: RoomInformation;
 
   private _roomStructures: StringMap<
@@ -104,16 +89,15 @@ export default class RoomHandler extends Mixin(RoomData) {
     UpdateRoomStats(room);
     Jobs.UpdateAllData(room);
 
-    //* Convert this \/
     const { controller } = room;
-    new SourceManager(room.name, roomMemory, roomCache).Run();
-    new DroppedResourceManager(room.name, roomMemory, roomCache).Run();
+    this.ExecuteRoomSourceManager();
+    this.ExecuteRoomDroppedResourceManager();
 
     if (controller) {
-      new ControllerManager(room.name, roomMemory, roomCache).Run();
+      this.ExecuteRoomControllerManager();
       if (controller.my) {
-        new MineralManager(room.name, roomMemory, roomCache).Run();
-        new SpawnManager(room.name, roomMemory, roomCache).Run();
+        this.ExecuteRoomMineralManager();
+        this.ExecuteRoomSpawnManager();
       }
     }
 
