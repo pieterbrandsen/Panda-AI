@@ -2,73 +2,75 @@ import { clone } from "lodash";
 import BaseMemoryData from "./interface";
 
 export default class StructureMemoryData extends BaseMemoryData {
-  private static type: MemoryTypes = "Structure";
-
-  static Validate(data: StringMap<StructureMemory>): ValidatedData {
-    return super.Validate(data, this.type);
+  private _id: string;
+  constructor(id:string) {
+    const memoryType: MemoryTypes = "Structure";
+    super(memoryType);
+    this._id = id;
   }
 
-  static ValidateSingle(data: StructureMemory): boolean {
-    return super.ValidateSingle(data, this.type);
+  protected ValidateMemoryData(data: StringMap<StructureMemory>): ValidatedData {
+    return super.ValidateMemoryData(data);
+  }
+
+  protected ValidateSingleMemoryData(data: StructureMemory): boolean {
+    return super.ValidateSingleMemoryData(data);
   }
 
   /**
    * Create an new object of this type
    */
-  static Generate(isSource = false): StructureMemory {
+  protected GenerateMemoryData(isSource = false): StructureMemory {
     return {
-      version: super.MinimumVersion(this.type),
+      version: super.MinimumMemoryVersion(),
       energyIncoming: {},
       energyOutgoing: {},
       isSourceStructure: isSource,
     };
   }
 
-  static Get(id: string): CRUDResult<StructureMemory> {
-    const data = clone(Memory.StructuresData.data[id]);
-    if (data === undefined) return { success: false, data: undefined };
-    return { success: this.ValidateSingle(data), data };
+  protected GetMemoryData(): CRUDResult<StructureMemory> {
+    const data = clone(Memory.StructuresData.data[this._id]);
+    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
   }
 
-  static Create(
-    id: string,
+  protected CreateMemoryData(
     data: StructureMemory
   ): CRUDResult<StructureMemory> {
-    const dataAtId = this.Get(id);
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+    let getResult = this.GetMemoryData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(id, data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateMemoryData(data);
+    getResult = this.GetMemoryData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  static Update(
-    id: string,
+  protected UpdateMemoryData(
     data: StructureMemory
   ): CRUDResult<StructureMemory> {
-    Memory.StructuresData.data[id] = data;
-    return { success: true, data };
+    Memory.StructuresData.data[this._id] = data;
+    return { success: Memory.StructuresData.data[this._id] !== undefined, data };
   }
 
-  static Delete(id: string): CRUDResult<StructureMemory> {
-    delete Memory.StructuresData.data[id];
-    return { success: true, data: undefined };
+  protected DeleteMemoryData(): CRUDResult<StructureMemory> {
+    delete Memory.StructuresData.data[this._id];
+    return { success: Memory.StructuresData.data[this._id] === undefined, data: undefined };
   }
 
-  static GetAll(
+  protected GetAllMemoryData(
     predicate?: Predicate<StructureMemory>
   ): StringMap<StructureMemory> {
     let { data } = Memory.StructuresData;
-    data = super.GetAllData(data, this.type, predicate);
+    data = super.GetAllMemoryDataFilter(data, predicate);
     return data;
   }
 
-  static Initialize(
-    id: string,
+  protected InitializeMemoryData(
     isSource?: boolean
   ): CRUDResult<StructureMemory> {
-    const cache = this.Generate(isSource);
-    const result = this.Create(id, cache);
-    return { data: result.data, success: result.success };
+    const cache = this.GenerateMemoryData(isSource);
+    const createResult = this.CreateMemoryData(cache);
+    return { data: createResult.data, success: createResult.success };
   }
 }

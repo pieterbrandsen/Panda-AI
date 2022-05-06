@@ -2,39 +2,43 @@ import { clone, pickBy } from "lodash";
 import BaseStatsMemoryData from "./interface";
 
 export default class RoomStatsMemoryData extends BaseStatsMemoryData {
-  static Get(id: string): CRUDResult<RoomStatsMemory> {
-    const data = clone(Memory.stats.rooms[id]);
+  private _id: string;
+  constructor(id:string) {
+    super();
+    this._id = id;
+  }
+  protected GetMemoryData(): CRUDResult<RoomStatsMemory> {
+    const data = clone(Memory.stats.rooms[this._id]);
     if (data === undefined) return { success: false, data: undefined };
 
     return { success: !!data, data };
   }
 
-  static Create(
-    id: string,
+  protected CreateMemoryData(
     data: RoomStatsMemory
   ): CRUDResult<RoomStatsMemory> {
-    const dataAtId = this.Get(id);
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+    let getResult = this.GetMemoryData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(id, data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateMemoryData(data);
+    getResult = this.GetMemoryData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  static Update(
-    id: string,
+  protected UpdateMemoryData(
     data: RoomStatsMemory
   ): CRUDResult<RoomStatsMemory> {
-    Memory.stats.rooms[id] = data;
-    return { success: true, data };
+    Memory.stats.rooms[this._id] = data;
+    return { success: Memory.stats.rooms[this._id] !== undefined, data };
   }
 
-  static Delete(id: string): CRUDResult<RoomStatsMemory> {
-    delete Memory.stats.rooms[id];
-    return { success: true, data: undefined };
+  public DeleteMemoryData(): CRUDResult<RoomStatsMemory> {
+    delete Memory.stats.rooms[this._id];
+    return { success: Memory.stats.rooms[this._id] === undefined, data: undefined };
   }
 
-  static GetAll(
+  protected GetAllMemoryData(
     getOnlyFreeJobs = false,
     predicate?: Predicate<RoomStatsMemory>
   ): StringMap<RoomStatsMemory> {
@@ -44,7 +48,7 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     return data;
   }
 
-  static Generate(): RoomStatsMemory {
+  protected GenerateMemoryData(): RoomStatsMemory {
     return {
       energyIncoming: {
         HarvestMineral: 0,
@@ -84,9 +88,9 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     };
   }
 
-  static Initialize(id: string): CRUDResult<RoomStatsMemory> {
-    const memory = this.Generate();
-    const result = this.Create(id, memory);
-    return { data: result.data, success: result.success };
+  protected InitializeMemoryData(): CRUDResult<RoomStatsMemory> {
+    const data = this.GenerateMemoryData();
+    const createResult = this.CreateMemoryData(data);
+    return { data: createResult.data, success: createResult.success };
   }
 }

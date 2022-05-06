@@ -2,40 +2,42 @@ import { clone } from "lodash";
 import BaseMemoryData from "./interface";
 
 export default class LogsMemoryData extends BaseMemoryData {
-  private static type: MemoryTypes = "Log";
-
-  static Validate(data: StringMap<LogsMemory>): ValidatedData {
-    return super.Validate(data, this.type);
+  constructor() {
+    const memoryType: MemoryTypes = "Structure";
+    super(memoryType);
   }
 
-  static ValidateSingle(data: LogsMemory): boolean {
-    return super.ValidateSingle(data, this.type);
+  protected ValidateMemoryData(data: StringMap<LogsMemory>): ValidatedData {
+    return super.ValidateMemoryData(data);
   }
 
-  static Generate(version?: number): LogsMemory {
+  protected ValidateSingleMemoryData(data: LogsMemory): boolean {
+    return super.ValidateSingleMemoryData(data);
+  }
+
+  public GenerateMemoryData(version?: number): LogsMemory {
     return {
-      version: version ?? super.MinimumVersion(this.type),
+      version: version ?? super.MinimumMemoryVersion(),
     };
   }
 
-  static Get(): CRUDResult<LogsMemory> {
+  protected GetMemoryData(): CRUDResult<LogsMemory> {
     const data = clone(Memory.logs);
-    if (data === undefined) return { success: false, data: undefined };
-
-    return { success: this.ValidateSingle(data), data };
+    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
   }
 
-  static Update(data: LogsMemory): CRUDResult<LogsMemory> {
+  protected UpdateMemoryData(data: LogsMemory): CRUDResult<LogsMemory> {
     Memory.logs = data;
-    return { success: true, data };
+    return { success: Memory.logs !== undefined, data };
   }
 
-  static Create(data: LogsMemory): CRUDResult<LogsMemory> {
-    const dataAtId = this.Get();
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+  protected Create(data: LogsMemory): CRUDResult<LogsMemory> {
+    let getResult = this.GetMemoryData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateMemoryData(data);
+    getResult = this.GetMemoryData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 }

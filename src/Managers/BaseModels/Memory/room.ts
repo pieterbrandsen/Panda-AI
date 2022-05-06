@@ -8,22 +8,27 @@ import DroppedResourceManagerData from "../../DroppedResourceManager/memory";
 import RoomStatsMemoryData from "./Stats/room";
 
 export default class RoomMemoryData extends BaseMemoryData {
-  private static type: MemoryTypes = "Room";
-
-  static Validate(data: StringMap<RoomMemory>): ValidatedData {
-    return super.Validate(data, this.type);
+  private _id: string;
+  constructor(id:string) {
+    const memoryType: MemoryTypes = "Room";
+    super(memoryType);
+    this._id = id;
   }
 
-  static ValidateSingle(data: RoomMemory): boolean {
-    return super.ValidateSingle(data, this.type);
+  protected ValidateMemoryData(data: StringMap<RoomMemory>): ValidatedData {
+    return super.ValidateMemoryData(data);
+  }
+
+  protected ValidateSingleMemoryData(data: RoomMemory): boolean {
+    return super.ValidateSingleMemoryData(data);
   }
 
   /**
    * Create an new object of this type
    */
-  static Generate(room: Room, remoteRooms?: StringMap<RemoteRoom>): RoomMemory {
+  protected GenerateMemoryData(room: Room, remoteRooms?: StringMap<RemoteRoom>): RoomMemory {
     return {
-      version: super.MinimumVersion(this.type),
+      version: super.MinimumMemoryVersion(),
       remoteRooms,
       controllerManager: ControllerManagerData.SetupMemory(room),
       mineralManager: MineralManagerData.SetupMemory(room),
@@ -33,65 +38,62 @@ export default class RoomMemoryData extends BaseMemoryData {
     };
   }
 
-  static Get(id: string): CRUDResult<RoomMemory> {
-    const data = clone(Memory.RoomsData.data[id]);
-    if (data === undefined) return { success: false, data: undefined };
-    return { success: this.ValidateSingle(data), data };
+  protected GetMemoryData(): CRUDResult<RoomMemory> {
+    const data = clone(Memory.RoomsData.data[this._id]);
+    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
   }
 
-  static Create(id: string, data: RoomMemory): CRUDResult<RoomMemory> {
-    const dataAtId = this.Get(id);
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+  protected CreateMemoryData(data: RoomMemory): CRUDResult<RoomMemory> {
+    let getResult = this.GetMemoryData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(id, data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateMemoryData(data);
+    getResult = this.GetMemoryData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  static Update(id: string, data: RoomMemory): CRUDResult<RoomMemory> {
-    Memory.RoomsData.data[id] = data;
-    return { success: true, data };
+  protected UpdateMemoryData(data: RoomMemory): CRUDResult<RoomMemory> {
+    Memory.RoomsData.data[this._id] = data;
+    return { success: Memory.RoomsData.data[this._id] !== undefined, data };
   }
 
-  static UpdateSourceMemory(
-    roomId: string,
+  protected UpdateSourceMemoryData(
     sourceId: string,
     data: SourceMemory
   ): CRUDResult<SourceMemory> {
-    Memory.RoomsData.data[roomId].sourceManager.sources[sourceId] = data;
-    return { success: true, data };
+    Memory.RoomsData.data[this._id].sourceManager.sources[sourceId] = data;
+    return { success: Memory.RoomsData.data[this._id].sourceManager.sources[sourceId] !== undefined, data };
   }
 
-  static UpdateControllerMemory(
-    roomId: string,
+  protected UpdateControllerMemoryData(
     data: ControllerMemory
   ): CRUDResult<ControllerMemory> {
-    Memory.RoomsData.data[roomId].controllerManager.controller = data;
-    return { success: true, data };
+    Memory.RoomsData.data[this._id].controllerManager.controller = data;
+    return { success: Memory.RoomsData.data[this._id].controllerManager.controller !== undefined, data };
   }
 
-  static Delete(id: string): CRUDResult<RoomMemory> {
-    delete Memory.RoomsData.data[id];
+  protected DeleteMemoryData(): CRUDResult<RoomMemory> {
+    delete Memory.RoomsData.data[this._id];
 
-    const result = RoomStatsMemoryData.Delete(id).success;
+    const result = new RoomStatsMemoryData(this._id).DeleteMemoryData().success;
     return { success: result, data: undefined };
   }
 
-  static GetAll(predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
+  protected GetAllMemoryData(predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
     let { data } = Memory.RoomsData;
-    data = super.GetAllData(data, this.type, predicate);
+    data = super.GetAllMemoryDataFilter(data, predicate);
     return data;
   }
 
-  static Initialize(
-    id: string,
+  protected InitializeMemoryData(
     room: Room,
     remoteRooms?: StringMap<RemoteRoom>
   ): CRUDResult<RoomMemory> {
-    const data = this.Generate(room, remoteRooms);
-    const result = this.Create(id, data);
+    const data = this.GenerateMemoryData(room, remoteRooms);
+    const result = this.CreateMemoryData(data);
     if (result.success) {
-      result.success = RoomStatsMemoryData.Initialize(id).success;
+      result.success = new RoomStatsMemoryData(this._id).DeleteMemoryData().success;
     }
 
     return { success: result.success, data: result.data };

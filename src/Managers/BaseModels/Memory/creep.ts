@@ -2,22 +2,27 @@ import { clone } from "lodash";
 import BaseMemoryData from "./interface";
 
 export default class CreepMemoryData extends BaseMemoryData {
-  private static type: MemoryTypes = "Creep";
-
-  static Validate(data: StringMap<CreepMemory>): ValidatedData {
-    return super.Validate(data, this.type);
+  private _id: string;
+  constructor(id:string) {
+    const memoryType: MemoryTypes = "Creep";
+    super(memoryType);
+    this._id = id;
   }
 
-  static ValidateSingle(data: CreepMemory): boolean {
-    return super.ValidateSingle(data, this.type);
+  protected ValidateMemoryData(data: StringMap<CreepMemory>): ValidatedData {
+    return super.ValidateMemoryData(data);
+  }
+
+  protected ValidateSingleMemoryData(data: CreepMemory): boolean {
+    return super.ValidateSingleMemoryData(data);
   }
 
   /**
    * Create an new object of this type
    */
-  static Generate(isRemoteCreep: boolean, name: string): CreepMemory {
+  protected GenerateMemoryData(isRemoteCreep: boolean, name: string): CreepMemory {
     return {
-      version: super.MinimumVersion(this.type),
+      version: super.MinimumMemoryVersion(),
       energyOutgoing: {},
       energyIncoming: {},
       isRemoteCreep,
@@ -25,44 +30,43 @@ export default class CreepMemoryData extends BaseMemoryData {
     };
   }
 
-  static Get(id: string): CRUDResult<CreepMemory> {
-    const data = clone(Memory.CreepsData.data[id]);
-    if (data === undefined) return { success: false, data: undefined };
-    return { success: this.ValidateSingle(data), data };
+  protected GetMemoryData(): CRUDResult<CreepMemory> {
+    const data = clone(Memory.CreepsData.data[this._id]);
+    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
   }
 
-  static Create(id: string, data: CreepMemory): CRUDResult<CreepMemory> {
-    const dataAtId = this.Get(id);
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+  protected CreateMemoryData(data: CreepMemory): CRUDResult<CreepMemory> {
+    let getResult = this.GetMemoryData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(id, data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateMemoryData(data);
+    getResult = this.GetMemoryData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  static Update(id: string, data: CreepMemory): CRUDResult<CreepMemory> {
-    Memory.CreepsData.data[id] = data;
-    return { success: true, data };
+  protected UpdateMemoryData(data: CreepMemory): CRUDResult<CreepMemory> {
+    Memory.CreepsData.data[this._id] = data;
+    return { success: Memory.CreepsData.data[this._id] !== undefined, data };
   }
 
-  static Delete(id: string): CRUDResult<CreepMemory> {
-    delete Memory.CreepsData.data[id];
-    return { success: true, data: undefined };
+  protected DeleteMemoryData(): CRUDResult<CreepMemory> {
+    delete Memory.CreepsData.data[this._id];
+    return { success: Memory.CreepsData.data[this._id] === undefined, data: undefined };
   }
 
-  static GetAll(predicate?: Predicate<CreepMemory>): StringMap<CreepMemory> {
+  protected GetAllMemoryData(predicate?: Predicate<CreepMemory>): StringMap<CreepMemory> {
     let { data } = Memory.CreepsData;
-    data = super.GetAllData(data, this.type, predicate);
+    data = super.GetAllMemoryDataFilter(data, predicate);
     return data;
   }
 
-  static Initialize(
-    id: string,
+  protected Initialize(
     name: string,
     isRemoteCreep: boolean
   ): CRUDResult<CreepMemory> {
-    const data = this.Generate(isRemoteCreep, name);
-    const result = this.Create(id, data);
-    return { success: result.success, data: result.data };
+    const data = this.GenerateMemoryData(isRemoteCreep, name);
+    const createResult = this.CreateMemoryData(data);
+    return { success: createResult.success, data: createResult.data };
   }
 }

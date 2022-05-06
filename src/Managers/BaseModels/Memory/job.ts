@@ -3,17 +3,22 @@ import BaseMemoryData from "./interface";
 import RoomPosition from "../Helper/Room/position";
 
 export default class JobMemoryData extends BaseMemoryData {
-  private static type: MemoryTypes = "Job";
-
-  static Validate(data: StringMap<JobMemory>): ValidatedData {
-    return super.Validate(data, this.type);
+  private _id: string;
+  constructor(id:string) {
+    const memoryType: MemoryTypes = "Job";
+    super(memoryType);
+    this._id = id;
   }
 
-  static ValidateSingle(data: JobMemory): boolean {
-    return super.ValidateSingle(data, this.type);
+  protected ValidateMemoryData(data: StringMap<JobMemory>): ValidatedData {
+    return super.ValidateMemoryData(data);
   }
 
-  static Generate(
+  protected ValidateSingleMemoryData(data: JobMemory): boolean {
+    return super.ValidateSingleMemoryData(data);
+  }
+
+  protected GenerateMemoryData(
     targetId: string,
     pos: FreezedRoomPosition,
     objectType: JobObjectExecuter,
@@ -26,7 +31,7 @@ export default class JobMemoryData extends BaseMemoryData {
       lastAssigned: Game.time,
       targetId,
       pos,
-      version: super.MinimumVersion(this.type),
+      version: super.MinimumMemoryVersion(),
       amountToTransfer,
       fromTargetId,
       structureType,
@@ -36,45 +41,43 @@ export default class JobMemoryData extends BaseMemoryData {
     };
   }
 
-  static Get(id: string): CRUDResult<JobMemory> {
-    const data = clone(Memory.JobsData.data[id]);
-    if (data === undefined) return { success: false, data: undefined };
-
+  protected GetMemoryData(): CRUDResult<JobMemory> {
+    const data = clone(Memory.JobsData.data[this._id]);
     data.pos = RoomPosition.UnFreezeRoomPosition(data.pos);
-    return { success: this.ValidateSingle(data), data };
+    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
   }
 
-  static Create(id: string, data: JobMemory): CRUDResult<JobMemory> {
-    const dataAtId = this.Get(id);
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+  protected CreateMemoryData(data: JobMemory): CRUDResult<JobMemory> {
+    let getResult = this.GetMemoryData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(id, data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateMemoryData(data);
+    getResult = this.GetMemoryData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  static Update(id: string, data: JobMemory): CRUDResult<JobMemory> {
-    Memory.JobsData.data[id] = data;
-    return { success: true, data };
+  protected UpdateMemoryData(data: JobMemory): CRUDResult<JobMemory> {
+    Memory.JobsData.data[this._id] = data;
+    return { success: Memory.JobsData.data[this._id] !== undefined, data };
   }
 
-  static Delete(id: string): CRUDResult<JobMemory> {
-    delete Memory.JobsData.data[id];
-    return { success: true, data: undefined };
+  protected DeleteMemoryData(): CRUDResult<JobMemory> {
+    delete Memory.JobsData.data[this._id];
+    return { success: Memory.JobsData.data[this._id] === undefined, data: undefined };
   }
 
-  static GetAll(
+  protected GetAllMemoryData(
     getOnlyFreeJobs = false,
     predicate?: Predicate<JobMemory>
   ): StringMap<JobMemory> {
     let { data } = Memory.JobsData;
     if (getOnlyFreeJobs) data = pickBy(data);
-    data = super.GetAllData(data, this.type, predicate);
+    data = super.GetAllMemoryDataFilter(data, predicate);
     return data;
   }
 
-  static Initialize(
-    id: string,
+  protected InitializeMemoryData(
     targetId: string,
     pos: FreezedRoomPosition,
     objectType: JobObjectExecuter,
@@ -83,7 +86,7 @@ export default class JobMemoryData extends BaseMemoryData {
     structureType?: StructureConstant,
     maxCreepsCount?: number
   ): CRUDResult<JobMemory> {
-    const memory = this.Generate(
+    const memory = this.GenerateMemoryData(
       targetId,
       pos,
       objectType,
@@ -92,7 +95,7 @@ export default class JobMemoryData extends BaseMemoryData {
       structureType,
       maxCreepsCount
     );
-    const result = this.Create(id, memory);
+    const result = this.CreateMemoryData(memory);
     return { data: result.data, success: result.success };
   }
 }

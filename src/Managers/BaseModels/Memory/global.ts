@@ -4,7 +4,7 @@ import StatsMemoryData from "./Stats/global";
 import LogsMemoryData from "./logs";
 
 export default class GlobalMemoryData extends BaseMemoryData {
-  static ValidateSingle(): boolean {
+  protected ValidateSingleMemoryData(): boolean {
     let isValid = true;
     if (Memory.version === undefined) {
       isValid = false;
@@ -15,7 +15,7 @@ export default class GlobalMemoryData extends BaseMemoryData {
   /**
    * Create an new object of this type
    */
-  static Generate(): Memory {
+  protected GenerateMemoryData(): Memory {
     const defaultObject = {
       creeps: {},
       flags: {},
@@ -50,24 +50,24 @@ export default class GlobalMemoryData extends BaseMemoryData {
       },
       ...defaultObject,
       updateCreepNames: [],
-      stats: StatsMemoryData.Generate(0),
-      logs: LogsMemoryData.Generate(0),
+      stats: new StatsMemoryData().GenerateMemoryData(0),
+      logs: new LogsMemoryData().GenerateMemoryData(0),
     };
   }
 
-  static Get(): CRUDResult<Memory> {
+  protected GetMemoryData(): CRUDResult<Memory> {
     const data = clone(Memory);
-    return { success: !!data, data };
+    return { success: data !== undefined ? this.ValidateSingleMemoryData() : false, data };
   }
 
-  static Update(data: Memory): CRUDResult<Memory> {
+  protected UpdateMemoryData(data: Memory): CRUDResult<Memory> {
     forEach(data, (value: unknown, key: string) => {
       Memory[key] = value;
     });
     return { success: true, data };
   }
 
-  static Delete(key?: string): CRUDResult<Memory> {
+  protected DeleteMemoryData(key?: string): CRUDResult<Memory> {
     if (key) {
       delete Memory[key];
       return { success: true, data: undefined };
@@ -78,11 +78,10 @@ export default class GlobalMemoryData extends BaseMemoryData {
     return { success: true, data: undefined };
   }
 
-  static Initialize(): CRUDResult<Memory> {
-    this.Delete();
-    const data = this.Generate();
-    const result = this.Update(data);
-
-    return { success: result.success, data: result.data };
+  protected InitializeMemoryData(): CRUDResult<Memory> {
+    this.DeleteMemoryData();
+    const data = this.GenerateMemoryData();
+    const updateResult = this.UpdateMemoryData(data);
+    return { success: updateResult.success, data: updateResult.data };
   }
 }

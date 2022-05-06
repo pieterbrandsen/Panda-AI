@@ -2,19 +2,22 @@ import { clone } from "lodash";
 import BaseMemoryData from "../interface";
 
 export default class GlobalStatsMemoryData extends BaseMemoryData {
-  private static type: MemoryTypes = "Stats";
-
-  static Validate(data: StringMap<StatsMemory>): ValidatedData {
-    return super.Validate(data, this.type);
+  constructor() {
+    const memoryType: MemoryTypes = "Stats";
+    super(memoryType);
   }
 
-  static ValidateSingle(data: StatsMemory): boolean {
-    return super.ValidateSingle(data, this.type);
+  protected ValidateMemoryData(data: StringMap<StatsMemory>): ValidatedData {
+    return super.ValidateMemoryData(data);
   }
 
-  static Generate(version?: number): StatsMemory {
+  protected ValidateSingleMemoryData(data: StatsMemory): boolean {
+    return super.ValidateSingleMemoryData(data);
+  }
+
+  public GenerateMemoryData(version?: number): StatsMemory {
     return {
-      version: version ?? super.MinimumVersion(this.type),
+      version: version ?? super.MinimumMemoryVersion(),
       rooms: {},
       resources: {
         ACCESS_KEY: 0,
@@ -29,24 +32,23 @@ export default class GlobalStatsMemoryData extends BaseMemoryData {
     };
   }
 
-  static Get(): CRUDResult<StatsMemory> {
+  protected GetMemoryData(): CRUDResult<StatsMemory> {
     const data = clone(Memory.stats);
-    if (data === undefined) return { success: false, data: undefined };
-
-    return { success: this.ValidateSingle(data), data };
+    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
   }
 
-  static Create(data: StatsMemory): CRUDResult<StatsMemory> {
-    const dataAtId = this.Get();
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+  protected CreateMemoryData(data: StatsMemory): CRUDResult<StatsMemory> {
+    let getResult = this.GetMemoryData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateMemoryData(data);
+    getResult = this.GetMemoryData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  static Update(data: StatsMemory): CRUDResult<StatsMemory> {
+  protected UpdateMemoryData(data: StatsMemory): CRUDResult<StatsMemory> {
     Memory.stats = data;
-    return { success: true, data };
+    return { success: Memory.stats !== undefined, data };
   }
 }

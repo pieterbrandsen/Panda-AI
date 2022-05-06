@@ -3,7 +3,7 @@
 import { pickBy } from "lodash";
 
 export default abstract class StatsMemoryData {
-  protected static GetAllData<T extends MemoryStatsObjects>(
+  protected GetAllData<T extends MemoryStatsObjects>(
     data: StringMap<T>,
     predicate?: Predicate<T>
   ): StringMap<T> {

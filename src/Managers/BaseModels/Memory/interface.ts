@@ -2,12 +2,17 @@
 
 import { forEach, pickBy } from "lodash";
 
-export default abstract class MemoryData {
+export default abstract class BaseMemoryData {
+  private _type:MemoryTypes;
+  constructor(protected type: MemoryTypes) {
+    this._type = type;
+  }
+
   /**
    * Returns minimum memory version for type saved in memory
    */
-  protected static MinimumVersion(type: MemoryTypes): number {
-    switch (type) {
+  protected MinimumMemoryVersion(): number {
+    switch (this._type) {
       case "Creep":
         if (Memory.CreepsData) return Memory.CreepsData.version;
         break;
@@ -38,11 +43,10 @@ export default abstract class MemoryData {
   /**
    * Check all data in object and return list of non valid memory objects based on version
    */
-  protected static Validate(
-    data: StringMap<MemoryObjects>,
-    type: MemoryTypes
-  ): ValidatedData {
-    const minimumVersion = this.MinimumVersion(type);
+  protected ValidateMemoryData(
+    data: StringMap<MemoryObjects>
+      ): ValidatedData {
+    const minimumVersion = this.MinimumMemoryVersion();
     let isValid = true;
     const nonValidObjects: string[] = [];
     forEach(data, (value, key) => {
@@ -58,11 +62,10 @@ export default abstract class MemoryData {
   /**
    * Check single object and return if its valid based on version
    */
-  protected static ValidateSingle(
+  protected ValidateSingleMemoryData(
     data: MemoryObjects,
-    type: MemoryTypes
   ): boolean {
-    const minimumVersion = this.MinimumVersion(type);
+    const minimumVersion = this.MinimumMemoryVersion();
 
     let isValid = true;
     if (data.version !== minimumVersion) {
@@ -72,12 +75,11 @@ export default abstract class MemoryData {
     return isValid;
   }
 
-  protected static GetAllData<T extends MemoryObjects>(
-    data: StringMap<T>,
-    type: MemoryTypes,
+  protected GetAllMemoryDataFilter<T extends MemoryObjects>(
+    data: StringMap<T>,    
     predicate?: Predicate<T>
   ): StringMap<T> {
-    const validatedData = this.Validate(data, type);
+    const validatedData = this.ValidateMemoryData(data);
     forEach(validatedData.nonValidObjects, (key) => {
       delete data[key];
     });
