@@ -2,53 +2,58 @@ import { clone } from "lodash";
 import BaseCacheData from "./interface";
 
 export default class JobCacheData extends BaseCacheData {
-  private static type: CacheTypes = "Job";
-
-  static Validate(data: StringMap<JobCache>): ValidatedData {
-    return super.Validate(data, this.type);
+  private _id:string;
+  constructor(id:string) {
+    const cacheType:CacheTypes = "Job";
+    super(cacheType);
+    this._id = id;
   }
 
-  static ValidateSingle(data: JobCache): boolean {
-    return super.ValidateSingle(data, this.type);
+  protected ValidateCacheData(data: StringMap<JobCache>): ValidatedData {
+    return super.ValidateCacheData(data);
+  }
+
+  protected ValidateSingleCacheData(data: JobCache): boolean {
+    return super.ValidateSingleCacheData(data);
   }
 
   /**
    * Create an new object of this type
    */
-  static Generate(executer: string, type: JobTypes): JobCache {
+  protected GenerateCacheData(executer: string, type:JobTypes): JobCache {
     return {
       type,
       executer,
-      version: super.MinimumVersion(this.type),
+      version: super.MinimumCacheVersion(),
     };
   }
 
-  static Get(id: string): CRUDResult<JobCache> {
-    const data = clone(Memory.JobsData.cache[id]);
-    if (data === undefined) return { success: false, data: undefined };
-    return { success: this.ValidateSingle(data), data };
+  protected GetCacheData(): CRUDResult<JobCache> {
+    const data = clone(Memory.JobsData.cache[this._id]);
+    return { success: data !== undefined ? this.ValidateSingleCacheData(data) : false, data };
   }
 
-  static Create(id: string, data: JobCache): CRUDResult<JobCache> {
-    const dataAtId = this.Get(id);
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+  protected CreateCacheData(data: JobCache): CRUDResult<JobCache> {
+    let getResult = this.GetCacheData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(id, data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateCacheData(data);
+    getResult = this.GetCacheData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  static Update(id: string, data: JobCache): CRUDResult<JobCache> {
-    Memory.JobsData.cache[id] = data;
-    return { success: true, data };
+  protected UpdateCacheData(data: JobCache): CRUDResult<JobCache> {
+    Memory.JobsData.cache[this._id] = data;
+    return { success:  Memory.JobsData.cache[this._id] !== undefined, data };
   }
 
-  static Delete(id: string): CRUDResult<JobCache> {
-    delete Memory.JobsData.cache[id];
-    return { success: true, data: undefined };
+  protected DeleteCacheData(): CRUDResult<JobCache> {
+    delete Memory.JobsData.cache[this._id];
+    return {success: Memory.CreepsData.cache[this._id] === undefined, data: undefined };
   }
 
-  static GetAll(
+  protected GetAllCacheData(
     executer?: string,
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
@@ -56,9 +61,8 @@ export default class JobCacheData extends BaseCacheData {
     predicate2?: Predicate<JobCache>
   ): StringMap<JobCache> {
     let data = Memory.JobsData.cache;
-    data = super.GetAllData(
+    data = super.GetAllCacheDataFilter(
       data,
-      this.type,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,
@@ -68,13 +72,11 @@ export default class JobCacheData extends BaseCacheData {
     return data;
   }
 
-  static Initialize(
-    id: string,
-    executer: string,
+  protected InitializeCacheData(executer: string,
     type: JobTypes
   ): CRUDResult<JobCache> {
-    const cache = this.Generate(executer, type);
-    const result = this.Create(id, cache);
+    const cache = this.GenerateCacheData(executer, type);
+    const result = this.CreateCacheData(cache);
     return { data: result.data, success: result.success };
   }
 }

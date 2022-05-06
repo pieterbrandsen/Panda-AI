@@ -2,73 +2,75 @@ import { clone } from "lodash";
 import BaseCacheData from "./interface";
 
 export default class DroppedResourceCacheData extends BaseCacheData {
-  private static type: CacheTypes = "DroppedResource";
-
-  static Validate(data: StringMap<DroppedResourceCache>): ValidatedData {
-    return super.Validate(data, this.type);
+  private _id:string;
+  constructor(id:string) {
+    const cacheType:CacheTypes = "DroppedResource";
+    super(cacheType);
+    this._id = id;
   }
 
-  static ValidateSingle(data: DroppedResourceCache): boolean {
-    return super.ValidateSingle(data, this.type);
+  protected ValidateCacheData(data: StringMap<DroppedResourceCache>): ValidatedData {
+    return super.ValidateCacheData(data);
+  }
+
+  protected ValidateSingleCacheData(data: DroppedResourceCache): boolean {
+    return super.ValidateSingleCacheData(data);
   }
 
   /**
    * Create an new object of this type
    */
-  static Generate(
+  protected GenerateCacheData(
     executer: string,
     pos: FreezedRoomPosition,
     type: ResourceConstant
   ): DroppedResourceCache {
     return {
-      version: super.MinimumVersion(this.type),
+      version: super.MinimumCacheVersion(),
       executer,
       pos,
       type,
     };
   }
 
-  static Get(id: string): CRUDResult<DroppedResourceCache> {
-    const data = clone(Memory.DroppedResourceData.cache[id]);
-    if (data === undefined) return { success: false, data: undefined };
-    return { success: this.ValidateSingle(data), data };
+  protected GetCacheData(): CRUDResult<DroppedResourceCache> {
+    const data = clone(Memory.DroppedResourceData.cache[this._id]);
+    return { success: data !== undefined ? this.ValidateSingleCacheData(data) : false, data };
   }
 
-  static Create(
-    id: string,
+  protected CreateCacheData(
     data: DroppedResourceCache
   ): CRUDResult<DroppedResourceCache> {
-    const dataAtId = this.Get(id);
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+    let getResult = this.GetCacheData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(id, data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateCacheData(data);
+    getResult = this.GetCacheData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  static Update(
-    id: string,
+  protected UpdateCacheData(
     data: DroppedResourceCache
   ): CRUDResult<DroppedResourceCache> {
-    Memory.DroppedResourceData.cache[id] = data;
-    return { success: true, data };
+    Memory.DroppedResourceData.cache[this._id] = data;
+    return { success:  Memory.DroppedResourceData.cache[this._id] !== undefined, data };
   }
 
-  static Delete(id: string): CRUDResult<DroppedResourceCache> {
-    delete Memory.DroppedResourceData.cache[id];
-    return { success: true, data: undefined };
+  protected DeleteCacheData(): CRUDResult<DroppedResourceCache> {
+    delete Memory.DroppedResourceData.cache[this._id];
+    return { success: Memory.DroppedResourceData.cache[this._id] === undefined, data: undefined };
   }
 
-  static GetAll(
+  protected GetAllCacheData(
     executer = "",
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<DroppedResourceCache>
   ): StringMap<DroppedResourceCache> {
     let data = Memory.DroppedResourceData.cache;
-    data = super.GetAllData(
+    data = super.GetAllCacheDataFilter(
       data,
-      this.type,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,
@@ -77,14 +79,13 @@ export default class DroppedResourceCacheData extends BaseCacheData {
     return data;
   }
 
-  static Initialize(
-    id: string,
+  protected InitializeCacheData(
     executer: string,
     pos: FreezedRoomPosition,
     type: ResourceConstant
   ): CRUDResult<DroppedResourceCache> {
-    const cache = this.Generate(executer, pos, type);
-    const result = this.Create(id, cache);
-    return { data: result.data, success: result.success };
+    const cache = this.GenerateCacheData(executer, pos, type);
+    const createResult = this.CreateCacheData( cache);
+    return { data: createResult.data, success: createResult.success };
   }
 }

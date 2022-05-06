@@ -2,61 +2,64 @@ import { clone } from "lodash";
 import BaseCacheData from "./interface";
 
 export default class RoomCacheData extends BaseCacheData {
-  private static type: CacheTypes = "Room";
-
-  static Validate(data: StringMap<RoomCache>): ValidatedData {
-    return super.Validate(data, this.type);
+  private _id:string;
+  constructor(id:string) {
+    const cacheType:CacheTypes = "Room";
+    super(cacheType);
+    this._id = id;
+  }
+  protected ValidateCacheData(data: StringMap<RoomCache>): ValidatedData {
+    return super.ValidateCacheData(data);
   }
 
-  static ValidateSingle(data: RoomCache): boolean {
-    return super.ValidateSingle(data, this.type);
+  protected ValidateSingleCacheData(data: RoomCache): boolean {
+    return super.ValidateSingleCacheData(data);
   }
 
   /**
    * Create an new object of this type
    */
-  static Generate(): RoomCache {
+  protected GenerateCacheData(): RoomCache {
     return {
-      version: super.MinimumVersion(this.type),
+      version: super.MinimumCacheVersion(),
       executer: "",
     };
   }
 
-  static Get(id: string): CRUDResult<RoomCache> {
-    const data = clone(Memory.RoomsData.cache[id]);
-    if (data === undefined) return { success: false, data: undefined };
-    return { success: this.ValidateSingle(data), data };
+  protected GetCacheData(): CRUDResult<RoomCache> {
+    const data = clone(Memory.RoomsData.cache[this._id]);
+    return { success: data !== undefined ? this.ValidateSingleCacheData(data) : false, data };
   }
 
-  static Create(id: string, data: RoomCache): CRUDResult<RoomCache> {
-    const dataAtId = this.Get(id);
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+  protected CreateCacheData(data: RoomCache): CRUDResult<RoomCache> {
+    let getResult = this.GetCacheData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.Update(id, data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateCacheData(data);
+    getResult = this.GetCacheData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  static Update(id: string, data: RoomCache): CRUDResult<RoomCache> {
-    Memory.RoomsData.cache[id] = data;
-    return { success: true, data };
+  protected UpdateCacheData(data: RoomCache): CRUDResult<RoomCache> {
+    Memory.RoomsData.cache[this._id] = data;
+    return { success:  Memory.RoomsData.cache[this._id] !== undefined, data };
   }
 
-  static Delete(id: string): CRUDResult<RoomCache> {
-    delete Memory.RoomsData.cache[id];
-    return { success: true, data: undefined };
+  protected Delete(): CRUDResult<RoomCache> {
+    delete Memory.RoomsData.cache[this._id];
+    return { success: Memory.RoomsData.cache[this._id] === undefined, data: undefined };
   }
 
-  static GetAll(
+  protected GetAll(
     executer = "",
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<RoomCache>
   ): StringMap<RoomCache> {
     let data = Memory.RoomsData.cache;
-    data = super.GetAllData(
+    data = super.GetAllCacheDataFilter(
       data,
-      this.type,
       executer,
       getOnlyExecuterJobs,
       roomsToCheck,
@@ -65,9 +68,9 @@ export default class RoomCacheData extends BaseCacheData {
     return data;
   }
 
-  static Initialize(id: string): CRUDResult<RoomCache> {
-    const cache = this.Generate();
-    const result = this.Create(id, cache);
+  protected InitializeCacheData(): CRUDResult<RoomCache> {
+    const cache = this.GenerateCacheData();
+    const result = this.CreateCacheData(cache);
     return { data: result.data, success: result.success };
   }
 }
