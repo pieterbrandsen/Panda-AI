@@ -2,23 +2,21 @@ import { clone } from "lodash";
 import BaseHeapData from "./interface";
 
 export default class RoomHeapData extends BaseHeapData {
-  private type: HeapTypes = "Room";
-
   private _id: string;
-
   constructor(id: string) {
-    super();
+    const heapType: HeapTypes = "Room";
+    super(heapType);
     this._id = id;
   }
 
-  protected ValidateSingleHeap(): boolean {
-    return super.ValidateSingleHeap(this._id, this.type);
+  protected ValidateSingleHeapData(): boolean {
+    return super.ValidateSingleHeapData(this._id);
   }
 
   /**
    * Create an new object of this type
    */
-  protected GenerateHeap(): RoomHeap {
+  protected GenerateHeapData(): RoomHeap {
     return {
       stats: {
         energyIncoming: {
@@ -60,33 +58,34 @@ export default class RoomHeapData extends BaseHeapData {
     };
   }
 
-  protected GetHeap(): CRUDResult<RoomHeap> {
+  protected GetHeapData(): CRUDResult<RoomHeap> {
     const data = clone(global.RoomsData[this._id]);
-    return { success: !!data, data };
+    return { success: this.ValidateSingleHeapData(), data };
   }
 
-  protected CreateHeap(data: RoomHeap): CRUDResult<RoomHeap> {
-    const dataAtId = this.GetHeap();
-    if (dataAtId.success) {
-      return { success: false, data: dataAtId.data };
+  protected CreateHeapData(data: RoomHeap): CRUDResult<RoomHeap> {
+    let getResult = this.GetHeapData();
+    if (getResult.success) {
+      return { success: false, data: getResult.data };
     }
-    const result = this.UpdateHeap(data);
-    return { success: result.success, data: clone(result.data) };
+    this.UpdateHeapData(data);
+    getResult = this.GetHeapData();
+    return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  protected UpdateHeap(data: RoomHeap): CRUDResult<RoomHeap> {
+  protected UpdateHeapData(data: RoomHeap): CRUDResult<RoomHeap> {
     global.RoomsData[this._id] = data;
-    return { success: true, data };
+    return { success: this.ValidateSingleHeapData(), data };
   }
 
   protected DeleteHeap(): CRUDResult<RoomHeap> {
     delete global.RoomsData[this._id];
-    return { success: true, data: undefined };
+    return { success: !this.ValidateSingleHeapData(), data: undefined };
   }
 
   protected InitializeHeap(): CRUDResult<RoomHeap> {
-    const data = this.GenerateHeap();
-    const result = this.CreateHeap(data);
-    return { success: result.success, data: result.data };
+    const data = this.GenerateHeapData();
+    const createResult = this.CreateHeapData(data);
+    return { success: createResult.success, data: createResult.data };
   }
 }

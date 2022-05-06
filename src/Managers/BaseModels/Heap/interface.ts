@@ -3,9 +3,13 @@
 // TODO: Create object
 // TODO: CRUD
 
-export default class HeapData {
-  protected ValidateSingleHeap(id: string, type: HeapTypes): boolean {
-    switch (type) {
+export default class BaseHeapData {
+  private _type: HeapTypes;
+  constructor(type: HeapTypes) {
+    this._type = type;
+  }
+  protected ValidateSingleHeapData(id: string): boolean {
+    switch (this._type) {
       case "Creep":
         return global.CreepsData[id] !== undefined;
       case "Structure":

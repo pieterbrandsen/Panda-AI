@@ -1,21 +1,23 @@
-import { forEach } from "lodash";
+import { clone, forEach } from "lodash";
 import BaseHeapData from "./interface";
 
 export default class GlobalHeapData extends BaseHeapData {
-  private type: HeapTypes = "Global";
-
-  protected MinimumVersion(): number {
+  constructor() {
+    const heapType: HeapTypes = "Global";
+    super(heapType);
+  }
+  public MinimumVersionHeapData(): number {
     return 0;
   }
 
-  protected ValidateSingle(): boolean {
-    return super.ValidateSingleHeap("", this.type);
+  public ValidateSingleHeapData(): boolean {
+    return super.ValidateSingleHeapData("");
   }
 
   /**
    * Create an new object of this type
    */
-  protected Generate(): GlobalData {
+   public GenerateHeapData(): GlobalData {
     return {
       Version: 0,
       CreepsData: {},
@@ -24,24 +26,24 @@ export default class GlobalHeapData extends BaseHeapData {
     };
   }
 
-  protected Get(): CRUDResult<GlobalData> {
-    const data: GlobalData = {
+  public GetHeapData(): CRUDResult<GlobalData> {
+    const data: GlobalData = clone({
       CreepsData: global.CreepsData,
       RoomsData: global.RoomsData,
       StructuresData: global.StructuresData,
       Version: global.Version,
-    };
-    return { success: !!data, data };
+    });
+    return { success: this.ValidateSingleHeapData(), data };
   }
 
-  protected Update(data: GlobalData): CRUDResult<GlobalData> {
+  public UpdateHeapData(data: GlobalData): CRUDResult<GlobalData> {
     forEach(data, (value: unknown, key: string) => {
       global[key] = value;
     });
     return { success: true, data };
   }
 
-  protected Initialize(): boolean {
-    return this.Update(this.Generate()).success;
+  public InitializeHeap(): boolean {
+    return this.UpdateHeapData(this.GenerateHeapData()).success;
   }
 }
