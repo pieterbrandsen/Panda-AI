@@ -3,7 +3,7 @@ import BaseCacheData from "./interface";
 import RoomPosition from "../Helper/Room/position";
 
 export default class StructureCacheData extends BaseCacheData {
-  private _id:string;
+  protected _id:string;
   constructor(id:string) {
     const cacheType:CacheTypes = "Structure";
     super(cacheType);
@@ -50,12 +50,12 @@ export default class StructureCacheData extends BaseCacheData {
     return { success:  Memory.StructuresData.cache[this._id] !== undefined, data };
   }
 
-  protected Delete(): CRUDResult<StructureCache> {
+  protected DeleteCacheData(): CRUDResult<StructureCache> {
     delete Memory.StructuresData.cache[this._id];
     return { success: Memory.StructuresData.cache[this._id] === undefined, data: undefined };
   }
 
-  protected GetAll(
+  protected static GetAllCacheData(type:CacheTypes,
     executer = "",
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
@@ -63,7 +63,7 @@ export default class StructureCacheData extends BaseCacheData {
     predicate2?: Predicate<StructureCache>
   ): StringMap<StructureCache> {
     let data = Memory.StructuresData.cache;
-    data = super.GetAllCacheDataFilter(
+    data = super.GetAllCacheDataFilter(type,
       data,
       executer,
       getOnlyExecuterJobs,

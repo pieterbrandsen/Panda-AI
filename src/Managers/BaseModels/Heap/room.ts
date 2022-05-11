@@ -2,7 +2,7 @@ import { clone } from "lodash";
 import BaseHeapData from "./interface";
 
 export default class RoomHeapData extends BaseHeapData {
-  private _id: string;
+  protected _id: string;
   constructor(id: string) {
     const heapType: HeapTypes = "Room";
     super(heapType);
@@ -78,12 +78,12 @@ export default class RoomHeapData extends BaseHeapData {
     return { success: this.ValidateSingleHeapData(), data };
   }
 
-  protected DeleteHeap(): CRUDResult<RoomHeap> {
+  protected DeleteHeapData(): CRUDResult<RoomHeap> {
     delete global.RoomsData[this._id];
     return { success: !this.ValidateSingleHeapData(), data: undefined };
   }
 
-  protected InitializeHeap(): CRUDResult<RoomHeap> {
+  protected InitializeHeapData(): CRUDResult<RoomHeap> {
     const data = this.GenerateHeapData();
     const createResult = this.CreateHeapData(data);
     return { success: createResult.success, data: createResult.data };

@@ -8,7 +8,7 @@ import DroppedResourceManagerData from "../../DroppedResourceManager/memory";
 import RoomStatsMemoryData from "./Stats/room";
 
 export default class RoomMemoryData extends BaseMemoryData {
-  private _id: string;
+  protected _id: string;
   constructor(id:string) {
     const memoryType: MemoryTypes = "Room";
     super(memoryType);
@@ -80,9 +80,9 @@ export default class RoomMemoryData extends BaseMemoryData {
     return { success: result, data: undefined };
   }
 
-  protected GetAllMemoryData(predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
+  protected static GetAllMemoryData(type:MemoryTypes,predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
     let { data } = Memory.RoomsData;
-    data = super.GetAllMemoryDataFilter(data, predicate);
+    data = super.GetAllMemoryDataFilter(type,data, predicate);
     return data;
   }
 

@@ -3,7 +3,7 @@ import BaseMemoryData from "./interface";
 import RoomPosition from "../Helper/Room/position";
 
 export default class JobMemoryData extends BaseMemoryData {
-  private _id: string;
+  protected _id: string;
   constructor(id:string) {
     const memoryType: MemoryTypes = "Job";
     super(memoryType);
@@ -67,13 +67,14 @@ export default class JobMemoryData extends BaseMemoryData {
     return { success: Memory.JobsData.data[this._id] === undefined, data: undefined };
   }
 
-  protected GetAllMemoryData(
+  protected static GetAllMemoryData(
+    type:MemoryTypes,
     getOnlyFreeJobs = false,
     predicate?: Predicate<JobMemory>
   ): StringMap<JobMemory> {
     let { data } = Memory.JobsData;
     if (getOnlyFreeJobs) data = pickBy(data);
-    data = super.GetAllMemoryDataFilter(data, predicate);
+    data = super.GetAllMemoryDataFilter(type, data, predicate);
     return data;
   }
 

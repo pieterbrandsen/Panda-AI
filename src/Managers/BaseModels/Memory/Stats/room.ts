@@ -7,14 +7,14 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     super();
     this._id = id;
   }
-  protected GetMemoryData(): CRUDResult<RoomStatsMemory> {
+  public GetMemoryData(): CRUDResult<RoomStatsMemory> {
     const data = clone(Memory.stats.rooms[this._id]);
     if (data === undefined) return { success: false, data: undefined };
 
     return { success: !!data, data };
   }
 
-  protected CreateMemoryData(
+  public CreateMemoryData(
     data: RoomStatsMemory
   ): CRUDResult<RoomStatsMemory> {
     let getResult = this.GetMemoryData();
@@ -26,7 +26,7 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  protected UpdateMemoryData(
+  public UpdateMemoryData(
     data: RoomStatsMemory
   ): CRUDResult<RoomStatsMemory> {
     Memory.stats.rooms[this._id] = data;
@@ -38,7 +38,7 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     return { success: Memory.stats.rooms[this._id] === undefined, data: undefined };
   }
 
-  protected GetAllMemoryData(
+  public GetAllMemoryData(
     getOnlyFreeJobs = false,
     predicate?: Predicate<RoomStatsMemory>
   ): StringMap<RoomStatsMemory> {
@@ -48,7 +48,7 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     return data;
   }
 
-  protected GenerateMemoryData(): RoomStatsMemory {
+  public GenerateMemoryData(): RoomStatsMemory {
     return {
       energyIncoming: {
         HarvestMineral: 0,
@@ -88,7 +88,7 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     };
   }
 
-  protected InitializeMemoryData(): CRUDResult<RoomStatsMemory> {
+  public InitializeMemoryData(): CRUDResult<RoomStatsMemory> {
     const data = this.GenerateMemoryData();
     const createResult = this.CreateMemoryData(data);
     return { data: createResult.data, success: createResult.success };

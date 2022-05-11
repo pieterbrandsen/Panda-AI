@@ -2,142 +2,144 @@ import { forEach } from "lodash";
 import StructureMemoryData from "../../Memory/structure";
 import StructureCacheData from "../../Cache/structure";
 import StructureHeapData from "../../Heap/structure";
+import { Mixin } from "ts-mixer";
 
-export default class StructureDataHelper<
-  S extends Structure
-> extends StructureHeapData {
-  protected _structureInformation: StructureInformation<S>;
+export default class StructureData extends Mixin(StructureHeapData,StructureMemoryData,StructureCacheData) {
+  public static cacheType: CacheTypes = "Creep"; 
+  public static memoryType: MemoryTypes = "Creep"; 
+  public _id: string;
 
-  constructor(structureInformation: StructureInformation<S>) {
-    super(structureInformation.structure!.id);
-    this._structureInformation = structureInformation;
+  constructor(id: string) {
+    super(id);
+    this._id = id;
   }
 
-  protected GetData(): DoubleCRUDResult<StructureMemory, StructureCache> {
-    const { id } = this._structureInformation;
+  public HeapDataRepository = {
+    GetData: super.GetHeapData,
+    CreateData: super.CreateHeapData,
+    DeleteData: super.DeleteHeapData,
+    UpdateData: super.UpdateHeapData,
+    InitializeData: super.InitializeHeapData,
+    GenerateData: super.GenerateHeapData,
+  };
+
+  public GetData(): DoubleCRUDResult<StructureMemory, StructureCache> {
     const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = StructureMemoryData.Get(id);
+    const memoryResult = this.GetMemoryData();
     if (memoryResult.success) {
-      result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = StructureCacheData.Get(id);
-    if (cacheResult.success && result.success) {
-      result.success = true;
+    const cacheResult = this.GetCacheData();
+    if (cacheResult.success) {
       result.cache = cacheResult.data;
     }
+
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
     return result;
   }
 
-  protected CreateData(
+  public CreateData(
     memory: StructureMemory,
     cache: StructureCache
   ): DoubleCRUDResult<StructureMemory, StructureCache> {
-    const { id } = this._structureInformation;
     const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
-    const memoryResult = StructureMemoryData.Create(id, memory);
+    const memoryResult = this.CreateMemoryData(memory);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
-      result.success = true;
     }
 
-    const cacheResult = StructureCacheData.Create(id, cache);
-    if (cacheResult.success && result.success) {
+    const cacheResult = this.CreateCacheData(cache);
+    if (cacheResult.success) {
       result.cache = cacheResult.data;
+    }
+
+    if (result.cache !== undefined && result.memory !== undefined)
       result.success = true;
-    }
+    else this.DeleteData();
 
     return result;
   }
 
-  protected DeleteData(
-    isMemory: boolean,
-    isCache: boolean
-  ): DoubleCRUDResult<StructureMemory, StructureCache> {
-    const { id } = this._structureInformation;
-    const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
-      success: false,
-      memory: undefined,
-      cache: undefined,
-    };
-    if (isMemory) {
-      const deleteResult = StructureMemoryData.Delete(id);
-      if (deleteResult.success) {
-        result.success = true;
-        result.memory = deleteResult.data;
-      }
-    }
-    if (isCache && result.success) {
-      const deleteResult = StructureCacheData.Delete(id);
-      if (deleteResult.success) {
-        result.success = true;
-        result.cache = deleteResult.data;
-      }
-    }
-    return result;
-  }
-
-  protected UpdateData(
-    memory?: StructureMemory,
-    cache?: StructureCache
-  ): DoubleCRUDResult<StructureMemory, StructureCache> {
-    const { id } = this._structureInformation;
+  public DeleteData(): DoubleCRUDResult<StructureMemory, StructureCache> {
     const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
-    if (memory) {
-      const updateResult = StructureMemoryData.Update(id, memory);
-      if (updateResult.success) {
-        result.success = true;
-        result.memory = updateResult.data;
+    const data = this.GetData();
+    if (data.success) {
+      const memoryResult = this.DeleteMemoryData();
+      if (memoryResult.success) {
+        result.memory = data.memory;
+      }
+
+      const cacheResult = this.DeleteCacheData();
+      if (cacheResult.success) {
+        result.cache = cacheResult.data;
       }
     }
-    if (cache && result.success) {
-      const updateResult = StructureCacheData.Update(id, cache);
-      if (updateResult.success) {
-        result.success = true;
-        result.cache = updateResult.data;
-      }
+
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
+    else this.CreateData(data.memory as StructureMemory, data.cache as StructureCache);
+    return result;
+  }
+
+  public UpdateData(
+    memory: StructureMemory,
+    cache: StructureCache
+  ): DoubleCRUDResult<StructureMemory, StructureCache> {
+    const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
+      success: false,
+      memory: undefined,
+      cache: undefined,
+    };
+
+    const updateMemoryResult = this.UpdateMemoryData(memory);
+    if (updateMemoryResult.success) {
+      result.memory = updateMemoryResult.data;
+    }
+    const updateCacheResult = this.UpdateCacheData(cache);
+    if (updateCacheResult.success) {
+      result.cache = updateCacheResult.data;
     }
 
     return result;
   }
 
-  protected InitializeData(
+  public InitializeData(
     data: StructureInitializationData
   ): DoubleCRUDResult<StructureMemory, StructureCache> {
-    const { id } = data.structure;
     const result: DoubleCRUDResult<StructureMemory, StructureCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = StructureMemoryData.Initialize(id, data.isSource);
+    const memoryResult = this.InitializeMemoryData(data.isSource);
     if (memoryResult.success) {
-      result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = StructureCacheData.Initialize(
-      id,
+    const cacheResult = this.InitializeCacheData(
       data.structure,
       data.executer
     );
     if (cacheResult.success && result.success) {
-      result.success = true;
       result.cache = cacheResult.data;
     }
+    
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
     return result;
   }
 
@@ -155,8 +157,8 @@ export default class StructureDataHelper<
     > = {};
     const ids = Object.keys(
       isMemory
-        ? StructureMemoryData.GetAll(predicateMemory)
-        : StructureCacheData.GetAll(
+        ? this.GetAllMemoryData(this.memoryType, predicateMemory)
+        : this.GetAllCacheData(this.cacheType,
             executer,
             getOnlyExecuterJobs,
             roomsToCheck,
@@ -165,13 +167,13 @@ export default class StructureDataHelper<
           )
     );
     forEach(ids, (id) => {
-      const memoryResult = StructureMemoryData.Get(id);
-      const cacheResult = StructureCacheData.Get(id);
-      if (memoryResult.success && cacheResult.success) {
+      const repository = new StructureData(id);
+      const dataResult = repository.GetData();
+      if (dataResult.success) {
         result[id] = {
           success: true,
-          memory: memoryResult.data,
-          cache: cacheResult.data,
+          memory: dataResult.memory,
+          cache: dataResult.cache,
         };
       }
     });
@@ -179,13 +181,13 @@ export default class StructureDataHelper<
     return result;
   }
 
-  public static GetAllDataBasedOnMemory(
+  public static GetAllDataMemoryBasedOnMemory(
     predicate?: Predicate<StructureMemory>
   ): StringMap<DoubleCRUDResult<StructureMemory, StructureCache>> {
     return this.GetAllData(true, undefined, undefined, undefined, predicate);
   }
 
-  public static GetAllDataBasedOnCache(
+  public static GetAllMemoryDataBasedOnCache(
     executer = "",
     getOnlyExecuterJobs = false,
     roomsToCheck?: string[],

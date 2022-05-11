@@ -2,125 +2,126 @@ import { forEach } from "lodash";
 import CreepMemoryData from "../../Memory/creep";
 import CreepCacheData from "../../Cache/creep";
 import CreepHeapData from "../../Heap/creep";
+import { Mixin } from "ts-mixer";
 
-export default class CreepData extends CreepHeapData {
-  protected _creepInformation: CreepInformation;
+export default class CreepData extends Mixin(
+  CreepHeapData,
+  CreepMemoryData,
+  CreepCacheData
+) {
+  public static cacheType: CacheTypes = "Creep"; 
+  public static memoryType: MemoryTypes = "Creep"; 
+  protected _id: string;
 
-  constructor(creepInformation: CreepInformation) {
-    super(creepInformation.id);
-    this._creepInformation = creepInformation;
+  constructor(id: string) {
+    super(id);
+    this._id = id;
   }
+  public HeapDataRepository = {
+    GetData: super.GetHeapData,
+    CreateData: super.CreateHeapData,
+    DeleteData: super.DeleteHeapData,
+    UpdateData: super.UpdateHeapData,
+    InitializeData: super.InitializeHeapData,
+    GenerateData: super.GenerateHeapData,
+  };
 
-  protected GetData(): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const { id } = this._creepInformation;
+  public GetData(): DoubleCRUDResult<CreepMemory, CreepCache> {
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = CreepMemoryData.Get(id);
+    const memoryResult = this.GetMemoryData();
     if (memoryResult.success) {
-      result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = CreepCacheData.Get(id);
+    const cacheResult = this.GetCacheData();
     if (cacheResult.success) {
-      result.success = true;
       result.cache = cacheResult.data;
     }
+
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
     return result;
   }
 
-  protected CreateData(
+  public CreateData(
     memory: CreepMemory,
     cache: CreepCache
   ): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const { id } = this._creepInformation;
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
-    const memoryResult = CreepMemoryData.Create(id, memory);
+    const memoryResult = this.CreateMemoryData(memory);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
-      result.success = true;
     }
 
-    const cacheResult = CreepCacheData.Create(id, cache);
-    if (cacheResult.success && result.success) {
+    const cacheResult = this.CreateCacheData(cache);
+    if (cacheResult.success) {
       result.cache = cacheResult.data;
+    }
+
+    if (result.cache !== undefined && result.memory !== undefined)
       result.success = true;
-    }
+    else this.DeleteData();
 
     return result;
   }
 
-  protected DeleteData(
-    isMemory: boolean,
-    isCache: boolean
-  ): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const { id } = this._creepInformation;
+  public DeleteData(): DoubleCRUDResult<CreepMemory, CreepCache> {
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
-    const memoryData = CreepMemoryData.Get(id);
-    if (memoryData.success) {
-      const memory = memoryData.data as CreepMemory;
-      delete Memory.creeps[memory.name];
+    const data = this.GetData();
+    if (data.success) {
+      const memoryResult = this.DeleteMemoryData();
+      if (memoryResult.success) {
+        result.memory = data.memory;
+      }
+
+      const cacheResult = this.DeleteCacheData();
+      if (cacheResult.success) {
+        result.cache = cacheResult.data;
+      }
     }
 
-    if (isMemory) {
-      const deleteResult = CreepMemoryData.Delete(id);
-      if (deleteResult.success) {
-        result.success = true;
-        result.memory = deleteResult.data;
-      }
-    }
-    if (isCache && result.success) {
-      const deleteResult = CreepCacheData.Delete(id);
-      if (deleteResult.success) {
-        result.success = true;
-        result.cache = deleteResult.data;
-      }
-    }
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
+    else this.CreateData(data.memory as CreepMemory, data.cache as CreepCache);
     return result;
   }
 
-  protected UpdateData(
-    memory?: CreepMemory,
-    cache?: CreepCache
+  public UpdateData(
+    memory: CreepMemory,
+    cache: CreepCache
   ): DoubleCRUDResult<CreepMemory, CreepCache> {
-    const { id } = this._creepInformation;
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
-    if (memory) {
-      const updateResult = CreepMemoryData.Update(id, memory);
-      if (updateResult.success) {
-        result.success = true;
-        result.memory = updateResult.data;
-      }
+    const updateMemoryResult = this.UpdateMemoryData(memory);
+    if (updateMemoryResult.success) {
+      result.memory = updateMemoryResult.data;
     }
-    if (cache && result.success) {
-      const updateResult = CreepCacheData.Update(id, cache);
-      if (updateResult.success) {
-        result.success = true;
-        result.cache = updateResult.data;
-      }
+    const updateCacheResult = this.UpdateCacheData(cache);
+    if (updateCacheResult.success) {
+      result.cache = updateCacheResult.data;
     }
 
     return result;
   }
 
-  protected InitializeData(
+  public InitializeData(
     data: CreepInitializationData
   ): DoubleCRUDResult<CreepMemory, CreepCache> {
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {
@@ -129,26 +130,26 @@ export default class CreepData extends CreepHeapData {
       cache: undefined,
     };
 
-    const memoryResult = CreepMemoryData.Initialize(
-      data.id,
+    const memoryResult = this.InitializeMemoryData(
       data.name,
       data.isRemoteCreep
     );
     if (memoryResult.success) {
-      result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = CreepCacheData.Initialize(
-      data.id,
+
+    const cacheResult = this.InitializeCacheData(
       data.executer,
       data.body,
       data.pos,
       data.type
     );
     if (cacheResult.success && result.success) {
-      result.success = true;
       result.cache = cacheResult.data;
     }
+
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
     return result;
   }
 
@@ -163,8 +164,8 @@ export default class CreepData extends CreepHeapData {
     const result: StringMap<DoubleCRUDResult<CreepMemory, CreepCache>> = {};
     const ids = Object.keys(
       isMemory
-        ? CreepMemoryData.GetAll(predicateMemory)
-        : CreepCacheData.GetAll(
+        ? CreepMemoryData.GetAllMemoryData(this.memoryType,predicateMemory)
+        : CreepCacheData.GetAllCacheData(this.cacheType,
             executer,
             getOnlyExecuterJobs,
             roomsToCheck,
@@ -172,13 +173,13 @@ export default class CreepData extends CreepHeapData {
           )
     );
     forEach(ids, (id) => {
-      const memoryResult = CreepMemoryData.Get(id);
-      const cacheResult = CreepCacheData.Get(id);
-      if (memoryResult.success && cacheResult.success) {
+      const repository = new CreepData(id);
+      const dataResult = repository.GetData();
+      if (dataResult.success) {
         result[id] = {
           success: true,
-          memory: memoryResult.data,
-          cache: cacheResult.data,
+          memory: dataResult.memory,
+          cache: dataResult.cache,
         };
       }
     });

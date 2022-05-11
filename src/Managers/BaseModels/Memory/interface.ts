@@ -3,7 +3,7 @@
 import { forEach, pickBy } from "lodash";
 
 export default abstract class BaseMemoryData {
-  private _type:MemoryTypes;
+  protected _type:MemoryTypes;
   constructor(protected type: MemoryTypes) {
     this._type = type;
   }
@@ -11,8 +11,8 @@ export default abstract class BaseMemoryData {
   /**
    * Returns minimum memory version for type saved in memory
    */
-  protected MinimumMemoryVersion(): number {
-    switch (this._type) {
+  protected static MinimumMemoryVersion(type: MemoryTypes): number {
+    switch (type) {
       case "Creep":
         if (Memory.CreepsData) return Memory.CreepsData.version;
         break;
@@ -39,14 +39,17 @@ export default abstract class BaseMemoryData {
     }
     return 999;
   }
-
+  protected MinimumMemoryVersion(): number {
+    return BaseMemoryData.MinimumMemoryVersion(this._type);
+  }
   /**
    * Check all data in object and return list of non valid memory objects based on version
    */
-  protected ValidateMemoryData(
+  protected static ValidateMemoryData(
+    type:MemoryTypes,
     data: StringMap<MemoryObjects>
       ): ValidatedData {
-    const minimumVersion = this.MinimumMemoryVersion();
+    const minimumVersion = this.MinimumMemoryVersion(type);
     let isValid = true;
     const nonValidObjects: string[] = [];
     forEach(data, (value, key) => {
@@ -58,14 +61,19 @@ export default abstract class BaseMemoryData {
 
     return { isValid, nonValidObjects };
   }
-
+  protected ValidateMemoryData(
+    data: StringMap<MemoryObjects>,
+  ): ValidatedData {
+    return BaseMemoryData.ValidateMemoryData(this._type, data);
+  }
   /**
    * Check single object and return if its valid based on version
    */
-  protected ValidateSingleMemoryData(
+  public static ValidateSingleMemoryData(
+    type:MemoryTypes,
     data: MemoryObjects,
   ): boolean {
-    const minimumVersion = this.MinimumMemoryVersion();
+    const minimumVersion = this.MinimumMemoryVersion(type);
 
     let isValid = true;
     if (data.version !== minimumVersion) {
@@ -75,11 +83,15 @@ export default abstract class BaseMemoryData {
     return isValid;
   }
 
-  protected GetAllMemoryDataFilter<T extends MemoryObjects>(
+  protected ValidateSingleMemoryData(data: MemoryObjects): boolean {
+    return BaseMemoryData.ValidateSingleMemoryData(this._type, data);
+  }
+
+  public static GetAllMemoryDataFilter<T extends MemoryObjects>(type:MemoryTypes,
     data: StringMap<T>,    
     predicate?: Predicate<T>
   ): StringMap<T> {
-    const validatedData = this.ValidateMemoryData(data);
+    const validatedData = this.ValidateMemoryData(type,data);
     forEach(validatedData.nonValidObjects, (key) => {
       delete data[key];
     });

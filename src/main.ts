@@ -11,14 +11,15 @@ import Market from "./Extra/Market";
 
 // eslint-disable-next-line
 export const loop = ErrorMapper.wrapLoop((): void => {
-  if (!HeapMemory.ValidateSingleHeap()) {
+  const globalData = new GlobalData();
+  if (!globalData.ValidateSingleHeap()) {
     RawMemory.setActiveSegments([1, 98]);
-    HeapMemory.Initialize();
+    globalData.InitializeHeap();
     return;
   }
 
-  if (!GlobalMemory.ValidateSingle()) {
-    GlobalData.Initialize();
+  if (!globalData.ValidateSingleData()) {
+    globalData.InitializeData();
     return;
   }
 

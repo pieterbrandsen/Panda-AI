@@ -2,7 +2,7 @@ import { clone } from "lodash";
 import BaseMemoryData from "./interface";
 
 export default class CreepMemoryData extends BaseMemoryData {
-  private _id: string;
+  protected _id: string;
   constructor(id:string) {
     const memoryType: MemoryTypes = "Creep";
     super(memoryType);
@@ -55,13 +55,13 @@ export default class CreepMemoryData extends BaseMemoryData {
     return { success: Memory.CreepsData.data[this._id] === undefined, data: undefined };
   }
 
-  protected GetAllMemoryData(predicate?: Predicate<CreepMemory>): StringMap<CreepMemory> {
+  protected static GetAllMemoryData(type:MemoryTypes,predicate?: Predicate<CreepMemory>): StringMap<CreepMemory> {
     let { data } = Memory.CreepsData;
-    data = super.GetAllMemoryDataFilter(data, predicate);
+    data = super.GetAllMemoryDataFilter(type,data, predicate);
     return data;
   }
 
-  protected Initialize(
+  protected InitializeMemoryData(
     name: string,
     isRemoteCreep: boolean
   ): CRUDResult<CreepMemory> {

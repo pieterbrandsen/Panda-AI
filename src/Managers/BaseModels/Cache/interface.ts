@@ -5,16 +5,16 @@ import { forEach, pickBy } from "lodash";
 import Predicates from "./predicates";
 
 export default abstract class BaseCacheData {
-  constructor(type: CacheTypes) {
+  protected _type: CacheTypes;
+  constructor(type:CacheTypes) {
     this._type = type;
   }
-  private _type: CacheTypes;
 
   /**
    * Returns minimum cache version for type saved in cache
    */
-  protected MinimumCacheVersion(): number {
-    switch (this._type) {
+  protected static MinimumCacheVersion(type: CacheTypes): number {
+    switch (type) {
       case "Creep":
         return Memory.CreepsData.version;
       case "Structure":
@@ -28,13 +28,18 @@ export default abstract class BaseCacheData {
     }
   }
 
+  protected MinimumCacheVersion(): number {
+    return BaseCacheData.MinimumCacheVersion(this._type);
+  }
+
   /**
    * Check all data in object and return list of non valid cache objects based on version
    */
-  protected ValidateCacheData(
+  protected static ValidateCacheData(
+    type:CacheTypes,
     data: StringMap<CacheObjects>,
   ): ValidatedData {
-    const minimumVersion = this.MinimumCacheVersion();
+    const minimumVersion = this.MinimumCacheVersion(type);
     let isValid = true;
     const nonValidObjects: string[] = [];
     forEach(data, (value, key) => {
@@ -47,11 +52,17 @@ export default abstract class BaseCacheData {
     return { isValid, nonValidObjects };
   }
 
+  protected ValidateCacheData(
+    data: StringMap<CacheObjects>,
+  ): ValidatedData {
+    return BaseCacheData.ValidateCacheData(this._type, data);
+  }
+
   /**
    * Check single object and return if its valid based on version
    */
-  protected ValidateSingleCacheData(data: CacheObjects): boolean {
-    const minimumVersion = this.MinimumCacheVersion();
+  protected static ValidateSingleCacheData(type:CacheTypes, data: CacheObjects): boolean {
+    const minimumVersion = this.MinimumCacheVersion(type);
     let isValid = true;
     if (data.version < minimumVersion) {
       isValid = false;
@@ -59,16 +70,19 @@ export default abstract class BaseCacheData {
 
     return isValid;
   }
+  protected ValidateSingleCacheData(data: CacheObjects): boolean {
+    return BaseCacheData.ValidateSingleCacheData(this._type, data);
+  }
 
-  protected GetAllCacheDataFilter<T extends CacheObjects>(
-    data: StringMap<T>,
+  protected static GetAllCacheDataFilter<T extends CacheObjects>(
+    type:CacheTypes, data: StringMap<T>,
     executer?: string,
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<T>,
     predicate2?: Predicate<T>
   ): StringMap<T> {
-    const validatedData = this.ValidateCacheData(data);
+    const validatedData = this.ValidateCacheData(type,data);
     forEach(validatedData.nonValidObjects, (key) => {
       delete data[key];
     });

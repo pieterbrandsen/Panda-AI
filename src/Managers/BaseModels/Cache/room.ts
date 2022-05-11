@@ -2,7 +2,7 @@ import { clone } from "lodash";
 import BaseCacheData from "./interface";
 
 export default class RoomCacheData extends BaseCacheData {
-  private _id:string;
+  protected _id:string;
   constructor(id:string) {
     const cacheType:CacheTypes = "Room";
     super(cacheType);
@@ -46,19 +46,19 @@ export default class RoomCacheData extends BaseCacheData {
     return { success:  Memory.RoomsData.cache[this._id] !== undefined, data };
   }
 
-  protected Delete(): CRUDResult<RoomCache> {
+  protected DeleteCacheData(): CRUDResult<RoomCache> {
     delete Memory.RoomsData.cache[this._id];
     return { success: Memory.RoomsData.cache[this._id] === undefined, data: undefined };
   }
 
-  protected GetAll(
+  protected static GetAllCacheData(type:CacheTypes,
     executer = "",
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<RoomCache>
   ): StringMap<RoomCache> {
     let data = Memory.RoomsData.cache;
-    data = super.GetAllCacheDataFilter(
+    data = super.GetAllCacheDataFilter(type,
       data,
       executer,
       getOnlyExecuterJobs,

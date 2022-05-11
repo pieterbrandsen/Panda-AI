@@ -4,7 +4,7 @@
 // TODO: CRUD
 
 export default class BaseHeapData {
-  private _type: HeapTypes;
+  protected _type: HeapTypes;
   constructor(type: HeapTypes) {
     this._type = type;
   }

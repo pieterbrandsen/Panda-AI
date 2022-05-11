@@ -1,23 +1,31 @@
+import { Mixin } from "ts-mixer";
+import GlobalHeapData from "../../Heap/global";
 import GlobalMemoryData from "../../Memory/global";
 
-export default class GlobalDataHelper {
-  static GetMemory(): CRUDResult<Memory> {
-    return GlobalMemoryData.Get();
+export default class GlobalDataHelper extends Mixin(GlobalHeapData,GlobalMemoryData) {
+  public HeapDataRepository = {
+    GetData: super.GetHeapData,
+    UpdateData: super.UpdateHeapData,
+    GenerateData: super.GenerateHeapData,
+  };
+
+  public GetData(): CRUDResult<Memory> {
+    return super.GetMemoryData();
   }
 
-  static CreateMemory(memory: Memory): CRUDResult<Memory> {
-    return GlobalMemoryData.Update(memory);
+  public CreateData(memory: Memory): CRUDResult<Memory> {
+    return super.UpdateMemoryData(memory);
   }
 
-  static DeleteMemory(): CRUDResult<Memory> {
-    return GlobalMemoryData.Delete();
+  public DeleteData(): CRUDResult<Memory> {
+    return super.DeleteMemoryData();
   }
 
-  static UpdateMemory(memory: Memory): CRUDResult<Memory> {
-    return GlobalMemoryData.Update(memory);
+  public UpdateData(memory: Memory): CRUDResult<Memory> {
+    return super.UpdateMemoryData(memory);
   }
 
-  static Initialize(): CRUDResult<Memory> {
-    return GlobalMemoryData.Initialize();
+  public InitializeData(): CRUDResult<Memory> {
+    return super.InitializeMemoryData();
   }
 }

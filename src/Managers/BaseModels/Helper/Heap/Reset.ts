@@ -4,7 +4,8 @@ import StatsMemoryData from "../../Memory/Stats/global";
 
 export default class ResetHeap {
   static Reset(): boolean {
-    const statsData = StatsMemoryData.Get();
+    const statsRepo = new StatsMemoryData();
+    const statsData = statsRepo.GetMemoryData();
     if (!statsData.success) return false;
     const statsMemory = statsData.data as StatsMemory;
 
@@ -65,6 +66,6 @@ export default class ResetHeap {
       }
     });
 
-    return StatsMemoryData.Update(statsMemory).success;
+    return statsRepo.UpdateMemoryData(statsMemory).success;
   }
 }

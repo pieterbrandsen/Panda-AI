@@ -1,33 +1,40 @@
 import { forEach } from "lodash";
 import JobMemoryData from "../../Memory/job";
 import JobCacheData from "../../Cache/job";
+import { Mixin } from "ts-mixer";
 
-export default class JobDataHelper {
-  static GetJobId(type: JobTypes, pos: FreezedRoomPosition): string {
-    return `${type}_${pos.x}_${pos.y}_${pos.roomName}`;
+export default class JobData extends Mixin(JobMemoryData,JobCacheData) {
+  public static cacheType: CacheTypes = "Job"; 
+  public static memoryType: MemoryTypes = "Job"; 
+  protected _id: string;
+
+    constructor(forcedId:string="",type?: JobTypes, pos?: FreezedRoomPosition) {
+      const id = type !== undefined && pos !== undefined ? `${type}_${pos.x}_${pos.y}_${pos.roomName}`: forcedId;
+    super(id);
+    this._id = id;
   }
 
-  static GetMemory(id: string): DoubleCRUDResult<JobMemory, JobCache> {
+  public GetData(): DoubleCRUDResult<JobMemory, JobCache> {
     const result: DoubleCRUDResult<JobMemory, JobCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = JobMemoryData.Get(id);
+    const memoryResult = this.GetMemoryData();
     if (memoryResult.success) {
-      result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = JobCacheData.Get(id);
-    if (cacheResult.success && result.success) {
-      result.success = true;
+    const cacheResult = this.GetCacheData();
+    if (cacheResult.success) {
       result.cache = cacheResult.data;
     }
+
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
     return result;
   }
 
-  static CreateMemory(
-    id: string,
+  public CreateData(
     memory: JobMemory,
     cache: JobCache
   ): DoubleCRUDResult<JobMemory, JobCache> {
@@ -37,60 +44,61 @@ export default class JobDataHelper {
       cache: undefined,
     };
 
-    const memoryResult = JobMemoryData.Create(id, memory);
+    const memoryResult = this.CreateMemoryData(memory);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
-      result.success = true;
     }
 
-    const cacheResult = JobCacheData.Create(id, cache);
-    if (cacheResult.success && result.success) {
+    const cacheResult = this.CreateCacheData(cache);
+    if (cacheResult.success) {
       result.cache = cacheResult.data;
-      result.success = true;
     }
+
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
+    else this.DeleteData();
 
     return result;
   }
 
-  static DeleteMemory(
-    id: string,
-    isMemory: boolean,
-    isCache: boolean
+  protected DeleteData(
   ): DoubleCRUDResult<JobMemory, JobCache> {
     const result: DoubleCRUDResult<JobMemory, JobCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    if (isMemory) {
-      const deleteResult = JobMemoryData.Delete(id);
-      if (deleteResult.success) {
-        result.success = true;
-        result.memory = deleteResult.data;
+    const data = this.GetData();
+    if (data.success) {
+      const memoryResult = this.DeleteMemoryData();
+      if (memoryResult.success) {
+        result.memory = data.memory;
+      }
+
+      const cacheResult = this.DeleteCacheData();
+      if (cacheResult.success) {
+        result.cache = cacheResult.data;
       }
     }
-    if (isCache && result.success) {
-      const deleteResult = JobCacheData.Delete(id);
-      if (deleteResult.success) {
-        result.success = true;
-        result.cache = deleteResult.data;
-      }
-    }
+
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
+    else this.CreateData(data.memory as JobMemory, data.cache as JobCache);
     return result;
   }
 
-  static DeleteAllData(roomName: string): void {
-    const jobIds = Object.keys(JobCacheData.GetAll("", false, [roomName]));
+  public static DeleteAllData(roomName: string): void {
+    const jobIds = Object.keys(JobCacheData.GetAllCacheData(this.cacheType,"", false, [roomName]));
 
     forEach(jobIds, (id) => {
-      this.DeleteMemory(id, true, true);
+      const repo = new JobData(id)
+      repo.DeleteData();
     });
   }
 
-  static UpdateMemory(
-    id: string,
-    memory?: JobMemory,
-    cache?: JobCache
+  public UpdateData(
+    memory: JobMemory,
+    cache: JobCache
   ): DoubleCRUDResult<JobMemory, JobCache> {
     const result: DoubleCRUDResult<JobMemory, JobCache> = {
       success: false,
@@ -98,35 +106,27 @@ export default class JobDataHelper {
       cache: undefined,
     };
 
-    if (memory) {
-      const updateResult = JobMemoryData.Update(id, memory);
-      if (updateResult.success) {
-        result.success = true;
-        result.memory = updateResult.data;
-      }
+    const updateMemoryResult = this.UpdateMemoryData(memory);
+    if (updateMemoryResult.success) {
+      result.memory = updateMemoryResult.data;
     }
-    if (cache && result.success) {
-      const updateResult = JobCacheData.Update(id, cache);
-      if (updateResult.success) {
-        result.success = true;
-        result.cache = updateResult.data;
-      }
+    const updateCacheResult = this.UpdateCacheData(cache);
+    if (updateCacheResult.success) {
+      result.cache = updateCacheResult.data;
     }
 
     return result;
   }
 
-  static Initialize(
+  public InitializeData(
     data: JobInitializationData
   ): DoubleCRUDResult<JobMemory, JobCache> {
-    const id = this.GetJobId(data.type, data.pos);
     const result: DoubleCRUDResult<JobMemory, JobCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = JobMemoryData.Initialize(
-      id,
+    const memoryResult = this.InitializeMemoryData(
       data.targetId,
       data.pos,
       data.objectType,
@@ -136,18 +136,18 @@ export default class JobDataHelper {
       data.maxCreepsCount
     );
     if (memoryResult.success) {
-      result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = JobCacheData.Initialize(id, data.executer, data.type);
+    const cacheResult = this.InitializeCacheData(data.executer, data.type);
     if (cacheResult.success && result.success) {
-      result.success = true;
       result.cache = cacheResult.data;
     }
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
     return result;
   }
 
-  private static GetAll(
+  public static GetAllData(
     isMemory: boolean,
     getOnlyFreeJobs?: boolean,
     executer?: string,
@@ -159,8 +159,8 @@ export default class JobDataHelper {
     const result: StringMap<DoubleCRUDResult<JobMemory, JobCache>> = {};
     const ids = Object.keys(
       isMemory
-        ? JobMemoryData.GetAll(getOnlyFreeJobs, predicateMemory)
-        : JobCacheData.GetAll(
+        ? JobMemoryData.GetAllMemoryData(this.memoryType,getOnlyFreeJobs, predicateMemory)
+        : JobCacheData.GetAllCacheData(this.cacheType,
             executer,
             getOnlyExecuterJobs,
             roomsToCheck,
@@ -168,13 +168,13 @@ export default class JobDataHelper {
           )
     );
     forEach(ids, (id) => {
-      const memoryResult = JobMemoryData.Get(id);
-      const cacheResult = JobCacheData.Get(id);
-      if (memoryResult.success && cacheResult.success) {
+      const repository = new JobData(id);
+      const dataResult = repository.GetData();
+      if (dataResult.success) {
         result[id] = {
           success: true,
-          memory: memoryResult.data,
-          cache: cacheResult.data,
+          memory: dataResult.memory,
+          cache: dataResult.cache,
         };
       }
     });
@@ -182,11 +182,11 @@ export default class JobDataHelper {
     return result;
   }
 
-  static GetAllBasedOnMemory(
+  public static GetAllDataBasedOnMemory(
     getOnlyFreeJobs = false,
     predicate?: Predicate<JobMemory>
   ): StringMap<DoubleCRUDResult<JobMemory, JobCache>> {
-    return this.GetAll(
+    return this.GetAllData(
       true,
       getOnlyFreeJobs,
       undefined,
@@ -196,13 +196,13 @@ export default class JobDataHelper {
     );
   }
 
-  static GetAllBasedOnCache(
+  public static  GetAllDataBasedOnCache(
     executer = "",
     getOnlyExecuterJobs = false,
     roomsToCheck?: string[],
     predicate?: Predicate<JobCache>
   ): StringMap<DoubleCRUDResult<JobMemory, JobCache>> {
-    return this.GetAll(
+    return this.GetAllData(
       false,
       undefined,
       executer,

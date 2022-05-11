@@ -2,156 +2,141 @@ import { forEach } from "lodash";
 import RoomMemoryData from "../../Memory/room";
 import RoomCacheData from "../../Cache/room";
 import RoomHeapData from "../../Heap/room";
+import { Mixin } from "ts-mixer";
 
-export default class RoomData extends RoomHeapData {
-  protected _roomInformation: RoomInformation;
+export default class RoomData extends Mixin(RoomHeapData,RoomMemoryData,RoomCacheData) {
+  public static cacheType: CacheTypes = "Room"; 
+  public static memoryType: MemoryTypes = "Room"; 
+  protected _id: string;
 
-  constructor(roomInformation: RoomInformation) {
-    super(roomInformation.name);
-    this._roomInformation = roomInformation;
+  constructor(id: string) {
+    super(id);
+    this._id = id;
   }
+  public HeapDataRepository = {
+    GetData: super.GetHeapData,
+    CreateData: super.CreateHeapData,
+    DeleteData: super.DeleteHeapData,
+    UpdateData: super.UpdateHeapData,
+    InitializeData: super.InitializeHeapData,
+    GenerateData: super.GenerateHeapData,
+  };
 
   protected GetData(): DoubleCRUDResult<RoomMemory, RoomCache> {
-    const { name } = this._roomInformation;
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = RoomMemoryData.Get(name);
+    const memoryResult = this.GetMemoryData();
     if (memoryResult.success) {
-      result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = RoomCacheData.Get(name);
+    const cacheResult = this.GetCacheData();
     if (cacheResult.success) {
-      result.success = true;
       result.cache = cacheResult.data;
     }
+
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
     return result;
   }
 
-  protected CreateData(
+  public CreateData(
     memory: RoomMemory,
     cache: RoomCache
   ): DoubleCRUDResult<RoomMemory, RoomCache> {
-    const { name } = this._roomInformation;
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
-    const memoryResult = RoomMemoryData.Create(name, memory);
+    const memoryResult = this.CreateMemoryData(memory);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
-      result.success = true;
     }
 
-    const cacheResult = RoomCacheData.Create(name, cache);
-    if (cacheResult.success && result.success) {
+    const cacheResult = this.CreateCacheData(cache);
+    if (cacheResult.success) {
       result.cache = cacheResult.data;
+    }
+
+    if (result.cache !== undefined && result.memory !== undefined)
       result.success = true;
-    }
-
+    else this.DeleteData();
     return result;
   }
 
-  protected DeleteData(
-    isMemory: boolean,
-    isCache: boolean
-  ): DoubleCRUDResult<RoomMemory, RoomCache> {
-    const { name } = this._roomInformation;
+  public DeleteData(): DoubleCRUDResult<RoomMemory, RoomCache> {
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    if (isMemory) {
-      const deleteResult = RoomMemoryData.Delete(name);
-      if (deleteResult.success) {
-        result.success = true;
-        result.memory = deleteResult.data;
+    const data = this.GetData();
+    if (data.success) {
+      const memoryResult = this.DeleteMemoryData();
+      if (memoryResult.success) {
+        result.memory = data.memory;
+      }
+
+      const cacheResult = this.DeleteCacheData();
+      if (cacheResult.success) {
+        result.cache = cacheResult.data;
       }
     }
-    if (isCache && result.success) {
-      const deleteResult = RoomCacheData.Delete(name);
-      if (deleteResult.success) {
-        result.success = true;
-        result.cache = deleteResult.data;
-      }
-    }
+
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
+    else this.CreateData(data.memory as RoomMemory, data.cache as RoomCache);
     return result;
   }
 
-  protected UpdateData(
-    memory?: RoomMemory,
-    cache?: RoomCache
+  public UpdateData(
+    memory: RoomMemory,
+    cache: RoomCache
   ): DoubleCRUDResult<RoomMemory, RoomCache> {
-    const { name } = this._roomInformation;
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
 
-    if (memory) {
-      const updateResult = RoomMemoryData.Update(name, memory);
-      if (updateResult.success) {
-        result.success = true;
-        result.memory = updateResult.data;
-      }
+    const updateMemoryResult = this.UpdateMemoryData(memory);
+    if (updateMemoryResult.success) {
+      result.memory = updateMemoryResult.data;
     }
-    if (cache && result.success) {
-      const updateResult = RoomCacheData.Update(name, cache);
-      if (updateResult.success) {
-        result.success = true;
-        result.cache = updateResult.data;
-      }
+    const updateCacheResult = this.UpdateCacheData(cache);
+    if (updateCacheResult.success) {
+      result.cache = updateCacheResult.data;
     }
 
     return result;
   }
 
-  protected UpdateControllerMemory(
-    data: ControllerMemory
-  ): CRUDResult<ControllerMemory> {
-    const { name } = this._roomInformation;
-    return RoomMemoryData.UpdateControllerMemory(name, data);
-  }
-
-  protected UpdateSourceMemory(
-    sourceName: string,
-    data: SourceMemory
-  ): CRUDResult<SourceMemory> {
-    const { name } = this._roomInformation;
-    return RoomMemoryData.UpdateSourceMemory(name, sourceName, data);
-  }
-
-  protected InitializeData(
+  public InitializeData(
     data: RoomInitializationData
   ): DoubleCRUDResult<RoomMemory, RoomCache> {
-    const { name } = this._roomInformation;
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = RoomMemoryData.Initialize(
-      name,
+    const memoryResult = this.InitializeMemoryData(
       data.room,
       data.remoteRooms
     );
     if (memoryResult.success) {
-      result.success = true;
       result.memory = memoryResult.data;
     }
-    const cacheResult = RoomCacheData.Initialize(name);
+    const cacheResult = this.InitializeCacheData();
     if (cacheResult.success && result.success) {
-      result.success = true;
       result.cache = cacheResult.data;
     }
 
+    if (result.cache !== undefined && result.memory !== undefined)
+    result.success = true;
     return result;
   }
 
@@ -166,8 +151,8 @@ export default class RoomData extends RoomHeapData {
     const result: StringMap<DoubleCRUDResult<RoomMemory, RoomCache>> = {};
     const names = Object.keys(
       isMemory
-        ? RoomMemoryData.GetAll(predicateMemory)
-        : RoomCacheData.GetAll(
+        ? this.GetAllMemoryData(this.memoryType,predicateMemory)
+        : this.GetAllCacheData(this.cacheType,
             executer,
             getOnlyExecuterJobs,
             roomsToCheck,
@@ -175,13 +160,13 @@ export default class RoomData extends RoomHeapData {
           )
     );
     forEach(names, (name) => {
-      const memoryResult = RoomMemoryData.Get(name);
-      const cacheResult = RoomCacheData.Get(name);
-      if (memoryResult.success && cacheResult.success) {
+      const repository = new RoomData(name);
+      const dataResult = repository.GetData();
+      if (dataResult.success) {
         result[name] = {
           success: true,
-          memory: memoryResult.data,
-          cache: cacheResult.data,
+          memory: dataResult.memory,
+          cache: dataResult.cache,
         };
       }
     });

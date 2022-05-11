@@ -2,7 +2,7 @@ import { clone } from "lodash";
 import BaseMemoryData from "./interface";
 
 export default class StructureMemoryData extends BaseMemoryData {
-  private _id: string;
+  protected _id: string;
   constructor(id:string) {
     const memoryType: MemoryTypes = "Structure";
     super(memoryType);
@@ -58,11 +58,11 @@ export default class StructureMemoryData extends BaseMemoryData {
     return { success: Memory.StructuresData.data[this._id] === undefined, data: undefined };
   }
 
-  protected GetAllMemoryData(
+  protected static GetAllMemoryData(type:MemoryTypes,
     predicate?: Predicate<StructureMemory>
   ): StringMap<StructureMemory> {
     let { data } = Memory.StructuresData;
-    data = super.GetAllMemoryDataFilter(data, predicate);
+    data = super.GetAllMemoryDataFilter(type,data, predicate);
     return data;
   }
 

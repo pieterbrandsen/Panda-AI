@@ -2,7 +2,7 @@ import { clone } from "lodash";
 import BaseCacheData from "./interface";
 
 export default class JobCacheData extends BaseCacheData {
-  private _id:string;
+  protected _id:string;
   constructor(id:string) {
     const cacheType:CacheTypes = "Job";
     super(cacheType);
@@ -53,7 +53,7 @@ export default class JobCacheData extends BaseCacheData {
     return {success: Memory.CreepsData.cache[this._id] === undefined, data: undefined };
   }
 
-  protected GetAllCacheData(
+  protected static GetAllCacheData(type:CacheTypes,
     executer?: string,
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
@@ -61,7 +61,7 @@ export default class JobCacheData extends BaseCacheData {
     predicate2?: Predicate<JobCache>
   ): StringMap<JobCache> {
     let data = Memory.JobsData.cache;
-    data = super.GetAllCacheDataFilter(
+    data = super.GetAllCacheDataFilter(type,
       data,
       executer,
       getOnlyExecuterJobs,

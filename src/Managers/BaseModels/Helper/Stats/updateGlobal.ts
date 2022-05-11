@@ -1,7 +1,9 @@
 import GlobalStats from "../../Memory/Stats/global";
+import UpdateRoomStats from './updateRoom';
 
 export default function UpdateGlobalStats(): boolean {
-  const globalStatsResult = GlobalStats.Get();
+  const globalStatsRepo = new GlobalStats();
+  const globalStatsResult = globalStatsRepo.GetMemoryData();
   if (!globalStatsResult.success) return false;
   const globalStatsMemory = globalStatsResult.data as StatsMemory;
 
@@ -17,5 +19,5 @@ export default function UpdateGlobalStats(): boolean {
     progressTotal: Game.gcl.progressTotal,
   };
 
-  return GlobalStats.Update(globalStatsMemory).success;
+  return globalStatsRepo.UpdateMemoryData(globalStatsMemory).success;
 }

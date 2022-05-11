@@ -2,8 +2,7 @@ import { clone } from "lodash";
 import BaseHeapData from "./interface";
 
 export default class CreepHeapData extends BaseHeapData {
-
-  private _id: string;
+  protected _id: string;
 
   constructor(id: string) {
     const heapType: HeapTypes = "Creep";

@@ -2,7 +2,7 @@ import { clone } from "lodash";
 import BaseCacheData from "./interface";
 
 export default class DroppedResourceCacheData extends BaseCacheData {
-  private _id:string;
+  protected _id:string;
   constructor(id:string) {
     const cacheType:CacheTypes = "DroppedResource";
     super(cacheType);
@@ -62,14 +62,15 @@ export default class DroppedResourceCacheData extends BaseCacheData {
     return { success: Memory.DroppedResourceData.cache[this._id] === undefined, data: undefined };
   }
 
-  protected GetAllCacheData(
+  public static GetAllCacheData(
+    type:CacheTypes,
     executer = "",
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<DroppedResourceCache>
   ): StringMap<DroppedResourceCache> {
     let data = Memory.DroppedResourceData.cache;
-    data = super.GetAllCacheDataFilter(
+    data = super.GetAllCacheDataFilter(type,
       data,
       executer,
       getOnlyExecuterJobs,

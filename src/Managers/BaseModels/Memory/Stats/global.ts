@@ -7,11 +7,11 @@ export default class GlobalStatsMemoryData extends BaseMemoryData {
     super(memoryType);
   }
 
-  protected ValidateMemoryData(data: StringMap<StatsMemory>): ValidatedData {
+  public ValidateMemoryData(data: StringMap<StatsMemory>): ValidatedData {
     return super.ValidateMemoryData(data);
   }
 
-  protected ValidateSingleMemoryData(data: StatsMemory): boolean {
+  public ValidateSingleMemoryData(data: StatsMemory): boolean {
     return super.ValidateSingleMemoryData(data);
   }
 
@@ -32,12 +32,12 @@ export default class GlobalStatsMemoryData extends BaseMemoryData {
     };
   }
 
-  protected GetMemoryData(): CRUDResult<StatsMemory> {
+  public GetMemoryData(): CRUDResult<StatsMemory> {
     const data = clone(Memory.stats);
     return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
   }
 
-  protected CreateMemoryData(data: StatsMemory): CRUDResult<StatsMemory> {
+  public CreateMemoryData(data: StatsMemory): CRUDResult<StatsMemory> {
     let getResult = this.GetMemoryData();
     if (getResult.success) {
       return { success: false, data: getResult.data };
@@ -47,7 +47,7 @@ export default class GlobalStatsMemoryData extends BaseMemoryData {
     return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  protected UpdateMemoryData(data: StatsMemory): CRUDResult<StatsMemory> {
+  public UpdateMemoryData(data: StatsMemory): CRUDResult<StatsMemory> {
     Memory.stats = data;
     return { success: Memory.stats !== undefined, data };
   }

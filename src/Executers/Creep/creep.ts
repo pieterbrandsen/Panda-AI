@@ -1,11 +1,14 @@
 import { Mixin } from "ts-mixer";
+import CreepHeapData from "../../Managers/BaseModels/Heap/creep";
 import CreepData from "../../Managers/BaseModels/Helper/Creep/memory";
 import JobData from "../../Managers/BaseModels/Helper/Job/memory";
 import Jobs from "../../Managers/BaseModels/Jobs/interface";
 import CreepRoles from "./roles";
 
-export default class CreepHandler extends Mixin(CreepData, CreepRoles) {
+export default class CreepHandler extends Mixin(CreepRoles) {
   public creepInformation: CreepInformation;
+  public creepDataRepository:CreepData;
+  public creepHeapDataRepository: { GetData: () => CRUDResult<CreepHeap>; CreateData: (data: CreepHeap) => CRUDResult<CreepHeap>; DeleteData: () => CRUDResult<CreepHeap>; UpdateData: (data: CreepHeap) => CRUDResult<CreepHeap>; InitializeData: () => CRUDResult<CreepHeap>; GenerateData: () => CreepHeap; };
 
   public IsCreepSetup(): boolean {
     if (
@@ -27,21 +30,27 @@ export default class CreepHandler extends Mixin(CreepData, CreepRoles) {
     const creepInformation: CreepInformation = { id, creep };
     super(creepInformation);
 
-    const creepData = this.GetData();
+    const creepDataRepository = new CreepData(id);
+    const creepHeapDataRepository = creepDataRepository.HeapDataRepository;
+    this.creepDataRepository = creepDataRepository;
+    this.creepHeapDataRepository = creepHeapDataRepository;
+
+    const creepData = creepDataRepository.GetData();
     if (!creepData.success) {
       this.creepInformation = creepInformation;
       return;
     }
-    const creepHeapData = this.GetHeap();
+    const creepHeapData = creepHeapDataRepository.GetData();
     if (!creepHeapData.success) {
-      this.InitializeHeap();
+      creepHeapDataRepository.InitializeData();
     }
 
     creepInformation.memory = creepData.memory;
     creepInformation.cache = creepData.cache;
     if (!this.IsCreepSetup() || creepInformation.memory!.jobId === undefined) {
       if (creepData.memory) Jobs.UnassignCreepJob(id, creepData.memory, false);
-      this.DeleteData(true, true);
+      creepDataRepository.DeleteData();
+      creepHeapDataRepository.DeleteData();
       this.creepInformation = creepInformation;
       return;
     }
@@ -66,6 +75,6 @@ export default class CreepHandler extends Mixin(CreepData, CreepRoles) {
       Jobs.FindJobForCreep(creep);
     }
 
-    this.UpdateData(this.creepInformation.memory, this.creepInformation.cache);
+    this.creepDataRepository.UpdateData(this.creepInformation.memory as CreepMemory, this.creepInformation.cache as CreepCache);
   }
 }
