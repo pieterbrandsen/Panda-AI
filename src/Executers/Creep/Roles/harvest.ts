@@ -38,7 +38,7 @@ export default class CreepHarvestRole {
           creep.moveTo(target);
           break;
         case OK:
-          new JobsHelper().UpdateAmount(
+          JobsHelper.UpdateAmount(
             this._creepInformation.memory!.jobId as string,
             this._creepInformation.jobMemory!,
             this._creepInformation.jobCache!,

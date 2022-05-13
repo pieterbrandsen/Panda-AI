@@ -16,7 +16,7 @@ export default class StructureData extends Mixin(
   public _id: string;
 
   constructor(id: string) {
-    super(id);
+    super(id, "Structure");
     this._id = id;
   }
 
@@ -26,7 +26,7 @@ export default class StructureData extends Mixin(
     DeleteData: super.DeleteHeapData,
     UpdateData: super.UpdateHeapData,
     InitializeData: super.InitializeHeapData,
-    GenerateData: super.GenerateHeapData,
+    GenerateData: StructureHeapData.GenerateHeapData,
   };
 
   public GetData(): DoubleCRUDResult<StructureMemory, StructureCache> {

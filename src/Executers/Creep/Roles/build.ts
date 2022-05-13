@@ -22,7 +22,7 @@ export default class CreepBuilderRole {
           creep.moveTo(target);
           break;
         case OK:
-          new JobsHelper().UpdateAmount(
+          JobsHelper.UpdateAmount(
             this._creepInformation.memory!.jobId ?? "",
             this._creepInformation.jobMemory!,
             this._creepInformation.jobCache!,

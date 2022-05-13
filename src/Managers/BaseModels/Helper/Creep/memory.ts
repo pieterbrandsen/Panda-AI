@@ -16,18 +16,10 @@ export default class CreepData extends Mixin(
   protected _id: string;
 
   constructor(id: string) {
-    super(id);
+    const heapType: HeapTypes = "Creep";
+    super(id, heapType);
     this._id = id;
   }
-
-  public HeapDataRepository = {
-    GetData: super.GetHeapData,
-    CreateData: super.CreateHeapData,
-    DeleteData: super.DeleteHeapData,
-    UpdateData: super.UpdateHeapData,
-    InitializeData: super.InitializeHeapData,
-    GenerateData: super.GenerateHeapData,
-  };
 
   public GetData(): DoubleCRUDResult<CreepMemory, CreepCache> {
     const result: DoubleCRUDResult<CreepMemory, CreepCache> = {

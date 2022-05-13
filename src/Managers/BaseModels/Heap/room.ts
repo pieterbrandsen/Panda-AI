@@ -4,20 +4,19 @@ import BaseHeapData from "./interface";
 export default class RoomHeapData extends BaseHeapData {
   protected _id: string;
 
-  constructor(id: string) {
-    const heapType: HeapTypes = "Room";
+  constructor(id: string, heapType: HeapTypes) {
     super(heapType);
     this._id = id;
   }
 
-  protected ValidateSingleHeapData(): boolean {
+  public ValidateSingleHeapData(): boolean {
     return super.ValidateSingleHeapData(this._id);
   }
 
   /**
    * Create an new object of this type
    */
-  protected static GenerateHeapData(): RoomHeap {
+  public static GenerateHeapData(): RoomHeap {
     return {
       stats: {
         energyIncoming: {
@@ -59,12 +58,12 @@ export default class RoomHeapData extends BaseHeapData {
     };
   }
 
-  protected GetHeapData(): CRUDResult<RoomHeap> {
+  public GetHeapData(): CRUDResult<RoomHeap> {
     const data = clone(global.RoomsData[this._id]);
     return { success: this.ValidateSingleHeapData(), data };
   }
 
-  protected CreateHeapData(data: RoomHeap): CRUDResult<RoomHeap> {
+  public CreateHeapData(data: RoomHeap): CRUDResult<RoomHeap> {
     let getResult = this.GetHeapData();
     if (getResult.success) {
       return { success: false, data: getResult.data };
@@ -74,17 +73,17 @@ export default class RoomHeapData extends BaseHeapData {
     return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  protected UpdateHeapData(data: RoomHeap): CRUDResult<RoomHeap> {
+  public UpdateHeapData(data: RoomHeap): CRUDResult<RoomHeap> {
     global.RoomsData[this._id] = data;
     return { success: this.ValidateSingleHeapData(), data };
   }
 
-  protected DeleteHeapData(): CRUDResult<RoomHeap> {
+  public DeleteHeapData(): CRUDResult<RoomHeap> {
     delete global.RoomsData[this._id];
     return { success: !this.ValidateSingleHeapData(), data: undefined };
   }
 
-  protected InitializeHeapData(): CRUDResult<RoomHeap> {
+  public InitializeHeapData(): CRUDResult<RoomHeap> {
     const data = RoomHeapData.GenerateHeapData();
     const createResult = this.CreateHeapData(data);
     return { success: createResult.success, data: createResult.data };

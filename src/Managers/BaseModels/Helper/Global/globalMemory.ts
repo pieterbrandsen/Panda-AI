@@ -6,34 +6,32 @@ export default class GlobalDataHelper extends Mixin(
   GlobalHeapData,
   GlobalMemoryData
 ) {
-  public HeapDataRepository = {
-    GetData: super.GetHeapData,
-    UpdateData: super.UpdateHeapData,
-    GenerateData: super.GenerateHeapData,
-    ValidateSingleData: super.ValidateSingleHeapData,
-  };
-
-  public GetData(): CRUDResult<Memory> {
-    return super.GetMemoryData();
+  constructor() {
+    const heapType: HeapTypes = "Global";
+    super(heapType);
   }
 
-  public CreateData(memory: Memory): CRUDResult<Memory> {
-    return super.UpdateMemoryData(memory);
+  public static GetData(): CRUDResult<Memory> {
+    return GlobalMemoryData.GetMemoryData();
   }
 
-  public DeleteData(): CRUDResult<Memory> {
-    return super.DeleteMemoryData();
+  public static CreateData(memory: Memory): CRUDResult<Memory> {
+    return GlobalMemoryData.UpdateMemoryData(memory);
   }
 
-  public UpdateData(memory: Memory): CRUDResult<Memory> {
-    return super.UpdateMemoryData(memory);
+  public static DeleteData(): CRUDResult<Memory> {
+    return GlobalMemoryData.DeleteMemoryData();
   }
 
-  public InitializeData(): CRUDResult<Memory> {
-    return super.InitializeMemoryData();
+  public static UpdateData(memory: Memory): CRUDResult<Memory> {
+    return GlobalMemoryData.UpdateMemoryData(memory);
   }
 
-  public ValidateSingleData(): boolean {
-    return super.ValidateSingleMemoryData();
+  public static InitializeData(): CRUDResult<Memory> {
+    return GlobalMemoryData.InitializeMemoryData();
+  }
+
+  public static ValidateSingleData(): boolean {
+    return GlobalMemoryData.ValidateSingleMemoryData();
   }
 }

@@ -2,17 +2,8 @@ import { clone, forEach } from "lodash";
 import BaseHeapData from "./interface";
 
 export default class GlobalHeapData extends BaseHeapData {
-  constructor() {
-    const heapType: HeapTypes = "Global";
-    super(heapType);
-  }
-
   public static MinimumVersionHeapData(): number {
     return 0;
-  }
-
-  public ValidateSingleHeapData(): boolean {
-    return super.ValidateSingleHeapData("");
   }
 
   /**
@@ -34,7 +25,7 @@ export default class GlobalHeapData extends BaseHeapData {
       StructuresData: global.StructuresData,
       Version: global.Version,
     });
-    return { success: this.ValidateSingleHeapData(), data };
+    return { success: super.ValidateSingleHeapData(""), data };
   }
 
   public static UpdateHeapData(data: GlobalData): CRUDResult<GlobalData> {
@@ -44,7 +35,8 @@ export default class GlobalHeapData extends BaseHeapData {
     return { success: true, data };
   }
 
-  public static InitializeHeap(): boolean {
-    return this.UpdateHeapData(this.GenerateHeapData()).success;
+  public static InitializeHeapData(): boolean {
+    return GlobalHeapData.UpdateHeapData(GlobalHeapData.GenerateHeapData())
+      .success;
   }
 }

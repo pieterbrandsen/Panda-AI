@@ -81,10 +81,10 @@ export default class RoomHandler extends Mixin(
     const roomMemory = this._roomInformation.memory!;
     const roomCache = this._roomInformation.cache!;
 
-    new StructureExecuter().ExecuteAllStructures(
+    StructureExecuter.ExecuteAllStructures(
       Object.keys(this._roomStructures) as Id<Structure<StructureConstant>>[]
     );
-    new CreepExecuter().ExecuteAllCreeps(
+    CreepExecuter.ExecuteAllCreeps(
       Object.keys(this._roomCreeps) as Id<Creep>[]
     );
 

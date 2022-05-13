@@ -4,14 +4,14 @@
 // TODO: CRUD
 
 export default class BaseHeapData {
-  protected _type: HeapTypes;
+  public type: HeapTypes;
 
   constructor(type: HeapTypes) {
-    this._type = type;
+    this.type = type;
   }
 
-  protected ValidateSingleHeapData(id: string): boolean {
-    switch (this._type) {
+  public ValidateSingleHeapData(id: string): boolean {
+    switch (this.type) {
       case "Creep":
         return global.CreepsData[id] !== undefined;
       case "Structure":

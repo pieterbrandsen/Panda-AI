@@ -42,7 +42,7 @@ export default class CreepWithdrawResourceRole {
         case ERR_NOT_ENOUGH_RESOURCES:
           return "done";
         case OK:
-          new JobsHelper().UpdateAmount(
+          JobsHelper.UpdateAmount(
             this._creepInformation.memory!.jobId as string,
             this._creepInformation.jobMemory!,
             this._creepInformation.jobCache!,

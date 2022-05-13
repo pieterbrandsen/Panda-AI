@@ -40,7 +40,7 @@ export default class CreepPickupResourceRole {
         case ERR_FULL:
           return "full";
         case OK:
-          new JobsHelper().UpdateAmount(
+          JobsHelper.UpdateAmount(
             this._creepInformation.memory!.jobId ?? "",
             this._creepInformation.jobMemory!,
             this._creepInformation.jobCache!,

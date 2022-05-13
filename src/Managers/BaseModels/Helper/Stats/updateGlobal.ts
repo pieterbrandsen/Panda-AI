@@ -18,5 +18,5 @@ export default function UpdateGlobalStats(): boolean {
     progressTotal: Game.gcl.progressTotal,
   };
 
-  return globalStatsRepo.UpdateMemoryData(globalStatsMemory).success;
+  return GlobalStats.UpdateMemoryData(globalStatsMemory).success;
 }

@@ -36,7 +36,7 @@ export default class CreepTransferRoles<S extends Structure> {
         case ERR_NOT_ENOUGH_RESOURCES:
           return "empty";
         case OK:
-          new JobsHelper().UpdateAmount(
+          JobsHelper.UpdateAmount(
             this._structureInformation.memory!.jobId as string,
             this._structureInformation.jobMemory!,
             this._structureInformation.jobCache!,

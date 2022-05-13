@@ -66,6 +66,6 @@ export default class ResetHeap {
       }
     });
 
-    return statsRepo.UpdateMemoryData(statsMemory).success;
+    return StatsMemoryData.UpdateMemoryData(statsMemory).success;
   }
 }

@@ -32,7 +32,7 @@ export default class CreepJobs extends JobsHelper {
   public UnassignJob(saveJob: boolean): boolean {
     const memory = this._creepInformation.memory!;
     const jobMemory = this._creepInformation.jobMemory as JobMemory;
-    this.RemoveAssignedCreepOutOfArray(
+    JobsHelper.RemoveAssignedCreepOutOfArray(
       jobMemory.assignedCreeps,
       this._creepInformation.id
     );
@@ -296,7 +296,7 @@ export default class CreepJobs extends JobsHelper {
       roomNames = Object.keys(roomMemory.remoteRooms ?? {});
     }
 
-    const jobTypes = this.GetJobTypesToExecute(creep, creepCache.type);
+    const jobTypes = JobsHelper.GetJobTypesToExecute(creep, creepCache.type);
     if (jobTypes.length === 0) {
       return false;
     }
@@ -325,7 +325,11 @@ export default class CreepJobs extends JobsHelper {
         }
       }
     }
-    const newJob = this.FindNewJob(creepCache.executer, jobTypes, roomNames);
+    const newJob = JobsHelper.FindNewJob(
+      creepCache.executer,
+      jobTypes,
+      roomNames
+    );
     if (newJob !== undefined) {
       return this.AssignCreepJob(newJob.id);
     }

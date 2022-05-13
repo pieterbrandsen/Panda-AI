@@ -16,7 +16,7 @@ export default class RoomData extends Mixin(
   protected _id: string;
 
   constructor(id: string) {
-    super(id);
+    super(id, "Room");
     this._id = id;
   }
 
@@ -26,7 +26,7 @@ export default class RoomData extends Mixin(
     DeleteData: super.DeleteHeapData,
     UpdateData: super.UpdateHeapData,
     InitializeData: super.InitializeHeapData,
-    GenerateData: super.GenerateHeapData,
+    GenerateData: RoomHeapData.GenerateHeapData,
   };
 
   public GetData(): DoubleCRUDResult<RoomMemory, RoomCache> {

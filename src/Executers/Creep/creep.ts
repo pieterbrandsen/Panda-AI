@@ -35,9 +35,9 @@ export default class CreepHandler extends Mixin(CreepRoles, CreepJobs) {
       this.creepInformation = creepInformation;
       return;
     }
-    const creepHeapData = this.creepDataRepo.HeapDataRepository.GetData();
+    const creepHeapData = this.creepDataRepo.GetHeapData();
     if (!creepHeapData.success) {
-      this.creepDataRepo.HeapDataRepository.InitializeData();
+      this.creepDataRepo.InitializeHeapData();
     }
 
     creepInformation.memory = creepData.memory;
@@ -45,7 +45,7 @@ export default class CreepHandler extends Mixin(CreepRoles, CreepJobs) {
     if (!this.IsCreepSetup() || creepInformation.memory!.jobId === undefined) {
       if (creepData.memory) this.UnassignJob(false);
       this.creepDataRepo.DeleteData();
-      this.creepDataRepo.HeapDataRepository.DeleteData();
+      this.creepDataRepo.DeleteHeapData();
       this.creepInformation = creepInformation;
       return;
     }
