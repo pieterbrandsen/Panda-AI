@@ -1,22 +1,25 @@
 import { forEach } from "lodash";
+import { Mixin } from "ts-mixer";
 import CreepMemoryData from "../../Memory/creep";
 import CreepCacheData from "../../Cache/creep";
 import CreepHeapData from "../../Heap/creep";
-import { Mixin } from "ts-mixer";
 
 export default class CreepData extends Mixin(
   CreepHeapData,
   CreepMemoryData,
   CreepCacheData
 ) {
-  public static cacheType: CacheTypes = "Creep"; 
-  public static memoryType: MemoryTypes = "Creep"; 
+  public static cacheType: CacheTypes = "Creep";
+
+  public static memoryType: MemoryTypes = "Creep";
+
   protected _id: string;
 
   constructor(id: string) {
     super(id);
     this._id = id;
   }
+
   public HeapDataRepository = {
     GetData: super.GetHeapData,
     CreateData: super.CreateHeapData,
@@ -164,8 +167,9 @@ export default class CreepData extends Mixin(
     const result: StringMap<DoubleCRUDResult<CreepMemory, CreepCache>> = {};
     const ids = Object.keys(
       isMemory
-        ? CreepMemoryData.GetAllMemoryData(this.memoryType,predicateMemory)
-        : CreepCacheData.GetAllCacheData(this.cacheType,
+        ? CreepMemoryData.GetAllMemoryData(this.memoryType, predicateMemory)
+        : CreepCacheData.GetAllCacheData(
+            this.cacheType,
             executer,
             getOnlyExecuterJobs,
             roomsToCheck,

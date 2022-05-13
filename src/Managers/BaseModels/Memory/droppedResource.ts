@@ -3,13 +3,16 @@ import BaseMemoryData from "./interface";
 
 export default class DroppedResourcesMemoryData extends BaseMemoryData {
   protected _id: string;
-  constructor(id:string) {
+
+  constructor(id: string) {
     const memoryType: MemoryTypes = "DroppedResource";
     super(memoryType);
     this._id = id;
   }
 
-  protected ValidateMemoryData(data: StringMap<DroppedResourceMemory>): ValidatedData {
+  protected ValidateMemoryData(
+    data: StringMap<DroppedResourceMemory>
+  ): ValidatedData {
     return super.ValidateMemoryData(data);
   }
 
@@ -30,7 +33,10 @@ export default class DroppedResourcesMemoryData extends BaseMemoryData {
 
   protected GetMemoryData(): CRUDResult<DroppedResourceMemory> {
     const data = clone(Memory.DroppedResourceData.data[this._id]);
-    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleMemoryData(data) : false,
+      data,
+    };
   }
 
   protected CreateMemoryData(
@@ -49,19 +55,26 @@ export default class DroppedResourcesMemoryData extends BaseMemoryData {
     data: DroppedResourceMemory
   ): CRUDResult<DroppedResourceMemory> {
     Memory.DroppedResourceData.data[this._id] = data;
-    return { success: Memory.DroppedResourceData.data[this._id] !== undefined, data };
+    return {
+      success: Memory.DroppedResourceData.data[this._id] !== undefined,
+      data,
+    };
   }
 
   protected DeleteMemoryData(): CRUDResult<DroppedResourceMemory> {
     delete Memory.DroppedResourceData.data[this._id];
-    return { success: Memory.DroppedResourceData.data[this._id] === undefined, data: undefined };
+    return {
+      success: Memory.DroppedResourceData.data[this._id] === undefined,
+      data: undefined,
+    };
   }
 
-  public static GetAllMemoryData(type:MemoryTypes,
+  public static GetAllMemoryData(
+    type: MemoryTypes,
     predicate?: Predicate<DroppedResourceMemory>
   ): StringMap<DroppedResourceMemory> {
     let { data } = Memory.DroppedResourceData;
-    data = super.GetAllMemoryDataFilter(type,data, predicate);
+    data = super.GetAllMemoryDataFilter(type, data, predicate);
     return data;
   }
 

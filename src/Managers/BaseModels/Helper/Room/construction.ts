@@ -7,13 +7,17 @@ export default class RoomStructure {
     type: BuildableStructureConstant,
     executer: string
   ): string | undefined {
+    const jobType: JobTypes = "Build";
+    const jobId = JobData.GetJobId(jobType, pos);
+    const jobRepo = new JobData(jobId);
+
     const result = room.createConstructionSite(pos.x, pos.y, type);
     if (result === OK) {
-      const job = JobData.Initialize({
+      const job = jobRepo.InitializeData({
         executer,
         pos,
         targetId: "",
-        type: "Build",
+        type: jobType,
         amountToTransfer: CONSTRUCTION_COST[type],
         structureType: type,
         objectType: "Creep",
@@ -25,8 +29,7 @@ export default class RoomStructure {
       return undefined;
     }
     if (result === ERR_INVALID_TARGET) {
-      const jobId = JobData.GetJobId("Build", pos);
-      const jobData = JobData.GetMemory(jobId);
+      const jobData = jobRepo.GetData();
       if (
         jobData.success &&
         (jobData.memory as JobMemory).structureType === type

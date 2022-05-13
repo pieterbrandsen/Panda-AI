@@ -3,10 +3,12 @@ import BaseStatsMemoryData from "./interface";
 
 export default class RoomStatsMemoryData extends BaseStatsMemoryData {
   private _id: string;
-  constructor(id:string) {
+
+  constructor(id: string) {
     super();
     this._id = id;
   }
+
   public GetMemoryData(): CRUDResult<RoomStatsMemory> {
     const data = clone(Memory.stats.rooms[this._id]);
     if (data === undefined) return { success: false, data: undefined };
@@ -14,9 +16,7 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     return { success: !!data, data };
   }
 
-  public CreateMemoryData(
-    data: RoomStatsMemory
-  ): CRUDResult<RoomStatsMemory> {
+  public CreateMemoryData(data: RoomStatsMemory): CRUDResult<RoomStatsMemory> {
     let getResult = this.GetMemoryData();
     if (getResult.success) {
       return { success: false, data: getResult.data };
@@ -26,16 +26,17 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  public UpdateMemoryData(
-    data: RoomStatsMemory
-  ): CRUDResult<RoomStatsMemory> {
+  public UpdateMemoryData(data: RoomStatsMemory): CRUDResult<RoomStatsMemory> {
     Memory.stats.rooms[this._id] = data;
     return { success: Memory.stats.rooms[this._id] !== undefined, data };
   }
 
   public DeleteMemoryData(): CRUDResult<RoomStatsMemory> {
     delete Memory.stats.rooms[this._id];
-    return { success: Memory.stats.rooms[this._id] === undefined, data: undefined };
+    return {
+      success: Memory.stats.rooms[this._id] === undefined,
+      data: undefined,
+    };
   }
 
   public GetAllMemoryData(

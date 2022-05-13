@@ -6,13 +6,15 @@ import { StructuresWithRole } from "./constants";
 import Jobs from "../../Managers/BaseModels/Jobs/interface";
 import JobData from "../../Managers/BaseModels/Helper/Job/memory";
 import StructureRoles from "./roles";
+import StructureJobs from "./jobs";
 
 export default class StructureHandler<S extends Structure> extends Mixin(
-  StructureData,
   StructureRepair,
-  StructureRoles
+  StructureRoles, StructureJobs
 ) {
   public structureInformation: StructureInformation<S>;
+
+  public structureDataRepo: StructureData;
 
   public IsStructureSetup(): boolean {
     if (
@@ -34,17 +36,18 @@ export default class StructureHandler<S extends Structure> extends Mixin(
   }
 
   constructor(id: string, structure: S | null) {
+    super({ id, structure });
     const structureInformation: StructureInformation<S> = { id, structure };
-    super(structureInformation);
+    this.structureDataRepo = new StructureData(id);
 
-    const structureData = this.GetData();
+    const structureData = this.structureDataRepo.GetData();
     if (!structureData.success) {
       this.structureInformation = structureInformation;
       return;
     }
-    const structureHeapData = this.GetHeap();
+    const structureHeapData = this.structureDataRepo.HeapDataRepository.GetData();
     if (!structureHeapData.success) {
-      this.InitializeHeap();
+      this.structureDataRepo.HeapDataRepository.InitializeData();
     }
 
     structureInformation.cache = structureData.cache;
@@ -54,15 +57,15 @@ export default class StructureHandler<S extends Structure> extends Mixin(
       structureInformation.memory!.jobId === undefined
     ) {
       if (structureData.memory)
-        Jobs.UnassignStructureJob(id, structureData.memory, false);
-      this.DeleteData(true, true);
+        this.UnassignJob(false);
+      this.structureDataRepo.DeleteData();
       this.structureInformation = structureInformation;
       return;
     }
 
-    const structureJobData = JobData.GetMemory(
+    const structureJobData = new JobData(
       structureInformation.memory!.jobId
-    );
+    ).GetData();
     if (!structureJobData.success) {
       this.structureInformation = structureInformation;
       return;
@@ -83,9 +86,9 @@ export default class StructureHandler<S extends Structure> extends Mixin(
       this.ExecuteRole();
     }
 
-    this.UpdateData(
-      this.structureInformation.memory,
-      this.structureInformation.cache
+    this.structureDataRepo.UpdateData(
+      this.structureInformation.memory as StructureMemory,
+      this.structureInformation.cache as StructureCache
     );
   }
 

@@ -12,7 +12,9 @@ export default class RoomSetup {
 
   private creeps: Creep[];
 
-  private roomMemory?: RoomMemory;
+  private _roomData: DoubleCRUDResult<RoomMemory, RoomCache>;
+
+  private _roomDataRepo: RoomData;
 
   private updatedRoomMemory = false;
 
@@ -20,14 +22,13 @@ export default class RoomSetup {
     this.room = room;
     this.structures = room.find(FIND_STRUCTURES);
     this.creeps = room.find(FIND_MY_CREEPS);
-    const roomData = RoomData.GetMemory(room.name);
-    if (!roomData.success) return;
-    this.roomMemory = roomData.memory as RoomMemory;
+    this._roomDataRepo = new RoomData(room.name);
+    this._roomData = this._roomDataRepo.GetData();
   }
 
   private SetupStructures(): boolean {
-    const { roomMemory } = this;
-    if (roomMemory === undefined) return false;
+    if (!this._roomData.success) return false;
+    const roomMemory = this._roomData.memory as RoomMemory;
 
     forEach(this.structures, (structure) => {
       let executer = "";
@@ -73,7 +74,11 @@ export default class RoomSetup {
         default:
           break;
       }
-      StructureData.Initialize({ executer, structure, isSource });
+      new StructureData(structure.id).InitializeData({
+        executer,
+        structure,
+        isSource,
+      });
     });
     return true;
   }
@@ -86,7 +91,7 @@ export default class RoomSetup {
       const executer = RoomHelper.GetExecuter(roomName, "Controller");
       const isRemoteCreep =
         RoomHelper.GetRoomName(executer) !== creep.room.name;
-      CreepData.Initialize({
+      new CreepData(creep.id).InitializeData({
         body: BodyHelper.ConvertBodyToStringMap(body),
         isRemoteCreep,
         executer,
@@ -100,11 +105,11 @@ export default class RoomSetup {
     return true;
   }
 
-  Initialize(): boolean {
-    const roomData = RoomData.Initialize({ room: this.room });
+  public Initialize(): boolean {
+    const roomData = this._roomDataRepo.InitializeData({ room: this.room });
     if (!roomData.success) return false;
+    this._roomData = roomData;
 
-    this.roomMemory = roomData.memory as RoomMemory;
     this.SetupStructures();
     this.SetupCreeps();
 
@@ -112,8 +117,11 @@ export default class RoomSetup {
       c.remove();
     });
 
-    if (this.updatedRoomMemory)
-      RoomData.UpdateMemory(RoomData.GetId(this.room.name), this.roomMemory);
+    if (!this._roomData.success) return false;
+    this._roomDataRepo.UpdateData(
+      this._roomData!.memory as RoomMemory,
+      this._roomData!.cache as RoomCache
+    );
     return true;
   }
 }

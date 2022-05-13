@@ -1,11 +1,16 @@
 import { forEach } from "lodash";
+import { Mixin } from "ts-mixer";
 import DroppedResourceMemoryData from "../../Memory/droppedResource";
 import DroppedResourceCacheData from "../../Cache/droppedResource";
-import { Mixin } from "ts-mixer";
 
-export default class DroppedResourceData extends Mixin(DroppedResourceMemoryData,DroppedResourceCacheData) {
-  public static cacheType: CacheTypes = "DroppedResource"; 
-  public static memoryType: MemoryTypes = "DroppedResource"; 
+export default class DroppedResourceData extends Mixin(
+  DroppedResourceMemoryData,
+  DroppedResourceCacheData
+) {
+  public static cacheType: CacheTypes = "DroppedResource";
+
+  public static memoryType: MemoryTypes = "DroppedResource";
+
   protected _id: string;
 
   constructor(id: string) {
@@ -13,7 +18,10 @@ export default class DroppedResourceData extends Mixin(DroppedResourceMemoryData
     this._id = id;
   }
 
-  public GetData(): DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> {
+  public GetData(): DoubleCRUDResult<
+    DroppedResourceMemory,
+    DroppedResourceCache
+  > {
     const result: DoubleCRUDResult<
       DroppedResourceMemory,
       DroppedResourceCache
@@ -66,8 +74,10 @@ export default class DroppedResourceData extends Mixin(DroppedResourceMemoryData
     return result;
   }
 
-  public DeleteData(
-  ): DoubleCRUDResult<DroppedResourceMemory, DroppedResourceCache> {
+  public DeleteData(): DoubleCRUDResult<
+    DroppedResourceMemory,
+    DroppedResourceCache
+  > {
     const result: DoubleCRUDResult<
       DroppedResourceMemory,
       DroppedResourceCache
@@ -92,7 +102,11 @@ export default class DroppedResourceData extends Mixin(DroppedResourceMemoryData
 
     if (result.cache !== undefined && result.memory !== undefined)
       result.success = true;
-    else this.CreateData(data.memory as DroppedResourceMemory, data.cache as DroppedResourceCache);
+    else
+      this.CreateData(
+        data.memory as DroppedResourceMemory,
+        data.cache as DroppedResourceCache
+      );
     return result;
   }
 
@@ -146,7 +160,8 @@ export default class DroppedResourceData extends Mixin(DroppedResourceMemoryData
       result.cache = cacheResult.data;
     }
 
-    if (result.cache !== undefined && result.memory !== undefined) result.success = true;
+    if (result.cache !== undefined && result.memory !== undefined)
+      result.success = true;
     return result;
   }
 
@@ -163,8 +178,12 @@ export default class DroppedResourceData extends Mixin(DroppedResourceMemoryData
     > = {};
     const ids = Object.keys(
       isMemory
-        ? DroppedResourceMemoryData.GetAllMemoryData(this.memoryType,predicateMemory)
-        : DroppedResourceCacheData.GetAllCacheData(this.cacheType,
+        ? DroppedResourceMemoryData.GetAllMemoryData(
+            this.memoryType,
+            predicateMemory
+          )
+        : DroppedResourceCacheData.GetAllCacheData(
+            this.cacheType,
             executer,
             getOnlyExecuterJobs,
             roomsToCheck,

@@ -23,7 +23,10 @@ export default class LogsMemoryData extends BaseMemoryData {
 
   protected GetMemoryData(): CRUDResult<LogsMemory> {
     const data = clone(Memory.logs);
-    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleMemoryData(data) : false,
+      data,
+    };
   }
 
   protected UpdateMemoryData(data: LogsMemory): CRUDResult<LogsMemory> {

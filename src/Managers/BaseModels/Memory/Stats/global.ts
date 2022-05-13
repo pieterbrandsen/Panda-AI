@@ -34,7 +34,10 @@ export default class GlobalStatsMemoryData extends BaseMemoryData {
 
   public GetMemoryData(): CRUDResult<StatsMemory> {
     const data = clone(Memory.stats);
-    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleMemoryData(data) : false,
+      data,
+    };
   }
 
   public CreateMemoryData(data: StatsMemory): CRUDResult<StatsMemory> {

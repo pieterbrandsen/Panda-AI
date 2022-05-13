@@ -3,9 +3,11 @@ import LinkRole from "./Roles/link";
 import Jobs from "../../Managers/BaseModels/Jobs/interface";
 import StructureHandler from "../../Managers/BaseModels/Heap/structure";
 import { StructuresWithRole } from "./constants";
+import StructureJobs from "./jobs";
+import CreepJobs from "../Creep/jobs";
 
 export default class StructureRoles<S extends Structure> extends Mixin(
-  LinkRole
+  LinkRole,StructureJobs
 ) {
   protected _structureInformation: StructureInformation<S>;
 
@@ -32,18 +34,16 @@ export default class StructureRoles<S extends Structure> extends Mixin(
 
     if (StructuresWithRole.includes(structure.structureType)) {
       const result = this.HandleRole();
-      const structureId = structure.id;
-      const structureMemory = this._structureInformation.memory!;
       switch (result) {
         case "done":
-          Jobs.UnassignStructureJob(structureId, structureMemory, false);
-          Jobs.Delete(this._structureInformation.memory!.jobId ?? "");
+          this.UnassignJob(false);
+          CreepJobs.DeleteJobData(this._structureInformation.memory!.jobId ?? "");
           break;
         case "empty":
-          Jobs.UnassignStructureJob(structureId, structureMemory, false);
+          this.UnassignJob(false);
           break;
         case "full":
-          Jobs.UnassignStructureJob(structureId, structureMemory, false);
+          this.UnassignJob(false);
           break;
         default:
           break;

@@ -1,5 +1,5 @@
 import GlobalStats from "../../Memory/Stats/global";
-import UpdateRoomStats from './updateRoom';
+import UpdateRoomStats from "./updateRoom";
 
 export default function UpdateGlobalStats(): boolean {
   const globalStatsRepo = new GlobalStats();

@@ -2,14 +2,17 @@ import { clone } from "lodash";
 import BaseCacheData from "./interface";
 
 export default class DroppedResourceCacheData extends BaseCacheData {
-  protected _id:string;
-  constructor(id:string) {
-    const cacheType:CacheTypes = "DroppedResource";
+  protected _id: string;
+
+  constructor(id: string) {
+    const cacheType: CacheTypes = "DroppedResource";
     super(cacheType);
     this._id = id;
   }
 
-  protected ValidateCacheData(data: StringMap<DroppedResourceCache>): ValidatedData {
+  protected ValidateCacheData(
+    data: StringMap<DroppedResourceCache>
+  ): ValidatedData {
     return super.ValidateCacheData(data);
   }
 
@@ -35,7 +38,10 @@ export default class DroppedResourceCacheData extends BaseCacheData {
 
   protected GetCacheData(): CRUDResult<DroppedResourceCache> {
     const data = clone(Memory.DroppedResourceData.cache[this._id]);
-    return { success: data !== undefined ? this.ValidateSingleCacheData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleCacheData(data) : false,
+      data,
+    };
   }
 
   protected CreateCacheData(
@@ -54,23 +60,30 @@ export default class DroppedResourceCacheData extends BaseCacheData {
     data: DroppedResourceCache
   ): CRUDResult<DroppedResourceCache> {
     Memory.DroppedResourceData.cache[this._id] = data;
-    return { success:  Memory.DroppedResourceData.cache[this._id] !== undefined, data };
+    return {
+      success: Memory.DroppedResourceData.cache[this._id] !== undefined,
+      data,
+    };
   }
 
   protected DeleteCacheData(): CRUDResult<DroppedResourceCache> {
     delete Memory.DroppedResourceData.cache[this._id];
-    return { success: Memory.DroppedResourceData.cache[this._id] === undefined, data: undefined };
+    return {
+      success: Memory.DroppedResourceData.cache[this._id] === undefined,
+      data: undefined,
+    };
   }
 
   public static GetAllCacheData(
-    type:CacheTypes,
+    type: CacheTypes,
     executer = "",
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<DroppedResourceCache>
   ): StringMap<DroppedResourceCache> {
     let data = Memory.DroppedResourceData.cache;
-    data = super.GetAllCacheDataFilter(type,
+    data = super.GetAllCacheDataFilter(
+      type,
       data,
       executer,
       getOnlyExecuterJobs,
@@ -86,7 +99,7 @@ export default class DroppedResourceCacheData extends BaseCacheData {
     type: ResourceConstant
   ): CRUDResult<DroppedResourceCache> {
     const cache = this.GenerateCacheData(executer, pos, type);
-    const createResult = this.CreateCacheData( cache);
+    const createResult = this.CreateCacheData(cache);
     return { data: createResult.data, success: createResult.success };
   }
 }

@@ -6,11 +6,15 @@ import RoomPositionHelper from "../BaseModels/Helper/Room/position";
 
 export default class RoomMineralManager {
   protected _roomInformation: RoomInformation;
+
   protected _executer: string;
 
   constructor(roomInformation: RoomInformation) {
     this._roomInformation = roomInformation;
-    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "Mineral");
+    this._executer = RoomHelper.GetExecuter(
+      roomInformation.room!.name,
+      "Mineral"
+    );
   }
 
   private UpdateMineral(): void {
@@ -63,11 +67,13 @@ export default class RoomMineralManager {
           mineralMemory.pos,
           room
         ).length;
-        const jobResult = JobData.Initialize({
+        const jobType: JobTypes = "HarvestMineral";
+        const jobDataRepo = new JobData(undefined, jobType, mineralMemory.pos);
+        const jobResult = jobDataRepo.InitializeData({
           executer: this._executer,
           pos: mineralMemory.pos,
           targetId: mineralMemory.id,
-          type: "HarvestMineral",
+          type: jobType,
           amountToTransfer: mineral ? mineral.mineralAmount : 0,
           objectType: "Creep",
           maxCreepsCount: maxCreepsAround,
@@ -95,10 +101,7 @@ export default class RoomMineralManager {
 
   protected ExecuteRoomMineralManager(): void {
     const room = this._roomInformation.room!;
-    if (
-      (room.controller ? room.controller.level < 6 : true) ||
-      !room.storage
-    )
+    if ((room.controller ? room.controller.level < 6 : true) || !room.storage)
       return;
 
     this.UpdateMineral();

@@ -3,7 +3,8 @@
 import { forEach, pickBy } from "lodash";
 
 export default abstract class BaseMemoryData {
-  protected _type:MemoryTypes;
+  protected _type: MemoryTypes;
+
   constructor(protected type: MemoryTypes) {
     this._type = type;
   }
@@ -39,16 +40,18 @@ export default abstract class BaseMemoryData {
     }
     return 999;
   }
+
   protected MinimumMemoryVersion(): number {
     return BaseMemoryData.MinimumMemoryVersion(this._type);
   }
+
   /**
    * Check all data in object and return list of non valid memory objects based on version
    */
   protected static ValidateMemoryData(
-    type:MemoryTypes,
+    type: MemoryTypes,
     data: StringMap<MemoryObjects>
-      ): ValidatedData {
+  ): ValidatedData {
     const minimumVersion = this.MinimumMemoryVersion(type);
     let isValid = true;
     const nonValidObjects: string[] = [];
@@ -61,17 +64,17 @@ export default abstract class BaseMemoryData {
 
     return { isValid, nonValidObjects };
   }
-  protected ValidateMemoryData(
-    data: StringMap<MemoryObjects>,
-  ): ValidatedData {
+
+  protected ValidateMemoryData(data: StringMap<MemoryObjects>): ValidatedData {
     return BaseMemoryData.ValidateMemoryData(this._type, data);
   }
+
   /**
    * Check single object and return if its valid based on version
    */
   public static ValidateSingleMemoryData(
-    type:MemoryTypes,
-    data: MemoryObjects,
+    type: MemoryTypes,
+    data: MemoryObjects
   ): boolean {
     const minimumVersion = this.MinimumMemoryVersion(type);
 
@@ -87,11 +90,12 @@ export default abstract class BaseMemoryData {
     return BaseMemoryData.ValidateSingleMemoryData(this._type, data);
   }
 
-  public static GetAllMemoryDataFilter<T extends MemoryObjects>(type:MemoryTypes,
-    data: StringMap<T>,    
+  public static GetAllMemoryDataFilter<T extends MemoryObjects>(
+    type: MemoryTypes,
+    data: StringMap<T>,
     predicate?: Predicate<T>
   ): StringMap<T> {
-    const validatedData = this.ValidateMemoryData(type,data);
+    const validatedData = this.ValidateMemoryData(type, data);
     forEach(validatedData.nonValidObjects, (key) => {
       delete data[key];
     });

@@ -2,16 +2,22 @@ import RoomHelper from "../BaseModels/Helper/Room/interface";
 import JobDataHelper from "../BaseModels/Helper/Job/memory";
 import RoomData from "../BaseModels/Helper/Room/memory";
 import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControllerStructure";
+import JobData from "../BaseModels/Helper/Job/memory";
 
 export default class RoomControllerManager {
   protected _roomInformation: RoomInformation;
+
   protected _executer: string;
+
   protected _isRemote: boolean;
 
   constructor(roomInformation: RoomInformation) {
     this._roomInformation = roomInformation;
     this._isRemote = roomInformation.memory!.remoteOriginRoom !== undefined;
-    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "Controller");
+    this._executer = RoomHelper.GetExecuter(
+      roomInformation.room!.name,
+      "Controller"
+    );
   }
 
   private UpdateController(): void {
@@ -24,7 +30,7 @@ export default class RoomControllerManager {
         ? "UpgradeController"
         : "ReserveController";
       if (controllerMemory.isOwned) {
-        JobDataHelper.Initialize({
+        new JobData(undefined, jobType, controllerMemory.pos).InitializeData({
           executer: this._executer,
           pos: controllerMemory.pos,
           targetId: controllerMemory.id,
@@ -45,7 +51,7 @@ export default class RoomControllerManager {
   }
 
   protected ExecuteRoomControllerManager(): void {
-    const controller = this._roomInformation.room!.controller;
+    const { controller } = this._roomInformation.room!;
     const managerMemory = this._roomInformation.memory!.controllerManager;
     if (
       !controller &&

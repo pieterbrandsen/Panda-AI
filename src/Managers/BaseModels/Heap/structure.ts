@@ -3,6 +3,7 @@ import BaseHeapData from "./interface";
 
 export default class StructureHeapData extends BaseHeapData {
   protected _id: string;
+
   constructor(id: string) {
     const heapType: HeapTypes = "Structure";
     super(heapType);

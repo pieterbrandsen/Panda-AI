@@ -1,17 +1,26 @@
 import { forEach } from "lodash";
+import { Mixin } from "ts-mixer";
 import JobMemoryData from "../../Memory/job";
 import JobCacheData from "../../Cache/job";
-import { Mixin } from "ts-mixer";
 
-export default class JobData extends Mixin(JobMemoryData,JobCacheData) {
-  public static cacheType: CacheTypes = "Job"; 
-  public static memoryType: MemoryTypes = "Job"; 
+export default class JobData extends Mixin(JobMemoryData, JobCacheData) {
+  public static cacheType: CacheTypes = "Job";
+
+  public static memoryType: MemoryTypes = "Job";
+
   protected _id: string;
 
-    constructor(forcedId:string="",type?: JobTypes, pos?: FreezedRoomPosition) {
-      const id = type !== undefined && pos !== undefined ? `${type}_${pos.x}_${pos.y}_${pos.roomName}`: forcedId;
+  constructor(forcedId = "", type?: JobTypes, pos?: FreezedRoomPosition) {
+    const id =
+      type !== undefined && pos !== undefined
+        ? `${type}_${pos.x}_${pos.y}_${pos.roomName}`
+        : forcedId;
     super(id);
     this._id = id;
+  }
+
+  public static GetJobId(type: JobTypes, pos: FreezedRoomPosition) {
+    return `${type}_${pos.x}_${pos.y}_${pos.roomName}`;
   }
 
   public GetData(): DoubleCRUDResult<JobMemory, JobCache> {
@@ -61,8 +70,7 @@ export default class JobData extends Mixin(JobMemoryData,JobCacheData) {
     return result;
   }
 
-  protected DeleteData(
-  ): DoubleCRUDResult<JobMemory, JobCache> {
+  public DeleteData(): DoubleCRUDResult<JobMemory, JobCache> {
     const result: DoubleCRUDResult<JobMemory, JobCache> = {
       success: false,
       memory: undefined,
@@ -88,10 +96,12 @@ export default class JobData extends Mixin(JobMemoryData,JobCacheData) {
   }
 
   public static DeleteAllData(roomName: string): void {
-    const jobIds = Object.keys(JobCacheData.GetAllCacheData(this.cacheType,"", false, [roomName]));
+    const jobIds = Object.keys(
+      JobCacheData.GetAllCacheData(this.cacheType, "", false, [roomName])
+    );
 
     forEach(jobIds, (id) => {
-      const repo = new JobData(id)
+      const repo = new JobData(id);
       repo.DeleteData();
     });
   }
@@ -159,8 +169,13 @@ export default class JobData extends Mixin(JobMemoryData,JobCacheData) {
     const result: StringMap<DoubleCRUDResult<JobMemory, JobCache>> = {};
     const ids = Object.keys(
       isMemory
-        ? JobMemoryData.GetAllMemoryData(this.memoryType,getOnlyFreeJobs, predicateMemory)
-        : JobCacheData.GetAllCacheData(this.cacheType,
+        ? JobMemoryData.GetAllMemoryData(
+            this.memoryType,
+            getOnlyFreeJobs,
+            predicateMemory
+          )
+        : JobCacheData.GetAllCacheData(
+            this.cacheType,
             executer,
             getOnlyExecuterJobs,
             roomsToCheck,
@@ -196,7 +211,7 @@ export default class JobData extends Mixin(JobMemoryData,JobCacheData) {
     );
   }
 
-  public static  GetAllDataBasedOnCache(
+  public static GetAllDataBasedOnCache(
     executer = "",
     getOnlyExecuterJobs = false,
     roomsToCheck?: string[],

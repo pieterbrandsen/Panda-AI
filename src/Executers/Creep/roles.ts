@@ -8,6 +8,7 @@ import WithdrawResourceRole from "./Roles/withdrawResource";
 import PickupResourceRole from "./Roles/pickupResource";
 import UpgradeControllerRole from "./Roles/upgradeController";
 import Jobs from "../../Managers/BaseModels/Jobs/interface";
+import CreepJobs from "./jobs";
 
 export default class CreepRoles extends Mixin(
   BuildRole,
@@ -17,7 +18,8 @@ export default class CreepRoles extends Mixin(
   TransferRole,
   WithdrawResourceRole,
   PickupResourceRole,
-  UpgradeControllerRole
+  UpgradeControllerRole,
+  CreepJobs
 ) {
   protected _creepInformation: CreepInformation;
 
@@ -56,22 +58,17 @@ export default class CreepRoles extends Mixin(
     const gatherJobs: JobTypes[] = ["HarvestMineral", "HarvestSource"];
 
     const result = this.HandleRole();
-    const creepId = this._creepInformation.id;
     switch (result) {
       case "done":
-        Jobs.Delete(this._creepInformation.memory!.jobId ?? "");
+        CreepJobs.DeleteJobData(this._creepInformation.memory!.jobId ?? "");
         break;
       case "empty":
-        Jobs.UnassignCreepJob(
-          creepId,
-          this._creepInformation.memory!,
+        this.UnassignJob(
           spendJobs.includes(this._creepInformation.jobCache!.type)
         );
         break;
       case "full":
-        Jobs.UnassignCreepJob(
-          creepId,
-          this._creepInformation.memory!,
+        this.UnassignJob(
           gatherJobs.includes(this._creepInformation.jobCache!.type)
         );
         break;

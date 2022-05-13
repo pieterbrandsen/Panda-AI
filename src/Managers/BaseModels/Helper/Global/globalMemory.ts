@@ -2,11 +2,15 @@ import { Mixin } from "ts-mixer";
 import GlobalHeapData from "../../Heap/global";
 import GlobalMemoryData from "../../Memory/global";
 
-export default class GlobalDataHelper extends Mixin(GlobalHeapData,GlobalMemoryData) {
+export default class GlobalDataHelper extends Mixin(
+  GlobalHeapData,
+  GlobalMemoryData
+) {
   public HeapDataRepository = {
     GetData: super.GetHeapData,
     UpdateData: super.UpdateHeapData,
     GenerateData: super.GenerateHeapData,
+    ValidateSingleData: super.ValidateSingleHeapData
   };
 
   public GetData(): CRUDResult<Memory> {
@@ -28,4 +32,6 @@ export default class GlobalDataHelper extends Mixin(GlobalHeapData,GlobalMemoryD
   public InitializeData(): CRUDResult<Memory> {
     return super.InitializeMemoryData();
   }
+
+  public ValidateSingleData(): boolean { return super.ValidateSingleMemoryData(); }
 }

@@ -9,7 +9,8 @@ import RoomStatsMemoryData from "./Stats/room";
 
 export default class RoomMemoryData extends BaseMemoryData {
   protected _id: string;
-  constructor(id:string) {
+
+  constructor(id: string) {
     const memoryType: MemoryTypes = "Room";
     super(memoryType);
     this._id = id;
@@ -26,7 +27,10 @@ export default class RoomMemoryData extends BaseMemoryData {
   /**
    * Create an new object of this type
    */
-  protected GenerateMemoryData(room: Room, remoteRooms?: StringMap<RemoteRoom>): RoomMemory {
+  protected GenerateMemoryData(
+    room: Room,
+    remoteRooms?: StringMap<RemoteRoom>
+  ): RoomMemory {
     return {
       version: super.MinimumMemoryVersion(),
       remoteRooms,
@@ -40,7 +44,10 @@ export default class RoomMemoryData extends BaseMemoryData {
 
   protected GetMemoryData(): CRUDResult<RoomMemory> {
     const data = clone(Memory.RoomsData.data[this._id]);
-    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleMemoryData(data) : false,
+      data,
+    };
   }
 
   protected CreateMemoryData(data: RoomMemory): CRUDResult<RoomMemory> {
@@ -63,14 +70,24 @@ export default class RoomMemoryData extends BaseMemoryData {
     data: SourceMemory
   ): CRUDResult<SourceMemory> {
     Memory.RoomsData.data[this._id].sourceManager.sources[sourceId] = data;
-    return { success: Memory.RoomsData.data[this._id].sourceManager.sources[sourceId] !== undefined, data };
+    return {
+      success:
+        Memory.RoomsData.data[this._id].sourceManager.sources[sourceId] !==
+        undefined,
+      data,
+    };
   }
 
   protected UpdateControllerMemoryData(
     data: ControllerMemory
   ): CRUDResult<ControllerMemory> {
     Memory.RoomsData.data[this._id].controllerManager.controller = data;
-    return { success: Memory.RoomsData.data[this._id].controllerManager.controller !== undefined, data };
+    return {
+      success:
+        Memory.RoomsData.data[this._id].controllerManager.controller !==
+        undefined,
+      data,
+    };
   }
 
   protected DeleteMemoryData(): CRUDResult<RoomMemory> {
@@ -80,9 +97,12 @@ export default class RoomMemoryData extends BaseMemoryData {
     return { success: result, data: undefined };
   }
 
-  protected static GetAllMemoryData(type:MemoryTypes,predicate?: Predicate<RoomMemory>): StringMap<RoomMemory> {
+  protected static GetAllMemoryData(
+    type: MemoryTypes,
+    predicate?: Predicate<RoomMemory>
+  ): StringMap<RoomMemory> {
     let { data } = Memory.RoomsData;
-    data = super.GetAllMemoryDataFilter(type,data, predicate);
+    data = super.GetAllMemoryDataFilter(type, data, predicate);
     return data;
   }
 
@@ -93,7 +113,9 @@ export default class RoomMemoryData extends BaseMemoryData {
     const data = this.GenerateMemoryData(room, remoteRooms);
     const result = this.CreateMemoryData(data);
     if (result.success) {
-      result.success = new RoomStatsMemoryData(this._id).DeleteMemoryData().success;
+      result.success = new RoomStatsMemoryData(
+        this._id
+      ).DeleteMemoryData().success;
     }
 
     return { success: result.success, data: result.data };

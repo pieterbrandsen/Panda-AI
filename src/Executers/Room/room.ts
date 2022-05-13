@@ -20,8 +20,16 @@ import RoomDroppedResourceManager from "../../Managers/DroppedResourceManager/in
 import RoomControllerManager from "../../Managers/ControllerManager/interface";
 import RoomSpawnManager from "../../Managers/SpawnManager/interface";
 import RoomMineralManager from "../../Managers/MineralManager/interface";
+import RoomJobs from "./jobs";
 
-export default class RoomHandler extends Mixin(RoomData,RoomSourceManager,RoomDroppedResourceManager,RoomControllerManager,RoomMineralManager,RoomSpawnManager) {
+export default class RoomHandler extends Mixin(
+  RoomSourceManager,
+  RoomDroppedResourceManager,
+  RoomControllerManager,
+  RoomMineralManager,
+  RoomSpawnManager,
+  RoomJobs
+) {
   public _roomInformation: RoomInformation;
 
   private _roomStructures: StringMap<
@@ -29,6 +37,8 @@ export default class RoomHandler extends Mixin(RoomData,RoomSourceManager,RoomDr
   >;
 
   private _roomCreeps: StringMap<DoubleCRUDResult<CreepMemory, CreepCache>>;
+
+  public roomDataRepo: RoomData;
 
   public IsRoomSetup(): boolean {
     if (
@@ -46,6 +56,7 @@ export default class RoomHandler extends Mixin(RoomData,RoomSourceManager,RoomDr
       room: Game.rooms[roomName],
     };
     super(roomInformation);
+    this.roomDataRepo = new RoomData(roomName);
     this._roomStructures = StructureData.GetAllDataBasedOnCache("", false, [
       roomName,
     ]);
@@ -53,11 +64,11 @@ export default class RoomHandler extends Mixin(RoomData,RoomSourceManager,RoomDr
     if (!hasVision) {
       this._roomInformation = roomInformation;
       JobData.DeleteAllData(roomName);
-      this.DeleteData(true, true);
+      this.roomDataRepo.DeleteData();
       return;
     }
 
-    const roomData = this.GetData();
+    const roomData = this.roomDataRepo.GetData();
     if (!roomData.success) {
       this._roomInformation = roomInformation;
       return;
@@ -65,9 +76,9 @@ export default class RoomHandler extends Mixin(RoomData,RoomSourceManager,RoomDr
     roomInformation.memory = roomData.memory;
     roomInformation.cache = roomData.cache;
 
-    const roomHeapData = this.GetHeap();
+    const roomHeapData = this.roomDataRepo.HeapDataRepository.GetData();
     if (!roomHeapData.success) {
-      this.InitializeHeap();
+      this.roomDataRepo.HeapDataRepository.InitializeData();
     }
 
     this._roomInformation = roomInformation;
@@ -87,7 +98,7 @@ export default class RoomHandler extends Mixin(RoomData,RoomSourceManager,RoomDr
     );
 
     UpdateRoomStats(room);
-    Jobs.UpdateAllData(room);
+    this.UpdateAllData();
 
     const { controller } = room;
     this.ExecuteRoomSourceManager();
@@ -101,6 +112,6 @@ export default class RoomHandler extends Mixin(RoomData,RoomSourceManager,RoomDr
       }
     }
 
-    this.UpdateData(roomMemory, roomCache);
+    this.roomDataRepo.UpdateData(roomMemory, roomCache);
   }
 }

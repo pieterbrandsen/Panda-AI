@@ -23,7 +23,7 @@ export default class CreepHeapData extends BaseHeapData {
 
   protected GetHeapData(): CRUDResult<CreepHeap> {
     const data = clone(global.CreepsData[this._id]);
-    return { success:this.ValidateSingleHeapData(), data };
+    return { success: this.ValidateSingleHeapData(), data };
   }
 
   protected CreateHeapData(data: CreepHeap): CRUDResult<CreepHeap> {

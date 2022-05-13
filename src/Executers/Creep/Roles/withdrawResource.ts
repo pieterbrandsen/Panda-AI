@@ -1,3 +1,4 @@
+import JobsHelper from "../../../Managers/BaseModels/Jobs/interface";
 import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
 export default class CreepWithdrawResourceRole {
@@ -42,7 +43,7 @@ export default class CreepWithdrawResourceRole {
         case ERR_NOT_ENOUGH_RESOURCES:
           return "done";
         case OK:
-          Jobs.UpdateAmount(
+          new JobsHelper().UpdateAmount(
             this._creepInformation.memory!.jobId as string,
             this._creepInformation.jobMemory!,
             this._creepInformation.jobCache!,

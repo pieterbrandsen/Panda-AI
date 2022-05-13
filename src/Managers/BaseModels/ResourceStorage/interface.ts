@@ -50,11 +50,11 @@ export default class ResourceStorage {
     this.executer = executer;
     this.type = type;
     if (type === "Structure") {
-      const result = StructureData.GetMemory(object.id);
+      const result = new StructureData(object.id).GetData();
       this.memory = result.memory as StructureMemory;
       this.cache = result.cache as StructureCache;
     } else {
-      const result = CreepData.GetMemory((object as Creep).id);
+      const result = new CreepData((object as Creep).id).GetData();
       this.memory = result.memory as CreepMemory;
       this.cache = result.cache as CreepCache;
     }
@@ -71,13 +71,13 @@ export default class ResourceStorage {
       | CreepMemory
       | null = null;
     if (target === "creep") {
-      const result = CreepData.GetMemory(id);
+      const result = new CreepData(id).GetData();
       if (result.success) memory = result.memory as CreepMemory;
     } else if (target === "structure") {
-      const result = StructureData.GetMemory(id);
+      const result = new StructureData(id).GetData();
       if (result.success) memory = result.memory as StructureMemory;
     } else if (target === "droppedResource") {
-      const result = DroppedResourceData.GetMemory(id);
+      const result = new DroppedResourceData(id).GetData();
       if (result.success) memory = result.memory as DroppedResourceMemory;
     }
 
@@ -130,7 +130,7 @@ export default class ResourceStorage {
     if (type === "structure") {
       const structure = object as StructuresWithStorage;
 
-      const structureMemory = StructureData.GetMemory(structure.id)
+      const structureMemory = new StructureData(structure.id).GetData()
         .memory as StructureMemory;
       if (structureMemory && structureMemory.isSourceStructure) {
         if (isFromControllerOrSource) return fillToCapacity;
@@ -335,7 +335,7 @@ export default class ResourceStorage {
       | null = null;
     let bestScore = 0;
     forOwn(
-      StructureData.GetAllBasedOnCache(
+      StructureData.GetAllDataBasedOnCache(
         "",
         false,
         [this.object.room.name],
@@ -379,7 +379,7 @@ export default class ResourceStorage {
 
     if (this.type === "Creep") {
       forOwn(
-        DroppedResourceData.GetAllBasedOnCache(
+        DroppedResourceData.GetAllDataBasedOnCache(
           "",
           false,
           [this.object.room.name],
@@ -425,7 +425,7 @@ export default class ResourceStorage {
     let bestStructure: BestStructureLoop | null = null;
     let bestScore = 0;
     forOwn(
-      StructureData.GetAllBasedOnCache(
+      StructureData.GetAllDataBasedOnCache(
         "",
         false,
         [this.object.room.name],

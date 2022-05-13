@@ -3,7 +3,8 @@ import BaseMemoryData from "./interface";
 
 export default class CreepMemoryData extends BaseMemoryData {
   protected _id: string;
-  constructor(id:string) {
+
+  constructor(id: string) {
     const memoryType: MemoryTypes = "Creep";
     super(memoryType);
     this._id = id;
@@ -20,7 +21,10 @@ export default class CreepMemoryData extends BaseMemoryData {
   /**
    * Create an new object of this type
    */
-  protected GenerateMemoryData(isRemoteCreep: boolean, name: string): CreepMemory {
+  protected GenerateMemoryData(
+    isRemoteCreep: boolean,
+    name: string
+  ): CreepMemory {
     return {
       version: super.MinimumMemoryVersion(),
       energyOutgoing: {},
@@ -32,7 +36,10 @@ export default class CreepMemoryData extends BaseMemoryData {
 
   protected GetMemoryData(): CRUDResult<CreepMemory> {
     const data = clone(Memory.CreepsData.data[this._id]);
-    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleMemoryData(data) : false,
+      data,
+    };
   }
 
   protected CreateMemoryData(data: CreepMemory): CRUDResult<CreepMemory> {
@@ -52,12 +59,18 @@ export default class CreepMemoryData extends BaseMemoryData {
 
   protected DeleteMemoryData(): CRUDResult<CreepMemory> {
     delete Memory.CreepsData.data[this._id];
-    return { success: Memory.CreepsData.data[this._id] === undefined, data: undefined };
+    return {
+      success: Memory.CreepsData.data[this._id] === undefined,
+      data: undefined,
+    };
   }
 
-  protected static GetAllMemoryData(type:MemoryTypes,predicate?: Predicate<CreepMemory>): StringMap<CreepMemory> {
+  protected static GetAllMemoryData(
+    type: MemoryTypes,
+    predicate?: Predicate<CreepMemory>
+  ): StringMap<CreepMemory> {
     let { data } = Memory.CreepsData;
-    data = super.GetAllMemoryDataFilter(type,data, predicate);
+    data = super.GetAllMemoryDataFilter(type, data, predicate);
     return data;
   }
 

@@ -3,11 +3,15 @@ import CreepSpawning from "../BaseModels/CreepSpawning/interface";
 
 export default class RoomSpawnManager {
   protected _roomInformation: RoomInformation;
+
   protected _executer: string;
 
   constructor(roomInformation: RoomInformation) {
     this._roomInformation = roomInformation;
-    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "Mineral");
+    this._executer = RoomHelper.GetExecuter(
+      roomInformation.room!.name,
+      "Mineral"
+    );
   }
 
   private SpawnCreeps() {

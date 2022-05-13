@@ -1,12 +1,18 @@
 import { forEach } from "lodash";
+import { Mixin } from "ts-mixer";
 import StructureMemoryData from "../../Memory/structure";
 import StructureCacheData from "../../Cache/structure";
 import StructureHeapData from "../../Heap/structure";
-import { Mixin } from "ts-mixer";
 
-export default class StructureData extends Mixin(StructureHeapData,StructureMemoryData,StructureCacheData) {
-  public static cacheType: CacheTypes = "Creep"; 
-  public static memoryType: MemoryTypes = "Creep"; 
+export default class StructureData extends Mixin(
+  StructureHeapData,
+  StructureMemoryData,
+  StructureCacheData
+) {
+  public static cacheType: CacheTypes = "Creep";
+
+  public static memoryType: MemoryTypes = "Creep";
+
   public _id: string;
 
   constructor(id: string) {
@@ -92,7 +98,11 @@ export default class StructureData extends Mixin(StructureHeapData,StructureMemo
 
     if (result.cache !== undefined && result.memory !== undefined)
       result.success = true;
-    else this.CreateData(data.memory as StructureMemory, data.cache as StructureCache);
+    else
+      this.CreateData(
+        data.memory as StructureMemory,
+        data.cache as StructureCache
+      );
     return result;
   }
 
@@ -130,14 +140,11 @@ export default class StructureData extends Mixin(StructureHeapData,StructureMemo
     if (memoryResult.success) {
       result.memory = memoryResult.data;
     }
-    const cacheResult = this.InitializeCacheData(
-      data.structure,
-      data.executer
-    );
+    const cacheResult = this.InitializeCacheData(data.structure, data.executer);
     if (cacheResult.success && result.success) {
       result.cache = cacheResult.data;
     }
-    
+
     if (result.cache !== undefined && result.memory !== undefined)
       result.success = true;
     return result;
@@ -158,7 +165,8 @@ export default class StructureData extends Mixin(StructureHeapData,StructureMemo
     const ids = Object.keys(
       isMemory
         ? this.GetAllMemoryData(this.memoryType, predicateMemory)
-        : this.GetAllCacheData(this.cacheType,
+        : this.GetAllCacheData(
+            this.cacheType,
             executer,
             getOnlyExecuterJobs,
             roomsToCheck,
@@ -187,7 +195,7 @@ export default class StructureData extends Mixin(StructureHeapData,StructureMemo
     return this.GetAllData(true, undefined, undefined, undefined, predicate);
   }
 
-  public static GetAllMemoryDataBasedOnCache(
+  public static GetAllDataBasedOnCache(
     executer = "",
     getOnlyExecuterJobs = false,
     roomsToCheck?: string[],

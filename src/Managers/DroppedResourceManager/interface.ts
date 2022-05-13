@@ -3,43 +3,45 @@ import RoomHelper from "../BaseModels/Helper/Room/interface";
 import RoomData from "../BaseModels/Helper/Room/memory";
 import DroppedResourceData from "../BaseModels/Helper/DroppedResource/memory";
 import Jobs from "../BaseModels/Jobs/interface";
+import JobsHelper from "../BaseModels/Jobs/interface";
+import CreepJobs from "../../Executers/Creep/jobs";
 
 export default class RoomDroppedResourceManager {
   protected _executer: string;
-  protected _roomInformation: RoomInformation;
 
-  constructor(roomInformation: RoomInformation) {
-    this._roomInformation = roomInformation;
-    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "DroppedResource");
+  protected _room: Room;
+
+  constructor(id: string, room: Room) {
+    this._room = room;
+    this._executer = RoomHelper.GetExecuter(id, "DroppedResource");
   }
 
   private UpdateDroppedResources(): void {
-    const room = this._roomInformation.room!;
     const droppedResourceMemoryIds = Object.keys(
-      DroppedResourceData.GetAllBasedOnCache("", false, [room.name])
+      DroppedResourceData.GetAllDataBasedOnCache("", false, [this._room.name])
     );
     forEach(droppedResourceMemoryIds, (id) => {
       const resource = Game.getObjectById<Resource | null>(id);
       if (!resource) {
-        Jobs.Delete(id);
-        DroppedResourceData.DeleteMemory(id, true, true);
+        CreepJobs.DeleteJobData(id);
+        const droppedResourceRepo = new DroppedResourceData(id);
+        droppedResourceRepo.DeleteData();
       }
     });
 
-    const droppedResources = room.find(FIND_DROPPED_RESOURCES);
+    const droppedResources = this._room.find(FIND_DROPPED_RESOURCES);
     forEach(droppedResources, (droppedResource) => {
-      let droppedResourceData = DroppedResourceData.GetMemory(
-        droppedResource.id
-      );
+      const droppedResourceRepo = new DroppedResourceData(droppedResource.id);
+      let droppedResourceData = droppedResourceRepo.GetData();
       if (!droppedResourceData.success) {
-        droppedResourceData = DroppedResourceData.Initialize({
+        droppedResourceData = droppedResourceRepo.InitializeData({
           executer: this._executer,
           resource: droppedResource,
         });
       }
 
       global.RoomsData[
-        room.name
+        this._room.name
       ].stats.energyOutgoing.DroppedEnergyDecay += 1;
       // const droppedResourceMemory = droppedResourceData.memory as DroppedResourceMemory;
 

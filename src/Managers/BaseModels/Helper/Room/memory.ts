@@ -1,18 +1,25 @@
 import { forEach } from "lodash";
+import { Mixin } from "ts-mixer";
 import RoomMemoryData from "../../Memory/room";
 import RoomCacheData from "../../Cache/room";
 import RoomHeapData from "../../Heap/room";
-import { Mixin } from "ts-mixer";
 
-export default class RoomData extends Mixin(RoomHeapData,RoomMemoryData,RoomCacheData) {
-  public static cacheType: CacheTypes = "Room"; 
-  public static memoryType: MemoryTypes = "Room"; 
+export default class RoomData extends Mixin(
+  RoomHeapData,
+  RoomMemoryData,
+  RoomCacheData
+) {
+  public static cacheType: CacheTypes = "Room";
+
+  public static memoryType: MemoryTypes = "Room";
+
   protected _id: string;
 
   constructor(id: string) {
     super(id);
     this._id = id;
   }
+
   public HeapDataRepository = {
     GetData: super.GetHeapData,
     CreateData: super.CreateHeapData,
@@ -22,7 +29,7 @@ export default class RoomData extends Mixin(RoomHeapData,RoomMemoryData,RoomCach
     GenerateData: super.GenerateHeapData,
   };
 
-  protected GetData(): DoubleCRUDResult<RoomMemory, RoomCache> {
+  public GetData(): DoubleCRUDResult<RoomMemory, RoomCache> {
     const result: DoubleCRUDResult<RoomMemory, RoomCache> = {
       success: false,
       memory: undefined,
@@ -115,6 +122,19 @@ export default class RoomData extends Mixin(RoomHeapData,RoomMemoryData,RoomCach
     return result;
   }
 
+  public UpdateControllerData(
+    data: ControllerMemory
+  ): CRUDResult<ControllerMemory> {
+    return super.UpdateControllerMemoryData(data);
+  }
+
+  public UpdateSourceData(
+    sourceId: string,
+    data: SourceMemory
+  ): CRUDResult<SourceMemory> {
+    return super.UpdateSourceMemoryData(sourceId, data);
+  }
+
   public InitializeData(
     data: RoomInitializationData
   ): DoubleCRUDResult<RoomMemory, RoomCache> {
@@ -123,10 +143,7 @@ export default class RoomData extends Mixin(RoomHeapData,RoomMemoryData,RoomCach
       memory: undefined,
       cache: undefined,
     };
-    const memoryResult = this.InitializeMemoryData(
-      data.room,
-      data.remoteRooms
-    );
+    const memoryResult = this.InitializeMemoryData(data.room, data.remoteRooms);
     if (memoryResult.success) {
       result.memory = memoryResult.data;
     }
@@ -136,7 +153,7 @@ export default class RoomData extends Mixin(RoomHeapData,RoomMemoryData,RoomCach
     }
 
     if (result.cache !== undefined && result.memory !== undefined)
-    result.success = true;
+      result.success = true;
     return result;
   }
 
@@ -151,8 +168,9 @@ export default class RoomData extends Mixin(RoomHeapData,RoomMemoryData,RoomCach
     const result: StringMap<DoubleCRUDResult<RoomMemory, RoomCache>> = {};
     const names = Object.keys(
       isMemory
-        ? this.GetAllMemoryData(this.memoryType,predicateMemory)
-        : this.GetAllCacheData(this.cacheType,
+        ? this.GetAllMemoryData(this.memoryType, predicateMemory)
+        : this.GetAllCacheData(
+            this.cacheType,
             executer,
             getOnlyExecuterJobs,
             roomsToCheck,

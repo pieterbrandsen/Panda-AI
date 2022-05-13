@@ -2,9 +2,10 @@ import { clone } from "lodash";
 import BaseCacheData from "./interface";
 
 export default class JobCacheData extends BaseCacheData {
-  protected _id:string;
-  constructor(id:string) {
-    const cacheType:CacheTypes = "Job";
+  protected _id: string;
+
+  constructor(id: string) {
+    const cacheType: CacheTypes = "Job";
     super(cacheType);
     this._id = id;
   }
@@ -20,7 +21,7 @@ export default class JobCacheData extends BaseCacheData {
   /**
    * Create an new object of this type
    */
-  protected GenerateCacheData(executer: string, type:JobTypes): JobCache {
+  protected GenerateCacheData(executer: string, type: JobTypes): JobCache {
     return {
       type,
       executer,
@@ -30,7 +31,10 @@ export default class JobCacheData extends BaseCacheData {
 
   protected GetCacheData(): CRUDResult<JobCache> {
     const data = clone(Memory.JobsData.cache[this._id]);
-    return { success: data !== undefined ? this.ValidateSingleCacheData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleCacheData(data) : false,
+      data,
+    };
   }
 
   protected CreateCacheData(data: JobCache): CRUDResult<JobCache> {
@@ -45,15 +49,19 @@ export default class JobCacheData extends BaseCacheData {
 
   protected UpdateCacheData(data: JobCache): CRUDResult<JobCache> {
     Memory.JobsData.cache[this._id] = data;
-    return { success:  Memory.JobsData.cache[this._id] !== undefined, data };
+    return { success: Memory.JobsData.cache[this._id] !== undefined, data };
   }
 
   protected DeleteCacheData(): CRUDResult<JobCache> {
     delete Memory.JobsData.cache[this._id];
-    return {success: Memory.CreepsData.cache[this._id] === undefined, data: undefined };
+    return {
+      success: Memory.CreepsData.cache[this._id] === undefined,
+      data: undefined,
+    };
   }
 
-  protected static GetAllCacheData(type:CacheTypes,
+  protected static GetAllCacheData(
+    type: CacheTypes,
     executer?: string,
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
@@ -61,7 +69,8 @@ export default class JobCacheData extends BaseCacheData {
     predicate2?: Predicate<JobCache>
   ): StringMap<JobCache> {
     let data = Memory.JobsData.cache;
-    data = super.GetAllCacheDataFilter(type,
+    data = super.GetAllCacheDataFilter(
+      type,
       data,
       executer,
       getOnlyExecuterJobs,
@@ -72,7 +81,8 @@ export default class JobCacheData extends BaseCacheData {
     return data;
   }
 
-  protected InitializeCacheData(executer: string,
+  protected InitializeCacheData(
+    executer: string,
     type: JobTypes
   ): CRUDResult<JobCache> {
     const cache = this.GenerateCacheData(executer, type);

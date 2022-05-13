@@ -2,7 +2,8 @@ import { forEach } from "lodash";
 import RoomStats from "../../Memory/Stats/room";
 
 export default function UpdateRoomStats(room: Room): boolean {
-  const roomStatsResult = RoomStats.Get(room.name);
+  const roomStatsRepo = new RoomStats(room.name);
+  const roomStatsResult = roomStatsRepo.GetMemoryData();
   if (!roomStatsResult.success) return false;
   const roomStatsMemory = roomStatsResult.data as RoomStatsMemory;
 
@@ -33,5 +34,5 @@ export default function UpdateRoomStats(room: Room): boolean {
   roomStatsMemory.creepsCount = room.find(FIND_MY_CREEPS).length;
   roomStatsMemory.structuresCount = room.find(FIND_STRUCTURES).length;
 
-  return RoomStats.Update(room.name, roomStatsMemory).success;
+  return roomStatsRepo.UpdateMemoryData(roomStatsMemory).success;
 }

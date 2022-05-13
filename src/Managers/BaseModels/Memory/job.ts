@@ -4,7 +4,8 @@ import RoomPosition from "../Helper/Room/position";
 
 export default class JobMemoryData extends BaseMemoryData {
   protected _id: string;
-  constructor(id:string) {
+
+  constructor(id: string) {
     const memoryType: MemoryTypes = "Job";
     super(memoryType);
     this._id = id;
@@ -44,7 +45,10 @@ export default class JobMemoryData extends BaseMemoryData {
   protected GetMemoryData(): CRUDResult<JobMemory> {
     const data = clone(Memory.JobsData.data[this._id]);
     data.pos = RoomPosition.UnFreezeRoomPosition(data.pos);
-    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleMemoryData(data) : false,
+      data,
+    };
   }
 
   protected CreateMemoryData(data: JobMemory): CRUDResult<JobMemory> {
@@ -64,11 +68,14 @@ export default class JobMemoryData extends BaseMemoryData {
 
   protected DeleteMemoryData(): CRUDResult<JobMemory> {
     delete Memory.JobsData.data[this._id];
-    return { success: Memory.JobsData.data[this._id] === undefined, data: undefined };
+    return {
+      success: Memory.JobsData.data[this._id] === undefined,
+      data: undefined,
+    };
   }
 
   protected static GetAllMemoryData(
-    type:MemoryTypes,
+    type: MemoryTypes,
     getOnlyFreeJobs = false,
     predicate?: Predicate<JobMemory>
   ): StringMap<JobMemory> {

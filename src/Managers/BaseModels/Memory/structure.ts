@@ -3,13 +3,16 @@ import BaseMemoryData from "./interface";
 
 export default class StructureMemoryData extends BaseMemoryData {
   protected _id: string;
-  constructor(id:string) {
+
+  constructor(id: string) {
     const memoryType: MemoryTypes = "Structure";
     super(memoryType);
     this._id = id;
   }
 
-  protected ValidateMemoryData(data: StringMap<StructureMemory>): ValidatedData {
+  protected ValidateMemoryData(
+    data: StringMap<StructureMemory>
+  ): ValidatedData {
     return super.ValidateMemoryData(data);
   }
 
@@ -31,7 +34,10 @@ export default class StructureMemoryData extends BaseMemoryData {
 
   protected GetMemoryData(): CRUDResult<StructureMemory> {
     const data = clone(Memory.StructuresData.data[this._id]);
-    return { success: data !== undefined ? this.ValidateSingleMemoryData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleMemoryData(data) : false,
+      data,
+    };
   }
 
   protected CreateMemoryData(
@@ -50,19 +56,26 @@ export default class StructureMemoryData extends BaseMemoryData {
     data: StructureMemory
   ): CRUDResult<StructureMemory> {
     Memory.StructuresData.data[this._id] = data;
-    return { success: Memory.StructuresData.data[this._id] !== undefined, data };
+    return {
+      success: Memory.StructuresData.data[this._id] !== undefined,
+      data,
+    };
   }
 
   protected DeleteMemoryData(): CRUDResult<StructureMemory> {
     delete Memory.StructuresData.data[this._id];
-    return { success: Memory.StructuresData.data[this._id] === undefined, data: undefined };
+    return {
+      success: Memory.StructuresData.data[this._id] === undefined,
+      data: undefined,
+    };
   }
 
-  protected static GetAllMemoryData(type:MemoryTypes,
+  protected static GetAllMemoryData(
+    type: MemoryTypes,
     predicate?: Predicate<StructureMemory>
   ): StringMap<StructureMemory> {
     let { data } = Memory.StructuresData;
-    data = super.GetAllMemoryDataFilter(type,data, predicate);
+    data = super.GetAllMemoryDataFilter(type, data, predicate);
     return data;
   }
 

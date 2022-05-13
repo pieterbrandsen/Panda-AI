@@ -57,7 +57,10 @@ export default class GlobalMemoryData extends BaseMemoryData {
 
   protected GetMemoryData(): CRUDResult<Memory> {
     const data = clone(Memory);
-    return { success: data !== undefined ? this.ValidateSingleMemoryData() : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleMemoryData() : false,
+      data,
+    };
   }
 
   protected UpdateMemoryData(data: Memory): CRUDResult<Memory> {

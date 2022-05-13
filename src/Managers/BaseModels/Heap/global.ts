@@ -6,6 +6,7 @@ export default class GlobalHeapData extends BaseHeapData {
     const heapType: HeapTypes = "Global";
     super(heapType);
   }
+
   public MinimumVersionHeapData(): number {
     return 0;
   }
@@ -17,7 +18,7 @@ export default class GlobalHeapData extends BaseHeapData {
   /**
    * Create an new object of this type
    */
-   public GenerateHeapData(): GlobalData {
+  public GenerateHeapData(): GlobalData {
     return {
       Version: 0,
       CreepsData: {},

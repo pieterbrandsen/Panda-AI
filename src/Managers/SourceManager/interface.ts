@@ -7,11 +7,15 @@ import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControl
 
 export default class RoomSourceManager {
   protected _executer: string;
+
   protected _roomInformation: RoomInformation;
 
   constructor(roomInformation: RoomInformation) {
     this._roomInformation = roomInformation;
-    this._executer = RoomHelper.GetExecuter(roomInformation.room!.name, "Source");
+    this._executer = RoomHelper.GetExecuter(
+      roomInformation.room!.name,
+      "Source"
+    );
   }
 
   private UpdateSources(): void {
@@ -26,11 +30,13 @@ export default class RoomSourceManager {
           sourceMemory.pos,
           room
         ).length;
-        const jobResult = JobData.Initialize({
+        const jobType: JobTypes = "HarvestSource";
+        const jobDataRepo = new JobData(undefined, jobType, sourceMemory.pos);
+        const jobResult = jobDataRepo.InitializeData({
           executer: this._executer,
           pos: sourceMemory.pos,
           targetId: sourceId,
-          type: "HarvestSource",
+          type: jobType,
           objectType: "Creep",
           maxCreepsCount: maxCreepsAround,
         });

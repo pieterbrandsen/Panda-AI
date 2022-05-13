@@ -39,7 +39,7 @@ export default class CreepSpawning {
     this.spawnRoom = Game.rooms[spawnRoom];
     const roomsToCheck = !remoteRooms ? [spawnRoom] : remoteRooms;
     this.roomNames = roomsToCheck;
-    const spawnsCache = StructureData.GetAllBasedOnCache(
+    const spawnsCache = StructureData.GetAllDataBasedOnCache(
       "",
       false,
       [spawnRoom],
@@ -50,11 +50,11 @@ export default class CreepSpawning {
       if (spawn) this.spawns.push(spawn);
     });
 
-    const jobsData = JobData.GetAllBasedOnCache("", false, roomsToCheck);
+    const jobsData = JobData.GetAllDataBasedOnCache("", false, roomsToCheck);
     this.jobsData = jobsData;
 
     this.creepsData = groupBy(
-      Object.values(CreepData.GetAllBasedOnCache("", false, roomsToCheck)),
+      Object.values(CreepData.GetAllDataBasedOnCache("", false, roomsToCheck)),
       (creepData) => (creepData.cache as CreepCache).type
     ) as StringMapGeneric<
       DoubleCRUDResult<CreepMemory, CreepCache>[],
@@ -87,7 +87,7 @@ export default class CreepSpawning {
       type: creep.type,
       name: creep.name,
     };
-    return CreepData.Initialize(data).success;
+    return new CreepData(creep.name).InitializeData(data).success;
   }
 
   private RequestCreep(type: CreepTypes): SpawningObject | undefined {
@@ -103,7 +103,7 @@ export default class CreepSpawning {
     if (type === "miner") {
       const { controller } = this.spawnRoom;
       if (controller && controller.level < 6 && !this.isRemoteCreep) {
-        const roomData = RoomData.GetMemory(this.spawnRoom.name);
+        const roomData = new RoomData(this.spawnRoom.name).GetData();
         if (roomData.success) {
           const roomMemory = roomData.memory as RoomMemory;
           if (

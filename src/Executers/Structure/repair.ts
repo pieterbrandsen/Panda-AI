@@ -17,14 +17,16 @@ export default class StructureRepair<S extends Structure> {
     const cache = this._structureInformation.cache!;
     const missingHits = this.GetMissingHits();
     if (missingHits > 0) {
-      const jobData = JobData.GetMemory(JobData.GetJobId("Repair", cache.pos));
-      if (jobData.success) return true;
-      return JobData.Initialize({
+      const jobType: JobTypes = "Repair";
+      const jobId = JobData.GetJobId(jobType, cache.pos);
+      const jobRepo = new JobData(jobId);
+      if (jobRepo.GetData().success) return true;
+      return jobRepo.InitializeData({
         executer: cache.executer,
         pos: cache.pos,
         objectType: "Structure",
         targetId: structure.id,
-        type: "Repair",
+        type: jobType,
         amountToTransfer: missingHits,
         structureType: structure.structureType,
       }).success;

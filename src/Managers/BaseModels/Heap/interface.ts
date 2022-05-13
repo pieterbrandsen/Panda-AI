@@ -5,9 +5,11 @@
 
 export default class BaseHeapData {
   protected _type: HeapTypes;
+
   constructor(type: HeapTypes) {
     this._type = type;
   }
+
   protected ValidateSingleHeapData(id: string): boolean {
     switch (this._type) {
       case "Creep":

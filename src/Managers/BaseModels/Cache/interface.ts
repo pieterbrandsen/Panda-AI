@@ -6,7 +6,8 @@ import Predicates from "./predicates";
 
 export default abstract class BaseCacheData {
   protected _type: CacheTypes;
-  constructor(type:CacheTypes) {
+
+  constructor(type: CacheTypes) {
     this._type = type;
   }
 
@@ -36,8 +37,8 @@ export default abstract class BaseCacheData {
    * Check all data in object and return list of non valid cache objects based on version
    */
   protected static ValidateCacheData(
-    type:CacheTypes,
-    data: StringMap<CacheObjects>,
+    type: CacheTypes,
+    data: StringMap<CacheObjects>
   ): ValidatedData {
     const minimumVersion = this.MinimumCacheVersion(type);
     let isValid = true;
@@ -52,16 +53,17 @@ export default abstract class BaseCacheData {
     return { isValid, nonValidObjects };
   }
 
-  protected ValidateCacheData(
-    data: StringMap<CacheObjects>,
-  ): ValidatedData {
+  protected ValidateCacheData(data: StringMap<CacheObjects>): ValidatedData {
     return BaseCacheData.ValidateCacheData(this._type, data);
   }
 
   /**
    * Check single object and return if its valid based on version
    */
-  protected static ValidateSingleCacheData(type:CacheTypes, data: CacheObjects): boolean {
+  protected static ValidateSingleCacheData(
+    type: CacheTypes,
+    data: CacheObjects
+  ): boolean {
     const minimumVersion = this.MinimumCacheVersion(type);
     let isValid = true;
     if (data.version < minimumVersion) {
@@ -70,19 +72,21 @@ export default abstract class BaseCacheData {
 
     return isValid;
   }
+
   protected ValidateSingleCacheData(data: CacheObjects): boolean {
     return BaseCacheData.ValidateSingleCacheData(this._type, data);
   }
 
   protected static GetAllCacheDataFilter<T extends CacheObjects>(
-    type:CacheTypes, data: StringMap<T>,
+    type: CacheTypes,
+    data: StringMap<T>,
     executer?: string,
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
     predicate?: Predicate<T>,
     predicate2?: Predicate<T>
   ): StringMap<T> {
-    const validatedData = this.ValidateCacheData(type,data);
+    const validatedData = this.ValidateCacheData(type, data);
     forEach(validatedData.nonValidObjects, (key) => {
       delete data[key];
     });

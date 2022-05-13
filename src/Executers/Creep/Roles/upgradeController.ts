@@ -1,3 +1,4 @@
+import JobsHelper from "../../../Managers/BaseModels/Jobs/interface";
 import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
 export default class CreepUpgradeControllerRole {
@@ -33,7 +34,7 @@ export default class CreepUpgradeControllerRole {
           creep.moveTo(target);
           break;
         case OK:
-          Jobs.UpdateAmount(
+          new JobsHelper().UpdateAmount(
             this._creepInformation.memory!.jobId as string,
             this._creepInformation.jobMemory!,
             this._creepInformation.jobCache!,

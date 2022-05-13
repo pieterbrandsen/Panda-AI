@@ -40,14 +40,18 @@ export default function HandleSourceAndControllerStructure(
           bestPosition,
           structureType
         );
-        const structureData = StructureData.GetMemory(memory.structureId ?? "");
+        const structureRepo = new StructureData(memory.structureId ?? "");
+        const structureData = structureRepo.GetData();
         if (structure && structureData.success) {
           const structureMemory = structureData.memory as StructureMemory;
           structureMemory.isSourceStructure = true;
           memory.structureId = structure.id;
           memory.structureType = structure.structureType as BuildableStructureConstant;
           updatedMemory = true;
-          StructureData.UpdateMemory(structure.id, structureMemory);
+          structureRepo.UpdateData(
+            structureMemory,
+            structureData.cache as StructureCache
+          );
         }
       }
     }
@@ -101,21 +105,15 @@ export default function HandleSourceAndControllerStructure(
 
   if (!updatedMemory) return;
 
+  const roomRepo = new RoomData(target.room.name);
   if (type === "controller") {
-    RoomData.UpdateControllerMemory(
-      target.room.name,
-      memory as ControllerMemory
-    );
+    roomRepo.UpdateControllerData(memory as ControllerMemory);
   } else if (type === "source") {
-    const structureData = StructureData.GetMemory(memory.structureId ?? "");
+    const structureData = new StructureData(memory.structureId ?? "").GetData();
     if (structureData.success) {
       const structureMemory = structureData.memory as StructureMemory;
       structureMemory.isSourceStructure = true;
     }
-    RoomData.UpdateSourceMemory(
-      target.room.name,
-      target.id,
-      memory as SourceMemory
-    );
+    roomRepo.UpdateSourceData(target.id, memory as SourceMemory);
   }
 }

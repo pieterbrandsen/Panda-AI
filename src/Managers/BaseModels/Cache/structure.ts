@@ -3,12 +3,14 @@ import BaseCacheData from "./interface";
 import RoomPosition from "../Helper/Room/position";
 
 export default class StructureCacheData extends BaseCacheData {
-  protected _id:string;
-  constructor(id:string) {
-    const cacheType:CacheTypes = "Structure";
+  protected _id: string;
+
+  constructor(id: string) {
+    const cacheType: CacheTypes = "Structure";
     super(cacheType);
     this._id = id;
   }
+
   protected ValidateCacheData(data: StringMap<StructureCache>): ValidatedData {
     return super.ValidateCacheData(data);
   }
@@ -20,7 +22,10 @@ export default class StructureCacheData extends BaseCacheData {
   /**
    * Create an new object of this type
    */
-  protected GenerateCacheData(structure: Structure, executer: string): StructureCache {
+  protected GenerateCacheData(
+    structure: Structure,
+    executer: string
+  ): StructureCache {
     return {
       type: structure.structureType,
       version: super.MinimumCacheVersion(),
@@ -32,7 +37,10 @@ export default class StructureCacheData extends BaseCacheData {
   protected GetCacheData(): CRUDResult<StructureCache> {
     const data = clone(Memory.StructuresData.cache[this._id]);
     if (data === undefined) return { success: false, data: undefined };
-    return { success: data !== undefined ? this.ValidateSingleCacheData(data) : false, data };
+    return {
+      success: data !== undefined ? this.ValidateSingleCacheData(data) : false,
+      data,
+    };
   }
 
   protected CreateCacheData(data: StructureCache): CRUDResult<StructureCache> {
@@ -47,15 +55,22 @@ export default class StructureCacheData extends BaseCacheData {
 
   protected UpdateCacheData(data: StructureCache): CRUDResult<StructureCache> {
     Memory.StructuresData.cache[this._id] = data;
-    return { success:  Memory.StructuresData.cache[this._id] !== undefined, data };
+    return {
+      success: Memory.StructuresData.cache[this._id] !== undefined,
+      data,
+    };
   }
 
   protected DeleteCacheData(): CRUDResult<StructureCache> {
     delete Memory.StructuresData.cache[this._id];
-    return { success: Memory.StructuresData.cache[this._id] === undefined, data: undefined };
+    return {
+      success: Memory.StructuresData.cache[this._id] === undefined,
+      data: undefined,
+    };
   }
 
-  protected static GetAllCacheData(type:CacheTypes,
+  protected static GetAllCacheData(
+    type: CacheTypes,
     executer = "",
     getOnlyExecuterJobs = true,
     roomsToCheck: string[] = [],
@@ -63,7 +78,8 @@ export default class StructureCacheData extends BaseCacheData {
     predicate2?: Predicate<StructureCache>
   ): StringMap<StructureCache> {
     let data = Memory.StructuresData.cache;
-    data = super.GetAllCacheDataFilter(type,
+    data = super.GetAllCacheDataFilter(
+      type,
       data,
       executer,
       getOnlyExecuterJobs,
@@ -74,7 +90,8 @@ export default class StructureCacheData extends BaseCacheData {
     return data;
   }
 
-  protected InitializeCacheData(structure: Structure,
+  protected InitializeCacheData(
+    structure: Structure,
     executer: string
   ): CRUDResult<StructureCache> {
     const cache = this.GenerateCacheData(structure, executer);
