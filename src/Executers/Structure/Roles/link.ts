@@ -1,5 +1,4 @@
 import JobsHelper from "../../../Managers/BaseModels/Jobs/interface";
-import Jobs from "../../../Managers/BaseModels/Jobs/interface";
 
 export default class CreepTransferRoles<S extends Structure> {
   protected _structureInformation: StructureInformation<S>;

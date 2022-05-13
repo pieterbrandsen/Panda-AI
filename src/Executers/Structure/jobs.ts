@@ -1,4 +1,3 @@
-import JobData from "../../Managers/BaseModels/Helper/Job/memory";
 import StructureData from "../../Managers/BaseModels/Helper/Structure/memory";
 import JobsHelper from "../../Managers/BaseModels/Jobs/interface";
 
@@ -54,9 +53,9 @@ export default class StructureJobs<S extends Structure> extends JobsHelper {
     ).success;
   }
 
-  public AssignStructureJob(): void {}
+  // public AssignStructureJob(): void {}
 
-  public FindJobForStructure(structure: Structure): boolean {
+  public static FindJobForStructure(): boolean {
     return false;
   }
 }

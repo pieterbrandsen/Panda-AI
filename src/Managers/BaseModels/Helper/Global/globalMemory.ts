@@ -10,7 +10,7 @@ export default class GlobalDataHelper extends Mixin(
     GetData: super.GetHeapData,
     UpdateData: super.UpdateHeapData,
     GenerateData: super.GenerateHeapData,
-    ValidateSingleData: super.ValidateSingleHeapData
+    ValidateSingleData: super.ValidateSingleHeapData,
   };
 
   public GetData(): CRUDResult<Memory> {
@@ -33,5 +33,7 @@ export default class GlobalDataHelper extends Mixin(
     return super.InitializeMemoryData();
   }
 
-  public ValidateSingleData(): boolean { return super.ValidateSingleMemoryData(); }
+  public ValidateSingleData(): boolean {
+    return super.ValidateSingleMemoryData();
+  }
 }

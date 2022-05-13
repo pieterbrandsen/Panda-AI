@@ -4,7 +4,7 @@ import StatsMemoryData from "./Stats/global";
 import LogsMemoryData from "./logs";
 
 export default class GlobalMemoryData extends BaseMemoryData {
-  protected ValidateSingleMemoryData(): boolean {
+  protected static ValidateSingleMemoryData(): boolean {
     let isValid = true;
     if (Memory.version === undefined) {
       isValid = false;
@@ -15,7 +15,7 @@ export default class GlobalMemoryData extends BaseMemoryData {
   /**
    * Create an new object of this type
    */
-  protected GenerateMemoryData(): Memory {
+  protected static GenerateMemoryData(): Memory {
     const defaultObject = {
       creeps: {},
       flags: {},
@@ -55,7 +55,7 @@ export default class GlobalMemoryData extends BaseMemoryData {
     };
   }
 
-  protected GetMemoryData(): CRUDResult<Memory> {
+  protected static GetMemoryData(): CRUDResult<Memory> {
     const data = clone(Memory);
     return {
       success: data !== undefined ? this.ValidateSingleMemoryData() : false,
@@ -63,14 +63,14 @@ export default class GlobalMemoryData extends BaseMemoryData {
     };
   }
 
-  protected UpdateMemoryData(data: Memory): CRUDResult<Memory> {
+  protected static UpdateMemoryData(data: Memory): CRUDResult<Memory> {
     forEach(data, (value: unknown, key: string) => {
       Memory[key] = value;
     });
     return { success: true, data };
   }
 
-  protected DeleteMemoryData(key?: string): CRUDResult<Memory> {
+  protected static DeleteMemoryData(key?: string): CRUDResult<Memory> {
     if (key) {
       delete Memory[key];
       return { success: true, data: undefined };
@@ -81,7 +81,7 @@ export default class GlobalMemoryData extends BaseMemoryData {
     return { success: true, data: undefined };
   }
 
-  protected InitializeMemoryData(): CRUDResult<Memory> {
+  protected static InitializeMemoryData(): CRUDResult<Memory> {
     this.DeleteMemoryData();
     const data = this.GenerateMemoryData();
     const updateResult = this.UpdateMemoryData(data);

@@ -1,6 +1,5 @@
 import RoomHelper from "../BaseModels/Helper/Room/interface";
 import JobData from "../BaseModels/Helper/Job/memory";
-import RoomData from "../BaseModels/Helper/Room/memory";
 import RoomConstruction from "../BaseModels/Helper/Room/construction";
 import RoomPositionHelper from "../BaseModels/Helper/Room/position";
 

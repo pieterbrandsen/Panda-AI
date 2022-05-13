@@ -1,9 +1,6 @@
 import { forEach } from "lodash";
 import RoomHelper from "../BaseModels/Helper/Room/interface";
-import RoomData from "../BaseModels/Helper/Room/memory";
 import DroppedResourceData from "../BaseModels/Helper/DroppedResource/memory";
-import Jobs from "../BaseModels/Jobs/interface";
-import JobsHelper from "../BaseModels/Jobs/interface";
 import CreepJobs from "../../Executers/Creep/jobs";
 
 export default class RoomDroppedResourceManager {

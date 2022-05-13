@@ -29,7 +29,7 @@ export default class LogsMemoryData extends BaseMemoryData {
     };
   }
 
-  protected UpdateMemoryData(data: LogsMemory): CRUDResult<LogsMemory> {
+  protected static UpdateMemoryData(data: LogsMemory): CRUDResult<LogsMemory> {
     Memory.logs = data;
     return { success: Memory.logs !== undefined, data };
   }
@@ -39,7 +39,7 @@ export default class LogsMemoryData extends BaseMemoryData {
     if (getResult.success) {
       return { success: false, data: getResult.data };
     }
-    this.UpdateMemoryData(data);
+    LogsMemoryData.UpdateMemoryData(data);
     getResult = this.GetMemoryData();
     return { success: getResult.success, data: clone(getResult.data) };
   }

@@ -23,8 +23,7 @@ export default class RoomStructure {
         objectType: "Creep",
       });
       if (job.success && job.cache && job.memory) {
-        const jobId = JobData.GetJobId(job.cache.type, job.memory.pos);
-        return jobId;
+        return JobData.GetJobId(job.cache.type, job.memory.pos);
       }
       return undefined;
     }

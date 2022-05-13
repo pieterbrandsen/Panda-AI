@@ -1,16 +1,14 @@
 import { Mixin } from "ts-mixer";
 import StructureData from "../../Managers/BaseModels/Helper/Structure/memory";
 import StructureRepair from "./repair";
-import StructureHeap from "../../Managers/BaseModels/Heap/structure";
-import { StructuresWithRole } from "./constants";
-import Jobs from "../../Managers/BaseModels/Jobs/interface";
 import JobData from "../../Managers/BaseModels/Helper/Job/memory";
 import StructureRoles from "./roles";
 import StructureJobs from "./jobs";
 
 export default class StructureHandler<S extends Structure> extends Mixin(
   StructureRepair,
-  StructureRoles, StructureJobs
+  StructureRoles,
+  StructureJobs
 ) {
   public structureInformation: StructureInformation<S>;
 
@@ -56,8 +54,7 @@ export default class StructureHandler<S extends Structure> extends Mixin(
       !this.IsStructureSetup() ||
       structureInformation.memory!.jobId === undefined
     ) {
-      if (structureData.memory)
-        this.UnassignJob(false);
+      if (structureData.memory) this.UnassignJob(false);
       this.structureDataRepo.DeleteData();
       this.structureInformation = structureInformation;
       return;

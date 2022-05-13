@@ -1,10 +1,8 @@
 import { ErrorMapper } from "./Extra/ErrorMapper";
-import GlobalMemory from "./Managers/BaseModels/Memory/global";
 import GlobalData from "./Managers/BaseModels/Helper/Global/globalMemory";
 import UpdateGlobalStats from "./Managers/BaseModels/Helper/Stats/updateGlobal";
 import RoomsExecuter from "./Executers/Room/interface";
 import ResetHeap from "./Managers/BaseModels/Helper/Heap/Reset";
-import HeapMemory from "./Managers/BaseModels/Heap/global";
 import InitializeSpawnedCreeps from "./Extra/InitializeSpawnedCreepsSpawnedCreeps";
 import ShardVision from "./Extra/ShardVision";
 import Market from "./Extra/Market";

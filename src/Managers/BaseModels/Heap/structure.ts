@@ -17,7 +17,7 @@ export default class StructureHeapData extends BaseHeapData {
   /**
    * Create an new object of this type
    */
-  protected GenerateHeapData(): StructureHeap {
+  protected static GenerateHeapData(): StructureHeap {
     return {};
   }
 
@@ -47,7 +47,7 @@ export default class StructureHeapData extends BaseHeapData {
   }
 
   protected InitializeHeapData(): CRUDResult<StructureHeap> {
-    const data = this.GenerateHeapData();
+    const data = StructureHeapData.GenerateHeapData();
     const createResult = this.CreateHeapData(data);
     return { success: createResult.success, data: createResult.data };
   }

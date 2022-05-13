@@ -17,7 +17,7 @@ export default class CreepHeapData extends BaseHeapData {
   /**
    * Create an new object of this type
    */
-  protected GenerateHeapData(): CreepHeap {
+  protected static GenerateHeapData(): CreepHeap {
     return {};
   }
 
@@ -47,7 +47,7 @@ export default class CreepHeapData extends BaseHeapData {
   }
 
   protected InitializeHeapData(): CRUDResult<CreepHeap> {
-    const data = this.GenerateHeapData();
+    const data = CreepHeapData.GenerateHeapData();
     const createResult = this.CreateHeapData(data);
     return { success: createResult.success, data: createResult.data };
   }

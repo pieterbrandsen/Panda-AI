@@ -7,7 +7,7 @@ export default class GlobalHeapData extends BaseHeapData {
     super(heapType);
   }
 
-  public MinimumVersionHeapData(): number {
+  public static MinimumVersionHeapData(): number {
     return 0;
   }
 
@@ -18,7 +18,7 @@ export default class GlobalHeapData extends BaseHeapData {
   /**
    * Create an new object of this type
    */
-  public GenerateHeapData(): GlobalData {
+  public static GenerateHeapData(): GlobalData {
     return {
       Version: 0,
       CreepsData: {},
@@ -37,14 +37,14 @@ export default class GlobalHeapData extends BaseHeapData {
     return { success: this.ValidateSingleHeapData(), data };
   }
 
-  public UpdateHeapData(data: GlobalData): CRUDResult<GlobalData> {
+  public static UpdateHeapData(data: GlobalData): CRUDResult<GlobalData> {
     forEach(data, (value: unknown, key: string) => {
       global[key] = value;
     });
     return { success: true, data };
   }
 
-  public InitializeHeap(): boolean {
+  public static InitializeHeap(): boolean {
     return this.UpdateHeapData(this.GenerateHeapData()).success;
   }
 }

@@ -1,24 +1,16 @@
-import { forEach, forOwn, remove } from "lodash";
-import CreepData from "../Helper/Creep/memory";
+import { forEach, remove } from "lodash";
 import JobData from "../Helper/Job/memory";
 import RoomData from "../Helper/Room/memory";
 import Predicates from "./predicates";
-import MemoryPredicates from "../Memory/predicates";
-import ResourceStorage from "../ResourceStorage/interface";
-import StructureData from "../Helper/Structure/memory";
-import DroppedResourceData from "../Helper/DroppedResource/memory";
-import RoomConstruction from "../Helper/Room/construction";
 import RoomHelper from "../Helper/Room/interface";
 import JobHelper from "../Helper/Job/helper";
-import RoomHeapData from "../Heap/room";
-import CreepJobs from "../../../Executers/Creep/jobs";
 
 // TODO: Update (all/single)
 // TODO: GenerateObject (update whenever something needs to be added, assign in this function the missing data that is optional?)
 // *^ LATER
 
 export default class JobsHelper {
-  protected RemoveAssignedCreepOutOfArray(
+  protected static RemoveAssignedCreepOutOfArray(
     array: string[],
     key: string
   ): string[] {
@@ -26,7 +18,7 @@ export default class JobsHelper {
     return array;
   }
 
-  public UpdateAmount(
+  public static UpdateAmount(
     jobId: string,
     memory: JobMemory,
     cache: JobCache,
@@ -57,7 +49,7 @@ export default class JobsHelper {
     return jobDataRepo.UpdateData(memory, cache).success;
   }
 
-  public MoveJob(
+  public static MoveJob(
     jobId: string,
     type: "Room" | "Manager",
     newExecuter: string
@@ -78,7 +70,7 @@ export default class JobsHelper {
     return jobDataRepo.UpdateData(jobData.memory as JobMemory, jobCache);
   }
 
-  protected GetJobScore(memory: JobMemory): number {
+  protected static GetJobScore(memory: JobMemory): number {
     if (memory.assignedCreeps.length >= (memory.maxCreepsCount ?? 100))
       return 0;
 
@@ -90,7 +82,7 @@ export default class JobsHelper {
     return score;
   }
 
-  protected FindBestJob(jobIds: string[]): string | undefined {
+  protected static FindBestJob(jobIds: string[]): string | undefined {
     let bestJobId: string | undefined;
     let bestScore = 0;
     forEach(jobIds, (jobId: string) => {
@@ -108,7 +100,7 @@ export default class JobsHelper {
     return bestJobId;
   }
 
-  protected FindNewJob(
+  protected static FindNewJob(
     executer: string,
     jobTypes: JobTypes[],
     roomNames: string[]
@@ -137,7 +129,7 @@ export default class JobsHelper {
     return undefined;
   }
 
-  protected GetJobTypesToExecute(
+  protected static GetJobTypesToExecute(
     creep: Creep,
     creepType: CreepTypes
   ): JobTypes[] {

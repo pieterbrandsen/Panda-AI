@@ -1,8 +1,6 @@
 import { Mixin } from "ts-mixer";
-import CreepHeapData from "../../Managers/BaseModels/Heap/creep";
 import CreepData from "../../Managers/BaseModels/Helper/Creep/memory";
 import JobData from "../../Managers/BaseModels/Helper/Job/memory";
-import Jobs from "../../Managers/BaseModels/Jobs/interface";
 import CreepJobs from "./jobs";
 import CreepRoles from "./roles";
 

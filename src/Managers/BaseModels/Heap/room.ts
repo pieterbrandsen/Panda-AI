@@ -17,7 +17,7 @@ export default class RoomHeapData extends BaseHeapData {
   /**
    * Create an new object of this type
    */
-  protected GenerateHeapData(): RoomHeap {
+  protected static GenerateHeapData(): RoomHeap {
     return {
       stats: {
         energyIncoming: {
@@ -85,7 +85,7 @@ export default class RoomHeapData extends BaseHeapData {
   }
 
   protected InitializeHeapData(): CRUDResult<RoomHeap> {
-    const data = this.GenerateHeapData();
+    const data = RoomHeapData.GenerateHeapData();
     const createResult = this.CreateHeapData(data);
     return { success: createResult.success, data: createResult.data };
   }

@@ -72,7 +72,7 @@ export default abstract class BaseMemoryData {
   /**
    * Check single object and return if its valid based on version
    */
-  public static ValidateSingleMemoryData(
+  protected static ValidateSingleMemoryData(
     type: MemoryTypes,
     data: MemoryObjects
   ): boolean {

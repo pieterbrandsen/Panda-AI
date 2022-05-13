@@ -3,7 +3,6 @@ import CreepData from "../Helper/Creep/memory";
 import StructureData from "../Helper/Structure/memory";
 import RoomPositionHelper from "../Helper/Room/position";
 import CachePredicates from "../Cache/predicates";
-import JobData from "../Helper/Job/memory";
 import DroppedResourceData from "../Helper/DroppedResource/memory";
 
 export default class ResourceStorage {

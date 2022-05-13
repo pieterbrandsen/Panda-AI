@@ -7,7 +7,6 @@ import TransferRole from "./Roles/transfer";
 import WithdrawResourceRole from "./Roles/withdrawResource";
 import PickupResourceRole from "./Roles/pickupResource";
 import UpgradeControllerRole from "./Roles/upgradeController";
-import Jobs from "../../Managers/BaseModels/Jobs/interface";
 import CreepJobs from "./jobs";
 
 export default class CreepRoles extends Mixin(

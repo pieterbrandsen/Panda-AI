@@ -2,7 +2,6 @@
 import { forEach } from "lodash";
 import CreepJobs from "../Executers/Creep/jobs";
 import CreepData from "../Managers/BaseModels/Helper/Creep/memory";
-import Jobs from "../Managers/BaseModels/Jobs/interface";
 
 export default class InitializeSpawnedCreeps {
   private InitializeCreep(
@@ -11,12 +10,16 @@ export default class InitializeSpawnedCreeps {
   ): boolean {
     let result = true;
     const creepMemory = memoryData.memory as CreepMemory;
-    const creepRepo = new CreepData(creep.id);
     result = new CreepData(creep.id).CreateData(
       creepMemory,
       memoryData.cache as CreepCache
     ).success;
-    new CreepJobs({creep,id:creep.name,memory:creepMemory,cache:memoryData.cache}).UnassignJob(false);
+    new CreepJobs({
+      creep,
+      id: creep.name,
+      memory: creepMemory,
+      cache: memoryData.cache,
+    }).UnassignJob(false);
     if (result) result = new CreepData(creep.name).DeleteData().success;
     return result;
   }

@@ -1,7 +1,6 @@
 import { forEach } from "lodash";
 import RoomHelper from "../BaseModels/Helper/Room/interface";
 import JobData from "../BaseModels/Helper/Job/memory";
-import RoomData from "../BaseModels/Helper/Room/memory";
 import RoomPosition from "../BaseModels/Helper/Room/position";
 import HandleSourceAndControllerStructure from "../Helper/handleSourceAndControllerStructure";
 

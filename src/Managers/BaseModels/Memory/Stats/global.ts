@@ -45,12 +45,12 @@ export default class GlobalStatsMemoryData extends BaseMemoryData {
     if (getResult.success) {
       return { success: false, data: getResult.data };
     }
-    this.UpdateMemoryData(data);
+    GlobalStatsMemoryData.UpdateMemoryData(data);
     getResult = this.GetMemoryData();
     return { success: getResult.success, data: clone(getResult.data) };
   }
 
-  public UpdateMemoryData(data: StatsMemory): CRUDResult<StatsMemory> {
+  public static UpdateMemoryData(data: StatsMemory): CRUDResult<StatsMemory> {
     Memory.stats = data;
     return { success: Memory.stats !== undefined, data };
   }

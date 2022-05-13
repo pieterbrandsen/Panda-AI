@@ -19,7 +19,7 @@ export default class JobData extends Mixin(JobMemoryData, JobCacheData) {
     this._id = id;
   }
 
-  public static GetJobId(type: JobTypes, pos: FreezedRoomPosition) {
+  public static GetJobId(type: JobTypes, pos: FreezedRoomPosition): string {
     return `${type}_${pos.x}_${pos.y}_${pos.roomName}`;
   }
 

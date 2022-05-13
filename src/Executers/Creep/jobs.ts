@@ -85,9 +85,7 @@ export default class CreepJobs extends JobsHelper {
       .success;
   }
 
-  public AssignCreepJob(
-    jobId: string,
-  ): boolean {
+  public AssignCreepJob(jobId: string): boolean {
     const jobDataRepo = new JobData(jobId);
 
     const creepId = this._creepInformation.id;
@@ -108,7 +106,7 @@ export default class CreepJobs extends JobsHelper {
     creepCache.executer = jobCache.executer;
     jobMemory.fromTargetId = creepId;
     jobMemory.lastAssigned = Game.time;
-    if (!jobDataRepo.UpdateData(jobMemory,jobCache).success) {
+    if (!jobDataRepo.UpdateData(jobMemory, jobCache).success) {
       return false;
     }
 
@@ -124,9 +122,9 @@ export default class CreepJobs extends JobsHelper {
     cache: CreepCache | StructureCache | DroppedResourceCache,
     type: JobObjectExecuter
   ): boolean {
-      const { id } = targetInformation;
-      const structureDataRepo = new StructureData(id);
-    const droppedResourceDataRepo = new DroppedResourceData(id)
+    const { id } = targetInformation;
+    const structureDataRepo = new StructureData(id);
+    const droppedResourceDataRepo = new DroppedResourceData(id);
     let targetDataResult:
       | DoubleCRUDResult<StructureMemory, StructureCache>
       | DoubleCRUDResult<
@@ -216,19 +214,29 @@ export default class CreepJobs extends JobsHelper {
       }
 
       if (targetStructureInformation)
-        structureDataRepo.UpdateData(targetMemory as StructureMemory,targetCache as StructureCache);
-      else droppedResourceDataRepo.UpdateData(targetMemory as DroppedResourceMemory, targetCache as DroppedResourceCache);
+        structureDataRepo.UpdateData(
+          targetMemory as StructureMemory,
+          targetCache as StructureCache
+        );
+      else
+        droppedResourceDataRepo.UpdateData(
+          targetMemory as DroppedResourceMemory,
+          targetCache as DroppedResourceCache
+        );
       if (type === "Structure") {
-        return new StructureData(objectId).UpdateData(memory as StructureMemory, cache as StructureCache).success;
+        return new StructureData(objectId).UpdateData(
+          memory as StructureMemory,
+          cache as StructureCache
+        ).success;
       }
       if (type === "Resource") {
         return new DroppedResourceData(objectId).UpdateData(
-          memory as DroppedResourceMemory, cache as DroppedResourceCache).success;
+          memory as DroppedResourceMemory,
+          cache as DroppedResourceCache
+        ).success;
       }
 
-      return this.AssignCreepJob(
-        jobId,
-      );
+      return this.AssignCreepJob(jobId);
     }
 
     return true;
@@ -283,7 +291,8 @@ export default class CreepJobs extends JobsHelper {
 
     let roomNames = [creep.room.name];
     if (creepMemory.isRemoteCreep) {
-      const roomMemory = new RoomData(creep.room.name).GetData().memory as RoomMemory;
+      const roomMemory = new RoomData(creep.room.name).GetData()
+        .memory as RoomMemory;
       roomNames = Object.keys(roomMemory.remoteRooms ?? {});
     }
 
@@ -312,17 +321,13 @@ export default class CreepJobs extends JobsHelper {
       if (permJobData.success) {
         const permJobCache = permJobData.cache as JobCache;
         if (jobTypes.includes(permJobCache.type)) {
-          return this.AssignCreepJob(
-            creepMemory.permJobId,
-          );
+          return this.AssignCreepJob(creepMemory.permJobId);
         }
       }
     }
     const newJob = this.FindNewJob(creepCache.executer, jobTypes, roomNames);
     if (newJob !== undefined) {
-      return this.AssignCreepJob(
-        newJob.id,
-      );
+      return this.AssignCreepJob(newJob.id);
     }
     return false;
   }

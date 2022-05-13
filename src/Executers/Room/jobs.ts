@@ -7,25 +7,25 @@ import JobsHelper from "../../Managers/BaseModels/Jobs/interface";
 import CreepJobs from "../Creep/jobs";
 
 export default class RoomJobs extends JobsHelper {
-    protected _roomInformation: RoomInformation;
-  
-    constructor(roomInformation: RoomInformation) {
-      super();
-      this._roomInformation = roomInformation;
-    }
+  protected _roomInformation: RoomInformation;
 
-protected UpdateAllData(): void {
-    const room = this._roomInformation.room;
+  constructor(roomInformation: RoomInformation) {
+    super();
+    this._roomInformation = roomInformation;
+  }
+
+  protected UpdateAllData(): void {
+    const { room } = this._roomInformation;
     if (!room) return;
     const jobIds = Object.keys(
       JobData.GetAllDataBasedOnCache("", false, [room.name])
     );
     forEach(jobIds, (id) => {
-      this.UpdateData(room, id);
+      RoomJobs.UpdateData(room, id);
     });
   }
 
-  private UpdateData(room: Room, jobId: string): boolean {
+  private static UpdateData(room: Room, jobId: string): boolean {
     const jobDataRepo = new JobData(jobId);
     const jobData = jobDataRepo.GetData();
     if (!jobData.success) {

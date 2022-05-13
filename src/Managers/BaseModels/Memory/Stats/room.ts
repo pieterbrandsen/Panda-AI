@@ -49,7 +49,7 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
     return data;
   }
 
-  public GenerateMemoryData(): RoomStatsMemory {
+  public static GenerateMemoryData(): RoomStatsMemory {
     return {
       energyIncoming: {
         HarvestMineral: 0,
@@ -90,7 +90,7 @@ export default class RoomStatsMemoryData extends BaseStatsMemoryData {
   }
 
   public InitializeMemoryData(): CRUDResult<RoomStatsMemory> {
-    const data = this.GenerateMemoryData();
+    const data = RoomStatsMemoryData.GenerateMemoryData();
     const createResult = this.CreateMemoryData(data);
     return { data: createResult.data, success: createResult.success };
   }
